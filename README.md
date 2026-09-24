@@ -13,3 +13,4 @@ Each commit to this repository is either a prompt (+ reference data) or an agent
 - `ontology/` — normative OWL 2 ontology sources, and their own [README](ontology/README.md)
 - `reference/` — reference documents, data, and notes
 - `prompts/` — reusable prompts and prompt templates
+- `tools/` — supporting utilities, e.g. the CBAA spec extractor, and their own [README](tools/README.md)
