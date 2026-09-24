@@ -15,7 +15,7 @@ The principles governing this repository and anything built on it are set out in
 
 ### Repository Structure
 
-- `ontology/` — normative OWL 2 ontology sources, their [README](ontology/README.md), and the [design specification](ontology/design/design-spec.md)
+- `ontology/` — normative OWL 2 ontology sources, their [README](ontology/README.md), the [design specification](ontology/design/design-spec.md) and the [LATTICE integration specification](ontology/design/lattice-integration.md)
 - `reference/` — reference documents, data, and notes
 - `prompts/` — reusable prompts and prompt templates
-- `tools/` — supporting utilities, e.g. the CBAA spec extractor, and their own [README](tools/README.md). Its place here is open decision O1, since the principles exclude implementation code
+- `tools/` — tools that produce or check the specifications, e.g. the CBAA spec extractor, and their own [README](tools/README.md)

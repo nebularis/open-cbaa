@@ -15,11 +15,21 @@ At all times, the following files MUST be kept up to date with changes:
 
 DO NOT make design decisions unilaterally without consulting your user for architectural guidance.
 
+### Architecture Principles
+
+These govern all work in this repository. The [design specification](../ontology/design/design-spec.md#1-architecture-principles) is authoritative if the two ever differ.
+
+1. The ontological design is completed before a reference implementation is attempted. This repository holds semantic specifications and the tools used to produce and check them (`tools/`). It holds no implementation of the reference architecture.
+2. The ontological layers stand on their own. Software built on them is governed by their architecture and design, not the reverse.
+3. The reference architecture is technology-neutral until further notice.
+4. Clauses have meaning attached to them. How that meaning is produced is open, and its governance and assurance are outside this repository's scope.
+
 ### Repository Topology
 
 - `prompts/` contains reusable prompts and prompt templates 
 - `ontology/` owns semantic assets only: normative ontology sources, shapes, vocabularies, projections, semantic examples, semantic fixtures, and semantic documentation.
 - `reference/` contains reference documents, data, and notes to help you with your work
+- `tools/` contains tools that produce or check the specifications, such as source extraction. It holds no reference implementation
 
 You MAY write your own notes and memories to `reference` to help you with your work.
 

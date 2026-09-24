@@ -6,7 +6,9 @@ This is the first stratum: the Object Class Hierarchy, its Typing/Sub-Typing, an
 part-whole relation between them. The [design review](#design-review-cbaa-modules-m1m14)
 below assesses it against the CBAA module drafts (M1–M14) and proposes further strata. The
 [design specification](design/design-spec.md) turns that review into a concrete design, with
-the agreed architecture principles and a decision log. Neither is implemented yet.
+the agreed architecture principles and a decision log, and the
+[LATTICE integration specification](design/lattice-integration.md) covers how LATTICE is
+brought in and the description logic encoding. Neither is implemented yet.
 
 ## Files
 
@@ -260,5 +262,5 @@ No build pipeline yet. Modules are parsed with `rdflib`, merged with `owl:import
 
 ## Not yet modelled
 
-Everything in [Alignment gaps](#alignment-gaps). Lattice remains a reference only until open
-decision O2 in the design specification is settled.
+Everything in [Alignment gaps](#alignment-gaps). LATTICE is to be imported per the
+[integration specification](design/lattice-integration.md), whose §9 sets the order of work.

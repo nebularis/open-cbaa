@@ -18,7 +18,7 @@ As agreed. Numbering is normalised (the brief numbered two principles "2").
 
 | # | Principle |
 |---|---|
-| AP1 | This repository holds semantic specifications only and contains no implementation code. |
+| AP1 | The ontological design is completed before a reference implementation is attempted. This repository holds semantic specifications and the tools used to produce and check them (`tools/`). It holds no implementation of the reference architecture. |
 | AP2 | The ontological layers stand on their own. Software built on them is governed by their architecture and design, not the reverse. |
 | AP3 | The reference architecture is technology-neutral until further notice. |
 | AP4 | Clauses have meaning attached to them. How that meaning is produced (a controlled natural language such as InsurLE, LLM extraction with human validation, manual encoding) is open, and its governance and assurance are outside this repository's scope. |
@@ -197,8 +197,9 @@ Two things are missing from LATTICE's mechanism for this domain:
    against. "Europe A" or an insurable interest group means what it meant when the agreement
    was accepted, not what a later edition says.
 
-Proposed patch (§10, L3): a reified `SchemeBinding` carrying the contract, the edition, a scope
-and a temporal scope, with `boundScheme` retained as the unscoped default.
+Patched upstream (D10): `voc:SchemeBinding` carries the contract, the edition, zero or more
+`voc:BindingScope`s and a temporal scope, with `voc:boundScheme` retained as the unscoped
+default, and `voc:resolvedUnder` records the binding a record was resolved under.
 
 ### 4.3 Override
 
@@ -482,18 +483,18 @@ unsatisfiable-class defects (L1, L6).
 |---|---|---|
 | L1 | Quantification | **Defect.** `qnt:unresolvedReason` has domain `qnt:Comparison`, and `qnt:UnresolvedValue` requires one, so every unresolved value is inferred to be a Comparison, which is disjoint from Value. `UnresolvedValue` is unsatisfiable. Widen the domain to `Comparison ⊔ UnresolvedValue` |
 | L2 | Quantification | Derived rate spaces (its open question 4): a proportional value, ratio times a referenced base, for commission and fees as a percentage of GWP |
-| L3 | Quantification, Vocabulary | Calendar binding (its open question 2) and scoped scheme binding (§4.2): business-day extents converted against a jurisdiction's calendar, and bindings scoped by deployment and time |
+| L3 | Quantification, Vocabulary | Calendar binding (its open question 2): business-day extents converted against a jurisdiction's calendar. The scoped scheme binding part is done (D10) |
 | L4 | Foundation | The derived-artefact contract Quantification already depends on, reused for our compiled plane |
 | L5 | Quantification | Authored equivalents on a bound: one limit stated in several currencies without conversion |
 | L6 | Instrument | **Defect.** `Provision`, `Obligation` and `Qualifier` are subclasses of `Element` but listed with it in one `AllDisjointClasses`, so all three are unsatisfiable. Remove `Element` from the disjointness axiom |
 
-### 10.3 Recommendation
+### 10.3 Integration
 
-Import Foundation, Vocabulary and Quantification, pinned by `owl:versionIRI`, and contribute
-L1–L6 upstream. Keep the upper layers as reference until their fit is shown against CBAA
-content. Pinning plus a reasoner check on every import upgrade (which is how L1 and L6 were
-found) contains the stability risk. This reverses the earlier instruction not to build on
-LATTICE, so it is listed as an open decision.
+Decided (D7). How LATTICE is brought in, which layers are imported, how Open DARE uses their
+T-Box and assertions, the description logic encoding, toolchain reuse and the upstream changes
+still needed are specified in the [LATTICE integration specification](lattice-integration.md).
+It supersedes the table in §10.1 for Party, Eligibility, Instrument and Behaviour, whose fit
+against CBAA content it establishes, and replaces §10.2's list with its own §8.
 
 ## 11. Consequences for the Current Ontology
 
@@ -522,14 +523,14 @@ Not yet applied. Applying DP1 and DP2 to the files in this directory:
 | D3 | Vocabulary that changes often or varies by user lives in the A-Box. SKOS is the working choice | 2026-09-24 |
 | D4 | Authority is held as data and compiled, both (§6 is the design) | 2026-09-24 |
 | D5 | PROV-O alignment | 2026-09-24 |
+| D6 | AP1 permits the tools used to produce and check the specifications. Reference implementation waits for the ontological design (was O1) | 2026-09-24 |
+| D7 | LATTICE is imported. The mechanism is the subject of the integration specification (was O2) | 2026-09-24 |
+| D8 | Option C and the statement kinds of §3.3 (was O3) | 2026-09-24 |
+| D9 | Apply §11 to the current ontology (was O4). Sequenced after LATTICE is imported, since the reclassified schemes are `voc:` individuals (integration spec §9) | 2026-09-24 |
+| D10 | Scoped scheme binding patched upstream, LATTICE `65ac4a8` (was O5) | 2026-09-24 |
+| D11 | AP1–AP4 recorded in `.github/copilot-instructions.md` (was O6) | 2026-09-24 |
 
 ### Open
 
-| # | Question | Recommendation |
-|---|---|---|
-| O1 | `tools/cbaa_extract.py` is implementation code, which AP1 excludes | move it to a separate repository, keeping the extracted conventions in `reference/` |
-| O2 | Import LATTICE Foundation, Vocabulary and Quantification now, pinned, with patches | yes (§10.3) |
-| O3 | Option C and the statement kinds of §3.3 | adopt |
-| O4 | Apply §11 to the current ontology | yes, after O3 |
-| O5 | Scoped scheme binding: patch LATTICE Vocabulary or define locally | patch upstream (L3) |
-| O6 | Record AP1–AP4 in `.github/copilot-instructions.md` as well as here | yes |
+The integration specification's [open questions](lattice-integration.md#10-open-questions)
+(I1–I4).
