@@ -1,0 +1,145 @@
+@prefix : <https://nebularis.github.io/open-dare/ontology/lma-wim/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<https://nebularis.github.io/open-dare/ontology/lma-wim/core> a owl:Ontology ;
+    rdfs:label "LMA Wordings Information Model — Core"@en ;
+    rdfs:comment "Object Class Hierarchy (Contract, Component Group, Component, Data Element), the comprises part-whole relation, and the Typing-tier classes with no further Sub-Typing in the source model. Derived from reference/lma-wordings-information-model.md."@en ;
+    owl:versionInfo "0.1.0" .
+
+#################################################################
+# Annotation properties
+#################################################################
+
+:representationStatus a owl:AnnotationProperty ;
+    rdfs:label "representation status"@en ;
+    rdfs:comment "Marks a class whose instances currently exist only as document/analogue artifacts, pending future digitisation, per the yellow category in the LMA WIM legend."@en .
+
+#################################################################
+# Object Class Hierarchy
+#################################################################
+
+:Contract a owl:Class ;
+    rdfs:label "Contract"@en ;
+    skos:altLabel "CON" .
+
+:ComponentGroup a owl:Class ;
+    rdfs:label "Component Group"@en ;
+    skos:altLabel "CGP" ;
+    rdfs:comment "Nestable: a Component Group may comprise further Component Groups."@en .
+
+:Component a owl:Class ;
+    rdfs:label "Component"@en ;
+    skos:altLabel "CMP" .
+
+:DataElement a owl:Class ;
+    rdfs:label "Data Element"@en .
+
+[] a owl:AllDisjointClasses ;
+    owl:members ( :Contract :ComponentGroup :Component :DataElement ) .
+
+#################################################################
+# comprises (part-whole)
+#################################################################
+
+:comprises a owl:ObjectProperty, owl:TransitiveProperty ;
+    rdfs:label "comprises"@en ;
+    rdfs:comment "Transitive part-whole relation over the Object Class Hierarchy. Instance data should assert directlyComprises; comprises is closed under transitivity so skip-level containment (e.g. a Contract comprising a Data Element with no intervening Component Group) is entailed rather than asserted. Irreflexivity/asymmetry are declared on directlyComprises instead: OWL 2 DL forbids those characteristics on a transitive ('non-simple') property."@en .
+
+:isComprisedBy a owl:ObjectProperty, owl:TransitiveProperty ;
+    owl:inverseOf :comprises ;
+    rdfs:label "is comprised by"@en .
+
+:directlyComprises a owl:ObjectProperty, owl:IrreflexiveProperty, owl:AsymmetricProperty ;
+    rdfs:subPropertyOf :comprises ;
+    rdfs:label "directly comprises"@en ;
+    rdfs:comment "The direct edges of the Object Class Hierarchy, as drawn in the LMA WIM diagram. Assert this in instance data; leave the transitive closure to the reasoner."@en .
+
+:isDirectlyComprisedBy a owl:ObjectProperty, owl:IrreflexiveProperty, owl:AsymmetricProperty ;
+    rdfs:subPropertyOf :isComprisedBy ;
+    owl:inverseOf :directlyComprises ;
+    rdfs:label "is directly comprised by"@en .
+
+# Per-class closure of what each hierarchy level may comprise. Together these
+# restrictions are exactly closed under transitivity, so combining them with
+# comprises' TransitiveProperty declaration cannot derive an out-of-hierarchy
+# edge (e.g. Component comprising Component Group).
+
+:Contract rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty :comprises ;
+    owl:allValuesFrom [ a owl:Class ; owl:unionOf ( :ComponentGroup :Component :DataElement ) ]
+] .
+
+:ComponentGroup rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty :comprises ;
+    owl:allValuesFrom [ a owl:Class ; owl:unionOf ( :ComponentGroup :Component :DataElement ) ]
+] .
+
+:Component rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty :comprises ;
+    owl:allValuesFrom [ a owl:Class ; owl:unionOf ( :Component :DataElement ) ]
+] .
+
+:DataElement rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty :comprises ;
+    owl:allValuesFrom owl:Nothing
+] .
+
+#################################################################
+# Cross-cutting mixins (the Agreement/Policy/Both legend colours)
+#################################################################
+
+:AgreementRelated a owl:Class ;
+    rdfs:label "Agreement-related"@en ;
+    rdfs:comment "Cross-cutting mixin for Typing/Sub-Typing classes associated with Agreement-type contracts, per the blue-dotted category in the LMA WIM legend."@en .
+
+:PolicyRelated a owl:Class ;
+    rdfs:label "Policy-related"@en ;
+    rdfs:comment "Cross-cutting mixin for Typing/Sub-Typing classes associated with Policy-type contracts, per the red-dashed category in the LMA WIM legend."@en .
+
+#################################################################
+# Component Group typing (no further Sub-Typing in the source)
+#################################################################
+
+:Module a owl:Class ;
+    rdfs:subClassOf :ComponentGroup, :AgreementRelated ;
+    rdfs:label "Module"@en .
+
+:EndorsementOrComplexComponent a owl:Class ;
+    rdfs:subClassOf :ComponentGroup, :PolicyRelated ;
+    rdfs:label "Endorsement / Complex Component"@en .
+
+:Schedule a owl:Class ;
+    rdfs:subClassOf :ComponentGroup, :AgreementRelated, :PolicyRelated ;
+    rdfs:label "Schedule"@en ;
+    rdfs:comment "Initially scoped to CBAA (Computable Binding Authority Agreement) only, per LMA WIM."@en .
+
+[] a owl:AllDisjointClasses ;
+    owl:members ( :Module :EndorsementOrComplexComponent :Schedule ) .
+
+#################################################################
+# Component typing (no further Sub-Typing in the source; Clause,
+# which does branch further, is declared in clause.ttl)
+#################################################################
+
+:Definition a owl:Class ;
+    rdfs:subClassOf :Component ;
+    rdfs:label "Definition"@en ;
+    skos:altLabel "DEF" .
+
+:SystemGuidance a owl:Class ;
+    rdfs:subClassOf :Component ;
+    rdfs:label "System Guidance"@en ;
+    skos:altLabel "SYS" .
+
+:TechnicalGuidance a owl:Class ;
+    rdfs:subClassOf :Component ;
+    rdfs:label "Technical Guidance"@en ;
+    skos:altLabel "TEC" .

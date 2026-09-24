@@ -1,0 +1,193 @@
+@prefix : <https://nebularis.github.io/open-dare/ontology/lma-wim/clause#> .
+@prefix core: <https://nebularis.github.io/open-dare/ontology/lma-wim/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+<https://nebularis.github.io/open-dare/ontology/lma-wim/clause> a owl:Ontology ;
+    rdfs:label "LMA Wordings Information Model — Clause"@en ;
+    rdfs:comment "Clause branch of the Component typing: Scope of Authority Clause, Scope of Coverage Clause, Contractual Provision, and their Sub-Typing. Also carries the document/analogue-for-now artifacts (Schedule document, Contract Jacket, Certificate of Insurance, IPID, List of Benefits, Notice, Assessment) shown adjacent to Contractual Provision in the source diagram; no formal subtype or comprises relation to Contractual Provision is asserted for these pending clarification of the intended link, but core:representationStatus marks each as document-analogue for now."@en ;
+    owl:versionInfo "0.1.0" ;
+    owl:imports <https://nebularis.github.io/open-dare/ontology/lma-wim/core> .
+
+#################################################################
+# Clause
+#################################################################
+
+:Clause a owl:Class ;
+    rdfs:subClassOf core:Component, core:AgreementRelated, core:PolicyRelated ;
+    rdfs:label "Clause"@en ;
+    skos:altLabel "CLS" ;
+    rdfs:comment "Nestable: a Clause may comprise further Clauses (via core:comprises)."@en .
+
+[] a owl:AllDisjointClasses ;
+    owl:members ( core:Definition core:SystemGuidance core:TechnicalGuidance :Clause ) .
+
+:ScopeOfAuthorityClause a owl:Class ;
+    rdfs:subClassOf :Clause, core:AgreementRelated ;
+    rdfs:label "Scope of Authority Clause"@en .
+
+:ScopeOfCoverageClause a owl:Class ;
+    rdfs:subClassOf :Clause, core:PolicyRelated ;
+    rdfs:label "Scope of Coverage Clause"@en .
+
+:ContractualProvision a owl:Class ;
+    rdfs:subClassOf :Clause, core:AgreementRelated, core:PolicyRelated ;
+    rdfs:label "Contractual Provision"@en .
+
+[] a owl:AllDisjointClasses ;
+    owl:members ( :ScopeOfAuthorityClause :ScopeOfCoverageClause :ContractualProvision ) .
+
+#################################################################
+# Scope of Authority Clause
+#################################################################
+
+:GrantOfAuthority a owl:Class ;
+    rdfs:subClassOf :ScopeOfAuthorityClause ;
+    rdfs:label "Grant of Authority"@en .
+
+#################################################################
+# Scope of Coverage Clause
+#################################################################
+
+# Grants of Coverage and Limitations are deliberately NOT disjoint: the
+# source diagram lists "Exclusion & Limited Writeback" and "Affirmation &
+# Limited Exclusion" under both groupings, so their leaf classes below are
+# subclasses of both. Asserting disjointness here would make those shared
+# leaves unsatisfiable.
+
+:GrantsOfCoverage a owl:Class ;
+    rdfs:subClassOf :ScopeOfCoverageClause ;
+    rdfs:label "Grants of Coverage"@en .
+
+:Limitations a owl:Class ;
+    rdfs:subClassOf :ScopeOfCoverageClause ;
+    rdfs:label "Limitations"@en .
+
+:Conditions a owl:Class ;
+    rdfs:subClassOf :ScopeOfCoverageClause ;
+    rdfs:label "Conditions"@en .
+
+:InsuringClause a owl:Class ;
+    rdfs:subClassOf :GrantsOfCoverage ;
+    rdfs:label "Insuring Clause"@en .
+
+:Affirmation a owl:Class ;
+    rdfs:subClassOf :GrantsOfCoverage ;
+    rdfs:label "Affirmation"@en .
+
+:AffirmationAndLimitedExclusion a owl:Class ;
+    rdfs:subClassOf :GrantsOfCoverage, :Limitations ;
+    rdfs:label "Affirmation and Limited Exclusion"@en .
+
+:ExclusionAndLimitedWriteback a owl:Class ;
+    rdfs:subClassOf :GrantsOfCoverage, :Limitations ;
+    rdfs:label "Exclusion and Limited Writeback"@en .
+
+:Exclusion a owl:Class ;
+    rdfs:subClassOf :Limitations ;
+    rdfs:label "Exclusion"@en .
+
+:LimitsOrSubLimits a owl:Class ;
+    rdfs:subClassOf :Limitations ;
+    rdfs:label "Limits (or Sub-limits)"@en .
+
+:Excesses a owl:Class ;
+    rdfs:subClassOf :Limitations ;
+    rdfs:label "Excess(es)"@en .
+
+:Deductible a owl:Class ;
+    rdfs:subClassOf :Limitations ;
+    rdfs:label "Deductible"@en .
+
+:BareOrOrdinaryCondition a owl:Class ;
+    rdfs:subClassOf :Conditions ;
+    rdfs:label "Bare / Ordinary Condition"@en .
+
+:ConditionPrecedent a owl:Class ;
+    rdfs:subClassOf :Conditions ;
+    rdfs:label "Condition Precedent"@en .
+
+:Warranty a owl:Class ;
+    rdfs:subClassOf :Conditions ;
+    rdfs:label "Warranty"@en .
+
+[] a owl:AllDisjointClasses ;
+    owl:members ( :BareOrOrdinaryCondition :ConditionPrecedent :Warranty ) .
+
+#################################################################
+# Contractual Provision
+#################################################################
+
+:Claims a owl:Class ; rdfs:subClassOf :ContractualProvision ; rdfs:label "Claims"@en .
+:Complaints a owl:Class ; rdfs:subClassOf :ContractualProvision ; rdfs:label "Complaints"@en .
+:Service a owl:Class ; rdfs:subClassOf :ContractualProvision ; rdfs:label "Service"@en .
+
+:Payment a owl:Class ;
+    rdfs:subClassOf :ContractualProvision ;
+    rdfs:label "Payment"@en ;
+    rdfs:comment "e.g. Premiums"@en .
+
+:Cancellation a owl:Class ; rdfs:subClassOf :ContractualProvision ; rdfs:label "Cancellation"@en .
+
+:InformationOrNoticeProvision a owl:Class ;
+    rdfs:subClassOf :ContractualProvision ;
+    rdfs:label "Information / Notice"@en ;
+    rdfs:comment "e.g. Privacy"@en .
+
+:Calculation a owl:Class ; rdfs:subClassOf :ContractualProvision ; rdfs:label "Calculation"@en .
+:ServiceOfSuit a owl:Class ; rdfs:subClassOf :ContractualProvision ; rdfs:label "Service of Suit"@en .
+:SeveralLiability a owl:Class ; rdfs:subClassOf :ContractualProvision ; rdfs:label "Several Liability"@en .
+:Sanctions a owl:Class ; rdfs:subClassOf :ContractualProvision ; rdfs:label "Sanctions"@en .
+:Communication a owl:Class ; rdfs:subClassOf :ContractualProvision ; rdfs:label "Communication"@en .
+
+[] a owl:AllDisjointClasses ;
+    owl:members ( :Claims :Complaints :Service :Payment :Cancellation
+                  :InformationOrNoticeProvision :Calculation :ServiceOfSuit
+                  :SeveralLiability :Sanctions :Communication ) .
+
+#################################################################
+# Document/analogue-for-now artifacts (yellow, in the source diagram)
+#################################################################
+
+:ScheduleDocument a owl:Class ;
+    rdfs:subClassOf core:Component ;
+    rdfs:label "Schedule document"@en ;
+    core:representationStatus "document" .
+
+:ContractJacket a owl:Class ;
+    rdfs:subClassOf core:Component ;
+    rdfs:label "Contract Jacket"@en ;
+    core:representationStatus "document" .
+
+:CertificateOfInsurance a owl:Class ;
+    rdfs:subClassOf core:Component ;
+    rdfs:label "Certificate of Insurance"@en ;
+    core:representationStatus "document" .
+
+:IPID a owl:Class ;
+    rdfs:subClassOf core:Component ;
+    rdfs:label "IPID"@en ;
+    rdfs:comment "Insurance Product Information Document."@en ;
+    core:representationStatus "document" .
+
+:ListOfBenefits a owl:Class ;
+    rdfs:subClassOf core:Component ;
+    rdfs:label "List of Benefits"@en ;
+    core:representationStatus "document" .
+
+:NoticeDocument a owl:Class ;
+    rdfs:subClassOf core:Component ;
+    rdfs:label "Notice"@en ;
+    core:representationStatus "document" .
+
+:Assessment a owl:Class ;
+    rdfs:subClassOf core:Component ;
+    rdfs:label "Assessment"@en ;
+    core:representationStatus "document" .
+
+[] a owl:AllDisjointClasses ;
+    owl:members ( :ScheduleDocument :ContractJacket :CertificateOfInsurance
+                  :IPID :ListOfBenefits :NoticeDocument :Assessment ) .
