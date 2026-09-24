@@ -3,8 +3,8 @@
 Structural ontology for the LMA Wordings Information Model (WIM), derived from
 [reference/lma-wordings-information-model.md](../reference/lma-wordings-information-model.md).
 This is the first stratum: the Object Class Hierarchy, its Typing/Sub-Typing, and the
-part-whole relation between them. The [design review](#design-review-cbaa-modules-m1m8)
-below assesses it against the CBAA module drafts (M1–M8) and proposes further strata, which
+part-whole relation between them. The [design review](#design-review-cbaa-modules-m1m14)
+below assesses it against the CBAA module drafts (M1–M14) and proposes further strata, which
 are not yet implemented.
 
 ## Files
@@ -49,11 +49,14 @@ forbids. Profiles for later strata are discussed under [Proposed strata](#propos
 - **`de:linksTo`** (Reference to Definition, internal object, external document or Table) is
   an object property, not a subtype relation.
 
-## Design review (CBAA modules M1–M8)
+## Design review (CBAA modules M1–M14)
 
 Evidence, with clause references, is in
 [reference/cbaa-spec-observations.md](../reference/cbaa-spec-observations.md). Lattice was
-consulted for comparison only.
+consulted for comparison only. M7 (Evidence of Policies Bound), M11 (Management of Monies)
+and M15 (Definitions) are not yet available. Other modules reference M7 and M11 often, so
+the review assumes M7 governs policy documents and M11 monetary flows and settlement, and
+treats both as unverified.
 
 ### Intended use
 
@@ -76,6 +79,9 @@ wording is a projection of the model, and the renderer needs the governance of a
 
 ### What the current layer enables and prevents
 
+- The WIM structure holds across M1–M14. Nested component groups (CG09.1–CG09.3 inside
+  CG09), conditional components and sub-components all fit the `comprises` restrictions, and
+  no module needs a component to contain a component group.
 - It supports consistency checking of part-whole typing, transitive containment queries,
   and a shared WIM terminology.
 - Every class is primitive, so the reasoner infers little beyond what is asserted. DL pays
@@ -100,20 +106,27 @@ wording is a projection of the model, and the renderer needs the governance of a
 
 | Spec concept | Source | Current ontology |
 |---|---|---|
-| Inclusion modes (mandatory, variation slot, optional, conditional) with conditions | all modules | absent |
-| Governing variables as the vocabulary of conditions (GOV 3, 4, 7/8, 20/21, 79–81) | M4, M5 | `GoverningVariable` class only |
-| Variable declarations: stable id, value space, population method, reuse across clauses | endnotes, all modules | absent |
-| Referenced objects: Table Objects, Document Objects (annexes, not digitised), module and component cross-references | cbaa.md, all modules | placeholder classes |
+| Inclusion modes (mandatory, variation slot, optional, conditional) at every level from component group to inline text, with conditions and slot-to-slot dependencies | all modules | absent |
+| Governing variables as the vocabulary of conditions (GOV 3, 4, 7/8, 20/21, 79–81), some sourced from questions to the Contract Creator | M4, M5, M9 | `GoverningVariable` class only |
+| Variable declarations: stable id, agreement-wide scope shared across modules, value space, population method, derived defaults, min/max and cross-variable constraints, composite and multi-valued types | endnotes, all modules | absent |
+| Wording matrices keyed by governing variables (territory × authority level) and jurisdiction-scoped defined terms | M9 table | absent |
+| Referenced objects: Table Objects, Document Objects (annexes, not digitised), module and component cross-references, external instruments incorporated with options (EU SCC) | cbaa.md, M13, all modules | placeholder classes |
 | Guidance Objects as one family (Defined Terms, Technical, System) | cbaa.md | three unrelated classes |
-| Ordered inline composition of text objects, dynamic numbering, object ids `CGnn`/`Cnn.X`/`SCnn.X.Y` | M5, M6, M8 | absent |
-| Table templates: rows with optionality and rendering fragments, Agreement Segments as columns | M5 base tables | Dynamic/Static only |
-| Parties and roles (Coverholder, Lead/Follow Insurer by platform, Broker, Producing Intermediary, claims roles, Regulatory Body) | M1, M3, M4, M8, Insurer Capacity Table | absent |
-| Agreement Segment as the unit of authority, remuneration and claims arrangements | M5, M6, M8 | absent |
-| Controlled vocabularies (territory to city, insurable interest, perils, claims basis, level of authority), CDR-aligned | M5 tables | absent |
-| Jurisdiction tags and regulatory sources (Crystal+, PBQA, bulletins) on clauses | M4, M5 | absent |
-| Identity criteria: new Coverholder entity, Lead Insurer or broker number means a new Agreement | M3 3.2.1 | absent |
+| Ordered inline composition of text objects, dynamic numbering, object ids `CGnn`/`Cnn.X`/`SCnn.X.Y` | M5, M6, M8, M9, M10 | absent |
+| Table templates: rows with optionality and rendering fragments, segments or arrangements as columns, derived tables (policy data specification) | M5, M10 | Dynamic/Static only |
+| Activities as a shared vocabulary (quote, bind, extend, cancel and replace, FNOL, complaints, redress, reporting, sub-delegation) | M4, M8, M9, M10, M12, M14 | absent |
+| Authority grants per activity with level, scope (segment, territory, trading location) and limits | M5, M8, M9, M14 | absent |
+| Parties and roles, including natural persons, assigned per segment, data stream, territory or activity (Coverholder, Lead/Follow Insurer by platform, Broker, claims, reporting, data protection roles) | M1, M3, M4, M8, M10, M13, tables | absent |
+| Agreement Segment as the unit of authority, remuneration, claims and reporting arrangements | M5, M6, M8, M10 | absent |
+| Controlled vocabularies (territory to city, regulatory territory groupings, insurable interest, perils, claims basis, level of authority, data items), CDR and v5.2 aligned | M5, M9, M10 | absent |
+| Quantities: money with ISO currency, durations with business or calendar basis, percentages of a base, recurrence | M3, M6, M8, M10, M12, M13 | absent |
+| Jurisdiction tags and regulatory sources (Crystal+, PBQA, bulletins, LMA wordings) on clauses | M4, M5, M10 | absent |
+| Identity criteria: new Coverholder entity, Lead Insurer or broker number means a new Agreement | M3 3.2.1, M12 12.17.1 | absent |
 | Versions, acceptance events, agreed, effective and operational dates | M2, M3 | absent |
-| Obligations, permissions, prohibitions with bearer, trigger and deadline | all modules | absent |
+| Lifecycle states with state-specific authority, event, power, timer and notice transitions | M12 | absent |
+| Obligations, prohibitions, permissions and powers with bearer, trigger, deadline, recurrence and survival | all modules | absent |
+| Precedence rules between the Agreement, annexes, laws and versions | M1, M3, M12, M13 | absent |
+| Registers and data specifications with required fields | M9, M10 | absent |
 
 ### Architectural and operational semantics
 
@@ -143,20 +156,46 @@ same T-Box would serve as schema, with inferences materialised on load and valid
 write, and no reasoner on the request path. The proposal below supports both by keeping
 conditions and templates as data.
 
+### Wording and meaning
+
+M9–M14 show many wording variants that express the same norm with a different scope
+reference (M9 9.2.8A and B differ only in whether authority is agreement-wide or territory
+specific, M10 10.4A and B only in single vs multiple reporting arrangements). The library
+should therefore keep wording (text objects, variants, variables) separate from meaning
+(definitions, authority grants, obligations, permissions, powers), linked by an `expresses`
+relation. Wording is what the renderer produces and what drafters govern. Meaning is what
+criteria and behaviour evaluate. Several variants can express one norm, and a norm can be
+checked for conflicts regardless of how it is worded (the drafters already flag conflicts,
+e.g. M14 14.19 vs 14.23.1).
+
+Most meaning is organised around activities. The same activity vocabulary is referenced by:
+
+- authority grants: activity, level, scope and limits (M5 underwriting, M8 claims, M9
+  complaints with redress limits, M14 sub-delegation)
+- responsibilities assigned to named people (M4 table)
+- role assignments per segment or data stream (M10)
+- lifecycle-state overlays, where each M12 state lists what the Coverholder has or has no
+  authority to do
+
+The effective authority at a point in time is the grants for the activity, restricted by the
+current lifecycle state, and extended by any special acceptances.
+
 ### Proposed strata
 
 | Stratum | Content | Profile and mechanism |
 |---|---|---|
 | foundation | persistent identity vs version, provenance, bitemporal scope, governance state | OWL 2 DL, SHACL, PROV-O alignment |
-| vocabulary | territories, insurable interests, perils, bases, levels of authority, CDR mappings | SKOS, with an optional OWL 2 EL projection for classification over large hierarchies |
+| quantification | money with ISO currency, durations with business or calendar basis, business calendars by jurisdiction, percentages of a base, recurrence | OWL 2 DL and SHACL, arithmetic in compiled rules |
+| vocabulary | territories and regulatory groupings, insurable interests, perils, bases, activities, levels of authority, data items (v5.2), CDR mappings | SKOS, with an optional OWL 2 EL projection for classification over large hierarchies |
 | wim | this stratum | OWL 2 DL |
-| library | text object IR, inclusion modes, variation slots, conditions over governing variables, variable declarations, table templates, tags, regulatory sources, materiality designation | OWL 2 DL and SHACL, conditions held as data |
-| party | parties, roles, capacity participation, segments | OWL 2 DL and SHACL |
+| library | wording: text object IR, inclusion modes at every level, variation slots and their dependencies, conditions over governing variables, Contract Creator questions, variable declarations, wording matrices, table templates, tags, regulatory sources, materiality designation, external instruments with options | OWL 2 DL and SHACL, conditions held as data |
+| norms | meaning: jurisdiction-scoped definitions, authority grants, obligations, prohibitions, permissions and powers (bearer, counterparty, activity, scope, trigger, deadline, recurrence, survival), precedence rules | OWL 2 DL and SHACL |
+| party | parties, natural persons, role assignments scoped by segment, territory, data stream or activity with validity periods, capacity participation, segments | OWL 2 DL and SHACL, role assignments reified |
 | instance | agreement identity and versions, selections, bindings, amendments, acceptances | OWL 2 DL and SHACL |
-| criteria | authority envelopes per segment, match strategies, three-valued outcomes (permitted, denied, undetermined, where undetermined maps to referral) | conditions as data compiled for runtime, DL at design time |
-| behaviour | obligations (bearer, counterparty, trigger, deadline), state spaces for agreement, amendment, referral and FNOL lifecycles | declarations in OWL, compiled state machines, occurrences recorded as events |
-| market mix-ins | Lloyd's (syndicates, year of account, annual transfer, LIC, Crystal+), US surplus lines, others | modules adding axioms, shapes and conditions to market-neutral strata |
-| projections | CDR and ACORD mappings, reporting subsets, API schemas | generated |
+| criteria | evaluation of authority grants for any activity, with lifecycle-state overlays and special acceptances, match strategies, three-valued outcomes (permitted, denied, undetermined, where undetermined maps to referral) | conditions as data compiled for runtime, DL at design time |
+| behaviour | state spaces for agreement (M12), amendment, referral, FNOL and complaints lifecycles, with event, power, timer and notice transitions, deemed-receipt rules | declarations in OWL, compiled state machines, occurrences recorded as events |
+| market mix-ins | Lloyd's (syndicates, year of account, annual transfer, LIC, Crystal+, v5.2 reporting), US surplus lines, Australian Code of Practice, others | modules adding axioms, shapes and conditions to market-neutral strata |
+| projections | CDR and ACORD mappings, derived data specifications, reporting subsets, API schemas | generated |
 
 Mix-ins are needed because the CBAA is intended for company-only binders as well as Lloyd's.
 Lloyd's-specific content (annual transfer, LIC provisions, Crystal+ checks) should import the
@@ -178,25 +217,43 @@ DL reasoning has design-time uses that procedural code handles poorly:
 - **Condition checks.** The conditions of a variation slot should be pairwise disjoint and
   jointly exhaustive over the governing variables' value spaces, which is a satisfiability
   question.
+- **Norm conflict checks.** With norms classified by bearer, activity and scope, an
+  obligation and a prohibition over overlapping scopes are detectable before publication.
+  The same classification finds duplicated provisions across modules (M1 1.19 and M14 14.4).
 
 ### State and executability
 
 State spaces (agreement lifecycle, amendment approval, special acceptance, prior-submit
-referral, FNOL handling) are declared in the T-Box as ground truth and executed by compiled
-state machines in operational services. The A-Box records state occupancy and transitions as
-bitemporal events for audit and market queries. It is not the execution mechanism. This
-keeps reasoning off the request path and keeps the graph an evidential record.
+referral, FNOL and complaints handling) are declared in the T-Box as ground truth and
+executed by compiled state machines in operational services. The A-Box records state
+occupancy and transitions as bitemporal events for audit and market queries. It is not the
+execution mechanism. This keeps reasoning off the request path and keeps the graph an
+evidential record.
+
+M12 confirms this split and adds three requirements:
+
+- **State-dependent authority.** Each state carries its own authority overlay, so the state
+  machine and the criteria evaluation must share the activity vocabulary.
+- **Transitions from any party.** Transitions can be triggered by events concerning any
+  party, including follow insurers and the broker, by powers a party chooses to exercise,
+  and by timers measured in business or calendar days.
+- **Guards over operational data.** Run-off ends only when every policy has expired and every
+  claim is resolved, which is an aggregate over operational data. Guards of this kind are
+  evaluated in the operational tier and reported to the state machine as events.
 
 ### Decisions needed before implementation
 
-1. Next increment: library and party strata first (they unblock authoring and conditions),
-   or foundation first.
-2. Criteria: conditions as data evaluated by an engine, per-agreement T-Box compilation, or
+1. Next increment. Vocabulary and quantification now look like the right starting point,
+   since every other stratum references activities, territories, roles, money and durations.
+   The alternatives are library and party first, or foundation first.
+2. Wording and meaning: adopt the separation above, with norms as a stratum of their own, or
+   keep meaning implicit in the wording until criteria are built.
+3. Criteria: conditions as data evaluated by an engine, per-agreement T-Box compilation, or
    both (data for runtime, compiled classes for design-time checks as proposed above).
-3. Vocabularies: SKOS concept schemes or OWL class hierarchies, and which CDR release is
-   the source of truth.
-4. Ordering of text nodes: `rdf:List` or an explicit sequence index.
-5. External alignment: PROV-O and OWL-Time, or minimal local terms (Lattice aligns with
+4. Vocabularies: SKOS concept schemes or OWL class hierarchies, and which CDR and v5.2
+   releases are the source of truth.
+5. Ordering of text nodes: `rdf:List` or an explicit sequence index.
+6. External alignment: PROV-O and OWL-Time, or minimal local terms (Lattice aligns with
    PROV-O and declines OWL-Time).
 
 ## Validation
