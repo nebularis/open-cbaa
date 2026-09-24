@@ -17,10 +17,10 @@
 #################################################################
 
 :Clause a owl:Class ;
-    rdfs:subClassOf core:Component, core:AgreementRelated, core:PolicyRelated ;
+    rdfs:subClassOf core:Component ;
     rdfs:label "Clause"@en ;
     skos:altLabel "CLS" ;
-    rdfs:comment "Nestable: a Clause may comprise further Clauses (via core:comprises)."@en .
+    rdfs:comment "Nestable: a Clause may comprise further Clauses (via core:comprises). The source marks Clause as relevant to both Agreements and Policies because its sub-types span both. The mixins are asserted on the sub-types, not here, since asserting them on Clause would make every sub-type (e.g. Scope of Coverage Clause) inherit both."@en .
 
 [] a owl:AllDisjointClasses ;
     owl:members ( core:Definition core:SystemGuidance core:TechnicalGuidance :Clause ) .
