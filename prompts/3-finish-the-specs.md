@@ -1,0 +1,1 @@
+More of the specs (up to M14) have been added to the `.copilot​/` directory. Please process them and ensure the design we have so far remains viable for the planned universe.
