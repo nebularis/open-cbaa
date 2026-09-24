@@ -4,8 +4,9 @@ Structural ontology for the LMA Wordings Information Model (WIM), derived from
 [reference/lma-wordings-information-model.md](../reference/lma-wordings-information-model.md).
 This is the first stratum: the Object Class Hierarchy, its Typing/Sub-Typing, and the
 part-whole relation between them. The [design review](#design-review-cbaa-modules-m1m14)
-below assesses it against the CBAA module drafts (M1–M14) and proposes further strata, which
-are not yet implemented.
+below assesses it against the CBAA module drafts (M1–M14) and proposes further strata. The
+[design specification](design/design-spec.md) turns that review into a concrete design, with
+the agreed architecture principles and a decision log. Neither is implemented yet.
 
 ## Files
 
@@ -182,6 +183,11 @@ current lifecycle state, and extended by any special acceptances.
 
 ### Proposed strata
 
+The design specification refines this table: meaning as attached statements
+([§3](design/design-spec.md#3-what-a-clause-expresses)), vocabulary tiers and scoped binding
+([§4](design/design-spec.md#4-vocabulary)), and quantification taken from LATTICE
+([§5](design/design-spec.md#5-quantification-evaluation-of-lattice)).
+
 | Stratum | Content | Profile and mechanism |
 |---|---|---|
 | foundation | persistent identity vs version, provenance, bitemporal scope, governance state | OWL 2 DL, SHACL, PROV-O alignment |
@@ -241,20 +247,10 @@ M12 confirms this split and adds three requirements:
   claim is resolved, which is an aggregate over operational data. Guards of this kind are
   evaluated in the operational tier and reported to the state machine as events.
 
-### Decisions needed before implementation
+### Decisions
 
-1. Next increment. Vocabulary and quantification now look like the right starting point,
-   since every other stratum references activities, territories, roles, money and durations.
-   The alternatives are library and party first, or foundation first.
-2. Wording and meaning: adopt the separation above, with norms as a stratum of their own, or
-   keep meaning implicit in the wording until criteria are built.
-3. Criteria: conditions as data evaluated by an engine, per-agreement T-Box compilation, or
-   both (data for runtime, compiled classes for design-time checks as proposed above).
-4. Vocabularies: SKOS concept schemes or OWL class hierarchies, and which CDR and v5.2
-   releases are the source of truth.
-5. Ordering of text nodes: `rdf:List` or an explicit sequence index.
-6. External alignment: PROV-O and OWL-Time, or minimal local terms (Lattice aligns with
-   PROV-O and declines OWL-Time).
+Decisions taken and still open are recorded in the design specification's
+[decision log](design/design-spec.md#12-decision-log).
 
 ## Validation
 
@@ -264,4 +260,5 @@ No build pipeline yet. Modules are parsed with `rdflib`, merged with `owl:import
 
 ## Not yet modelled
 
-Everything in [Alignment gaps](#alignment-gaps). Lattice remains a reference only.
+Everything in [Alignment gaps](#alignment-gaps). Lattice remains a reference only until open
+decision O2 in the design specification is settled.

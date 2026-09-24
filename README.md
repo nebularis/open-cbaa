@@ -8,9 +8,14 @@ An open standards based exploration of Delegated (Binding) Authority, as realise
 
 Each commit to this repository is either a prompt (+ reference data) or an agentic response, updating artefacts in the repository. Each gen-ai commit will bear the model and (if used) tool-chain and other relevant information.
 
+### Architecture Principles
+
+The principles governing this repository and anything built on it are set out in the
+[design specification](ontology/design/design-spec.md#1-architecture-principles).
+
 ### Repository Structure
 
-- `ontology/` — normative OWL 2 ontology sources, and their own [README](ontology/README.md)
+- `ontology/` — normative OWL 2 ontology sources, their [README](ontology/README.md), and the [design specification](ontology/design/design-spec.md)
 - `reference/` — reference documents, data, and notes
 - `prompts/` — reusable prompts and prompt templates
-- `tools/` — supporting utilities, e.g. the CBAA spec extractor, and their own [README](tools/README.md)
+- `tools/` — supporting utilities, e.g. the CBAA spec extractor, and their own [README](tools/README.md). Its place here is open decision O1, since the principles exclude implementation code
