@@ -5,7 +5,7 @@ Version 0.2, draft for review. Nothing here has been applied to the `*.ttl` file
 
 Inputs: the CBAA module drafts M1–M14 (evidence in
 [reference/cbaa-spec-observations.md](../../reference/cbaa-spec-observations.md)), the
-[design review](../README.md#design-review-cbaa-modules-m1m14), the MERIDIAN CSO, FBO and
+[design review](../../ontology/README.md#design-review-cbaa-modules-m1m14), the MERIDIAN CSO, FBO and
 unified architecture documents, the SPC description logic encoding and its reference
 architecture, and the LATTICE Foundation, Vocabulary, Quantification and Instrument layers and
 RDF/SPARQL Operational Patterns Guide (commit `558650b`). LATTICE facts in §5 and §10 are
