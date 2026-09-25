@@ -4,7 +4,7 @@ Utilities that support the semantic work in `ontology/`. They are not part of an
 
 ## cbaa_extract.py
 
-Renders the CBAA module drafts and table files as annotated plain text, so they can be read,
+Renders CBAA module drafts and table files as annotated plain text, so they can be read,
 searched and diffed without Word or Excel. Python 3.9+, standard library only.
 
 ```bash
