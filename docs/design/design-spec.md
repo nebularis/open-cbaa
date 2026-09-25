@@ -22,7 +22,7 @@ As agreed. Numbering is normalised (the brief numbered two principles "2").
 | AP1 | The ontological design is completed before a reference implementation is attempted. This repository holds semantic specifications and the tools used to produce and check them (`tools/`). It holds no implementation of the reference architecture. |
 | AP2 | The ontological layers stand on their own. Software built on them is governed by their architecture and design, not the reverse. |
 | AP3 | The reference architecture is technology-neutral until further notice. |
-| AP4 | Clauses have meaning attached to them. How that meaning is produced (a controlled natural language such as InsurLE, LLM extraction with human validation, manual encoding) is open, and its governance and assurance are outside this repository's scope. |
+| AP4 | Clauses have meaning attached to them. How that meaning is produced (a controlled natural language such as InsurLE, LLM extraction with human validation, manual encoding) is open, and its governance and assurance are outside this repository's scope. The vision for producing it is §3.7. |
 
 ## 2. Design Principles
 
@@ -171,6 +171,54 @@ These are distinct and must not share a mechanism:
 | Evaluated over | governing variables of the agreement | operational facts (a complaint, a policy, a claim) |
 | Evaluated | once, at assembly and on amendment | at runtime, per event |
 | Example | M1 1.6.3.1 included only if a broker is engaged | M9 9.2.10 refer if redress would exceed authority |
+
+### 3.7 How meaning is produced
+
+Vision, not implemented in this repository (AP4). It is recorded so the meaning stratum is
+designed as the target of both routes below, and so plans and ideas can refer to one account.
+
+Two routes, complementary rather than competing:
+
+| | Controlled natural language | Machine extraction |
+|---|---|---|
+| Source | wording drafted in InsurLE, a subset of English defined by John Cummins et al. that compiles to a Prolog-like logic | wording as drafted today in natural language, and documents outside the library (policy wordings, bespoke clauses) |
+| Route | InsurLE's compiled logic, mapped to statements | an LLM, given one small chunk of text and a packaged domain ontology, proposes statements |
+| Character | deterministic compilation of what the drafter wrote | probabilistic, so every proposal is reviewed |
+| Fits | new and redrafted library wording | the existing library, legacy wordings, bespoke free text |
+
+Both converge on the statement kinds and parameters of §3.3 to §3.5. Where both exist for one
+wording object, each checks the other, and a disagreement is a signal for review.
+
+Machine extraction is being developed around LATTICE, where MORK already maps external schemas
+to domain ontologies using LLMs. Extraction of whole contracts into the MERIDIAN ontologies has
+given high-quality OWL, but at about USD 300 per contract. The techniques under investigation to
+make it viable:
+
+- **structure first**: pull the document apart before extraction, so each call sees one text
+  object and its variables. The WIM decomposition (Contract to Data Element) is that structure
+- **packaged ontologies**: LATTICE's MORK Teaching Pack technique, generalised so the authors of
+  any domain ontology can package it for extraction
+- **Graph RAG** over the contract as it is ingested, to answer questions about its state so far
+  (defined terms, variables, earlier clauses)
+
+§3.4 amortises the cost further. Meaning is attached once per library wording object version,
+so the standard language is extracted once for the market, and per-contract extraction is
+limited to bespoke clauses.
+
+What the vision requires of this design:
+
+1. **Output in LATTICE's own terms.** Parameters as Quantification quantities, bounds and ranges
+   (§3.5), scopes as Eligibility admission profiles and conditions (integration spec §4.5).
+   Output in that form enters the compilation pipeline (§6.5) unchanged, which makes it the
+   ingestion mechanism.
+2. **The original text is kept.** A proposal never replaces the wording it came from (DP3).
+3. **A proposal is not meaning.** MORK, or a similar mechanism, holds each proposed statement
+   as a suggestion node with provenance: the text object version, the extraction activity, and
+   the model and packaged ontology it used (§9). How suggestions are held apart from accepted
+   statements is open (integration spec I10).
+4. **A person validates every proposal.** Only an accepted proposal becomes a statement. The
+   acceptance, or the rejection, is an activity by a named agent. Its governance and assurance
+   stay outside this repository (AP4).
 
 ## 4. Vocabulary
 
@@ -455,6 +503,8 @@ PROV-O is adopted.
 | Statement derived from wording | `prov:wasDerivedFrom` the wording object version |
 | Meaning extraction, compilation, acceptance, amendment | `prov:Activity`, `prov:wasGeneratedBy` |
 | Drafter, extraction tool, reviewer, signatory, platform | `prov:Agent` |
+| Suggested statement (§3.7) | `prov:Entity`, `prov:wasDerivedFrom` its text object version, `prov:wasGeneratedBy` the extraction activity |
+| Review of a suggestion | `prov:Activity` associated with the reviewer. An accepted statement `prov:wasGeneratedBy` it and `prov:wasDerivedFrom` the suggestion |
 | Compiled artefact to its inputs | `prov:wasDerivedFrom` each input, plus the generation profile |
 
 This gives the trace MERIDIAN relies on (tank → facet → clause) in our terms: runtime decision →
@@ -519,4 +569,4 @@ Not yet applied. Applying DP1 and DP2 to the files in this directory:
 ### Open
 
 The integration specification's [open questions](lattice-integration.md#10-open-questions)
-(I1, I3, I5, I6).
+(I1, I3, I5 to I10).

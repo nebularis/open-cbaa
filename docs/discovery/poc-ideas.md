@@ -37,8 +37,9 @@ Obligations) are stretch goals: worth having, not required to prove the thesis.
 **Non-goals for a first cut.** A general contract-authoring platform (the ideation note already
 rejects that, §3). Full statement-kind coverage — one `AuthorityGrant` per demo risk is enough.
 Behaviour lifecycles and state machines. Production authentication and multi-tenancy. Automated
-extraction of meaning from prose — meaning is attached by a person, assisted or not, never
-inferred as a side effect of ingesting a document (see §3).
+extraction of meaning — InsurLE compilation and LLM extraction are the long-term routes
+(design-spec §3.7), developed outside this repository and this POC. The POC keeps their landing
+place open (§5.4): every statement it holds could have arrived as a reviewed suggestion.
 
 ## 3. Two Planes This Design Must Not Conflate
 
@@ -48,15 +49,19 @@ account of validation depends on both being ingested through different routes:
 | | Wording ingestion | Meaning attachment |
 |---|---|---|
 | Produces | `core:Contract` / `ComponentGroup` / `Component` / `DataElement` graph, `Text` content | `AuthorityGrant`, `Obligation` and other statements |
-| Route | `.docx` → XSLT → RDF (§4) | the Word add-in, or an internal tool, writing directly (§5) |
+| Route | `.docx` → XSLT → RDF (§4) | the Word add-in, or an internal tool, writing directly (§5). Later, suggestions from InsurLE compilation or LLM extraction, reviewed in the same tools (§5.4) |
 | Runs | once per published wording object version | once per statement, bound per agreement version |
-| Automatic? | yes, from a well-formed document | no — a person proposes it, per AP4 |
+| Automatic? | yes, from a well-formed document | no — a person authors it, or accepts a proposal (design-spec §3.7) |
 
 The docx pipeline in §4 fills the **library plane** with structure. It does not, and should not,
-guess that a SoUA table row is an `AuthorityGrant` with a territory and a limit. That binding is
-authored, because AP4 leaves meaning's provenance and assurance out of this repository's scope,
-and a silent inference would smuggle a claim about authority into the graph with nobody having
-asserted it.
+guess that a SoUA table row is an `AuthorityGrant` with a territory and a limit. A silent
+inference would put a claim about authority into the graph with nobody having asserted it.
+Meaning arrives through its own route, authored or proposed and then accepted by a person
+(design-spec §3.7).
+
+The two planes still meet. The structure §4 produces is what extraction needs: one text object
+at a time, with its variables and object id, rather than a whole document. So the wording
+pipeline is also the chunking step of the future ingestion route.
 
 ## 4. Ingesting Wording: OOXML → XSLT → RDF
 
@@ -228,6 +233,23 @@ sequenceDiagram
     Note over U: resolve the pending UI state by opId
 ```
 
+### 5.4 Suggestions and review
+
+Extraction is not built in the POC. Its landing place is, cheaply, because it reuses §5.2 and
+§5.3:
+
+- A `suggest-statement` envelope carries a proposed statement, in the same payload shape as
+  `attach-statement`, plus its provenance: the text object version, the producing activity
+  (InsurLE compilation or LLM extraction), and the model and packaged ontology used.
+- Suggestions are kept apart from statements (where is design-spec I10). The original text is
+  never modified.
+- The add-in shows a suggestion beside its source text. `accept-suggestion` turns it into a
+  statement and records the review as an activity by the reviewer. `reject-suggestion` records
+  the rejection. Both are ordinary write intents, so they reach the operational plane and replay
+  like any other write.
+
+For the demo's optional prelude (ideation §5), the suggestion is prepared in advance.
+
 ## 6. Backend Architecture
 
 ```mermaid
@@ -390,12 +412,13 @@ progress is visible the same way the demo itself will be.
 |---|---|---|
 | M0 | `docker-compose up`: Fuseki with the seven named graphs, RabbitMQ, a health-check-only Java API, a React shell | the skeleton runs |
 | M1 | One real M5 example ingested end to end (§4), rendered read-only, replacing Act 1's mock clause list with real structure | the docx pipeline works on a real document |
-| M2 | One `AuthorityGrant` attached by hand (an internal tool, not yet the Word add-in) to the SoUA row Act 1 already expands | meaning attaches to real wording |
+| M2 | One `AuthorityGrant` attached by hand (an internal tool, not yet the Word add-in) to the SoUA row Act 1 already expands, in the form extraction will produce (design-spec §3.7) | meaning attaches to real wording |
 | M3 | Act 2's four risks evaluated for real, through the Eligibility worker (§6.4) | Permitted/Denied/Undetermined is computed, not scripted |
 | M4 | Act 4's materiality proof runs for real, through the OWL reasoner harness | subsumption between compiled envelopes actually decides expansion vs contraction |
 | M5 | Act 5's chain is a real PROV-O traversal query | the audit question is a query |
 | M6 | The Word add-in, write path and round trip (§5) | the brief's original question is answered end to end |
 | M7 (stretch) | Act 3's accumulator, Act 6's obligations ledger | the remaining two acts |
+| M8 (stretch) | A suggestion prepared in advance, reviewed and accepted in the add-in (§5.4) | the review seam for future extraction, and the demo's prelude |
 
 M1–M5 alone deliver the ideation note's minimum slice. M6 is where this design earns the extra
 architecture in §5 and §6 over just querying a graph that was seeded by hand.
@@ -409,8 +432,9 @@ architecture in §5 and §6 over just querying a graph that was seeded by hand.
 | P3 | Surrogate IRIs vs object-id-derived IRIs for wording objects | surrogate, for consistency with the agreement identity pattern (design-spec §8.3) | not urgent, one example document |
 | P4 | STOMP vs MQTT for the browser push channel | STOMP, for React client ergonomics — see §6.3 | M6 |
 | P5 | Fuseki as a standalone service vs embedded TDB2 | standalone — the Python worker needs it too | M0 |
-| P6 | Where the OWL reasoner harness lives relative to LATTICE's own ADR-A83 harness — reuse it, or a POC-local equivalent | reuse LATTICE's once ADR-A83 lands; a thin POC-local stand-in until then | M4 |
+| P6 | Where the OWL reasoner harness lives relative to LATTICE's own ADR-A83 harness — reuse it, or a POC-local equivalent | reuse LATTICE's `platform/reasoning-testkit` (ADR-A83, delivered in `ddeaecf`), called as its own command line | M4 |
 | P7 | Per-agreement authorization on RabbitMQ topic subscriptions | out of scope for a POC, flagged in §8 as a known gap | before any shared deployment |
+| P8 | How suggestions are stored and promoted | follows design-spec I10. Until it is settled, a separate named graph `graph:suggestions`, outside the seven planes | M8 |
 
 ## 11. Decisions Needed
 

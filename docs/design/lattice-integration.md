@@ -440,8 +440,9 @@ prov:wasDerivedFrom` (ADR-A92). One query then answers "where did this come from
 meaning extraction, compilation and runtime decisions.
 
 **Meaning extraction.** MORK's uncertain mappings, hypotheses and intent nodes are a ready
-home for meanings proposed by LLM extraction and later validated (AP4). Open CBAA records only
-the provenance link. Assurance of the extraction stays out of scope.
+home for meanings proposed by InsurLE compilation or LLM extraction and later validated by a
+person (design-spec §3.7). Open CBAA records the provenance. Assurance of the extraction stays
+out of scope (AP4).
 
 ## 7. Persistence
 
@@ -534,3 +535,4 @@ design-time classes need I7 and I8 settled.
 | I7 | Dimensions on which a case holds several values (risk locations, perils, classes of business) have no design-time class under single-valued paths (§5.6) | open |
 | I8 | Author variation-slot inclusion conditions and statement scopes as `elg:AdmissionProfile`s, so the last two checks of §5.6 come from the same backend | open |
 | I9 | Where sibling disjointness is declared: an option of each compilation, or a Vocabulary declaration on the scheme edition (ADR-A90's open question) | open |
+| I10 | How suggested meaning (design-spec §3.7) is held apart from accepted statements, and in which plane (design-spec §8.1): MORK uncertain mappings or hypotheses in LATTICE, or an Open CBAA suggestion class | open. Leaning to MORK's nodes in a staging graph, promoted to a statement on acceptance, since the library plane holds only published versions |

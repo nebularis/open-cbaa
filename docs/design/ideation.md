@@ -13,6 +13,13 @@ Each encoding risk drift from the wording and from the other encodings, making i
 > The agreement is the rulebook. Write it once, and every check, referral and report comes from
 > it, and cites it.
 
+The other half of the vision is how meaning gets attached (design-spec §3.7). Wording drafted in
+InsurLE compiles to logic. Wording in natural language is split into small text objects, and an
+LLM proposes each one's meaning. Either way a person accepts or rejects each proposal, and the
+original text stays alongside it. Once proposals come back in LATTICE Quantification and
+Eligibility terms, they enter the same compilation pipeline, and any contract, not only CBAA
+library wording, can be brought in. Neither route is built in this repository.
+
 ## 2. Historical Mechanisms & Current Arts
 
 Blueprint Two and the Core Data Record (CDR) are the reference points today.
@@ -58,6 +65,7 @@ Each is something the model already specifies. The last column says where.
 | Why was this risk accepted? | audit sampling | every decision traces to its compiled artefact, the grant, the wording object version and the vocabulary edition, in PROV-O. The audit question becomes a query | design-spec §9, ADR-A92 |
 | Deadlines scattered through the wording | diaries and reminders | obligations with triggers and deadlines, in business days where the wording says so, become a ledger of what is due, from whom, by when | statement kinds (§3.3), ADR-A94 |
 | Every system re-implements the binder | N encodings that drift | one source, several compiled forms (bind-time table, bordereau shapes, design-time classes) that cannot disagree, because they share one intermediate representation | integration spec §6.2 |
+| Encoding a contract's rules | analysts re-key the rules into each system | meaning proposed from the wording itself, by InsurLE compilation or LLM extraction, accepted once by a person, attached to the library object and reused by every agreement | design-spec §3.4, §3.7 |
 | One wording across markets | separate wordings per market | market-scoped vocabulary bindings, so Lloyd's risk codes apply only in the Lloyd's scope, and the same agreement serves company, Lloyd's and mixed binders | ADR-A85, design-spec §4.2 |
 
 Three of these carry the demo, because no data standard can do them:
@@ -85,6 +93,10 @@ two insurers and a broker.
 
 The strongest single moment is act 4. Rehearse it first.
 
+An optional prelude to act 1 shows where the meaning came from: a SoUA row's suggested authority
+grant beside its source text, accepted by a reviewer, with the acceptance recorded. Extraction is
+not built here, so the suggestion is prepared in advance (design-spec §3.7).
+
 ### Minimum slice
 
 Acts 2, 4 and 5 over M5 alone make a complete proof. They need:
@@ -108,6 +120,8 @@ A proof of value should report numbers, not impressions. Candidates:
 - number of independent encodings of the binder's rules: one, against one per system
 - amendment review: which changes needed a human reading, against which were proved
 - audit: sample questions answered by query, with the provenance returned
+- meaning attachment, once extraction exists: cost and review time per wording object, and the
+  share of proposals accepted unchanged
 
 ## 7. Tensions and open questions
 
@@ -118,6 +132,8 @@ A proof of value should report numbers, not impressions. Candidates:
 | V3 | Use of LMA material | the drafts are shared for education. A public demo may need the LMA's agreement or synthetic wording |
 | V4 | The Blueprint Two and CDR comparison | verify §2 against current market sources before stating it to a market audience |
 | V5 | Bordereau format | Lloyd's coverholder reporting standards define the rows. The demo needs a mapping from one real layout, which is where MORK's validated mappings apply |
+| V6 | Meaning extraction and InsurLE are developed outside this repository (design-spec §3.7) | the demo uses hand-attached meaning, or proposals prepared in advance and reviewed live. Its statements should use the form extraction will produce, so nothing changes when extraction arrives |
+| V7 | InsurLE | whether any CBAA wording has been drafted in InsurLE, and whether its authors would take part |
 
 ## 8. Suggested next step
 

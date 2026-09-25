@@ -61,7 +61,7 @@ Then the gate decides timing, and nothing is waived. The gate's own conditions a
 | 1 | LATTICE | L11: the versioning and catalog checks run on push and pull request. The missing-version check covers consumer layouts. L14: `ontology_catalog.py write` emits a consumer's `nextCatalog` chain | nothing |
 | 2 | here | Submodule `imports/lattice` at the step-1 commit replaces the ignored symlink. Generated `ontology/catalog-v001.xml`. Version IRIs on our six documents (I5), all at `0.1.0` under `open-cbaa`. Import Foundation, Vocabulary and Party. Run the gate | step 1 |
 | 3 | here | Reclassification (design-spec §11): schemes as `voc:ConceptScheme` editions, properties bound by `voc:SchemeContract` | step 2 |
-| 4 | here | Meaning module: statement kinds, templates and bound statements, on Party, Eligibility and Instrument, with attachment per I6 | step 3, I6, I8 |
+| 4 | here | Meaning module: statement kinds, templates and bound statements, on Party, Eligibility and Instrument, with attachment per I6. Designed as the target of InsurLE compilation and LLM extraction (design-spec §3.7): parameters in Quantification terms, scopes as Eligibility profiles, and suggestion provenance expressible | step 3, I6, I8, I10 |
 | 5 | LATTICE, then here | L13 upstream first. Then the compilation module (Surface contracts, profile), the Persistence profile module and the design-time classes | L13, I7, I9 |
 | 6 | here | Lifecycles on Behaviour (M12, M3, referral, FNOL, complaints) | step 4 |
 
@@ -73,6 +73,7 @@ Then the gate decides timing, and nothing is waived. The gate's own conditions a
 | I8 | Statement scopes and slot conditions as profiles | profiles, or our own classes | profiles, with "Permitted = applies" stated once | step 4 |
 | I9 | Where sibling disjointness is declared | compile option, or a Vocabulary declaration | compile option, set in our compilation module per scheme. Split tree and groupings in the territory scheme | step 5 |
 | I6 | Obligation attachment | as recommended in §10 | accept | step 4 |
+| I10 | Suggested meaning, held apart from accepted statements (design-spec §3.7) | MORK uncertain mappings or hypotheses, or an Open CBAA suggestion class. Which plane | MORK's nodes in a staging graph, promoted to a statement on acceptance. The library plane holds only published versions | step 4 |
 | I3 | Agreement version boundary | named graph, or composite boundary | named graph, as recommended | step 5 (Persistence) |
 | L11 | Whether ontology IRIs move under `…/lattice/` | move now, or leave | leave. It's a LATTICE-wide MAJOR change with no need from us | nothing |
 | I1 | Submodule path | `imports/lattice` | as recommended. A new top-level directory, so the README must document it | step 2 |
