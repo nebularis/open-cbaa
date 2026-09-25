@@ -1,8 +1,10 @@
-# Open Dare
+# Open CBAA
 
 An open standards based exploration of Delegated (Binding) Authority, as realised for example, by the Lloyd's Market Association.
 
 **The Material In This Repository Is For Educational Purposes Only**
+
+Formerly Open DARE. Prompts written before the rename keep the old name.
 
 ## Evoling Ontology Using AI
 

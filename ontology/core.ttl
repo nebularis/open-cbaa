@@ -1,11 +1,11 @@
-@prefix : <https://nebularis.github.io/open-dare/ontology/lma-wim/core#> .
+@prefix : <https://nebularis.github.io/open-cbaa/ontology/lma-wim/core#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 
-<https://nebularis.github.io/open-dare/ontology/lma-wim/core> a owl:Ontology ;
+<https://nebularis.github.io/open-cbaa/ontology/lma-wim/core> a owl:Ontology ;
     rdfs:label "LMA Wordings Information Model — Core"@en ;
     rdfs:comment "Object Class Hierarchy (Contract, Component Group, Component, Data Element), the comprises part-whole relation, and the Typing-tier classes with no further Sub-Typing in the source model. Derived from reference/lma-wordings-information-model.md."@en ;
     owl:versionInfo "0.1.0" .

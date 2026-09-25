@@ -1,16 +1,16 @@
-@prefix : <https://nebularis.github.io/open-dare/ontology/lma-wim/clause#> .
-@prefix core: <https://nebularis.github.io/open-dare/ontology/lma-wim/core#> .
+@prefix : <https://nebularis.github.io/open-cbaa/ontology/lma-wim/clause#> .
+@prefix core: <https://nebularis.github.io/open-cbaa/ontology/lma-wim/core#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 
-<https://nebularis.github.io/open-dare/ontology/lma-wim/clause> a owl:Ontology ;
+<https://nebularis.github.io/open-cbaa/ontology/lma-wim/clause> a owl:Ontology ;
     rdfs:label "LMA Wordings Information Model — Clause"@en ;
     rdfs:comment "Clause branch of the Component typing: Scope of Authority Clause, Scope of Coverage Clause, Contractual Provision, and their Sub-Typing. Also carries the document/analogue-for-now artifacts (Schedule document, Contract Jacket, Certificate of Insurance, IPID, List of Benefits, Notice, Assessment) shown adjacent to Contractual Provision in the source diagram; no formal subtype or comprises relation to Contractual Provision is asserted for these pending clarification of the intended link, but core:representationStatus marks each as document-analogue for now."@en ;
     owl:versionInfo "0.1.0" ;
-    owl:imports <https://nebularis.github.io/open-dare/ontology/lma-wim/core> .
+    owl:imports <https://nebularis.github.io/open-cbaa/ontology/lma-wim/core> .
 
 #################################################################
 # Clause

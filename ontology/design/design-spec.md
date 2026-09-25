@@ -1,4 +1,4 @@
-# Open DARE Semantic Design Specification
+# Open CBAA Semantic Design Specification
 
 Version 0.2, draft for review. Nothing here has been applied to the `*.ttl` files yet. Section
 [12](#12-decision-log) records what is decided and what is open.
@@ -9,7 +9,7 @@ Inputs: the CBAA module drafts M1–M14 (evidence in
 unified architecture documents, the SPC description logic encoding and its reference
 architecture, and the LATTICE Foundation, Vocabulary, Quantification and Instrument layers and
 RDF/SPARQL Operational Patterns Guide (commit `558650b`). LATTICE facts in §5 and §10 are
-revised against `f55c7d2`, the [integration specification](lattice-integration.md)'s baseline.
+revised against `ddeaecf`, the [integration specification](lattice-integration.md)'s baseline.
 
 ---
 
@@ -250,14 +250,14 @@ subsumption-aware membership (MERIDIAN Rule 2: flat membership produces false ne
 |---|---|---|
 | Amount with ISO currency (M6, M9, M14) | `Quantity` on a currency `ValueSpace` with `UnitContract` | yes |
 | "or equivalent in other currencies" (M9 9.1.3) | `Conversion` of kind `Contextual`, `ConversionContext` at a date | yes. A missing rate yields `Undetermined`, which maps to referral |
-| Authored equivalents in several currencies (M5 SoUA row 42) | none. ADR-A95 proposes alternative bounds | **gap** (L5) |
+| Authored equivalents in several currencies (M5 SoUA row 42) | `qnt:alternativeBound`, one bound per unit with no conversion (ADR-A95) | yes, since L5 |
 | Comparator as a variable, "equal to" or "not exceeding" (M6 6.1B) | `Bound` with `boundSense` and `boundClosure`, degenerate `Range` for equality | yes |
 | Limits, maximum durations, advance binding days (M5) | `Range`, `Bound` | yes |
 | Levels of authority and complaints authority as ordered values (M3 3.9.1.6, M5, M9) | `OrdinalValue` on a `TotalOrder` space | yes |
-| Percentage of a base: commission 5% of each GWP, leader fee 10% of GWP, GWP trigger % (M6, M5) | `OperationCapability` of kind `Ratio` only. ADR-A93 proposes derived rate spaces | **gap** (L2) |
+| Percentage of a base: commission 5% of each GWP, leader fee 10% of GWP, GWP trigger % (M6, M5) | `qnt:DerivedValueSpace` naming numerator and denominator spaces (ADR-A93) | yes, since L2 |
 | Relative change: increase of more than 10% (M3 3.9.1.1B) | `AnchorBinding` with a `Proportional` offset on the old value | yes |
 | Deadlines relative to an event: within 1 business day of receipt, 10 business days before binding (M8, M4) | `AnchorBinding` of a temporal `Range` on the trigger occurrence | yes |
-| Business vs calendar days, per jurisdiction (M3, M8, M12) | `UnitContract` plus `ConversionContext`. ADR-A94 proposes calendar binding | **gap** (L3b) |
+| Business vs calendar days, per jurisdiction (M3, M8, M12) | `qnt:CalendarUnit`, a `Contextual` conversion naming the calendar's scheme contract (ADR-A94) | yes, since L3b |
 | Recurring obligations: monthly, within 15 days of period end (M10), annual testing (M14) | `Recurrence`, `RecurrenceBin`, then `AnchorBinding` on the bin end | yes |
 | Year of account and anniversary transfer (M2 2.9) | `Recurrence` with anchor | yes |
 | 24:00 end-of-day convention (M2 guidance) | `Bound` closure and granularity | yes |
@@ -270,9 +270,8 @@ subsumption-aware membership (MERIDIAN Rule 2: flat membership produces false ne
 
 ### 5.2 Verdict
 
-LATTICE Quantification is a suitable starting point. It covers 14 of the 18 in-scope
-requirements above directly, and a fifteenth once L3b lands. ADRs for the remaining three are
-drafted upstream. Its design stances match ours: it ships no units, currencies or
+LATTICE Quantification is a suitable starting point. It covers all 18 in-scope requirements
+above, the last four since L2, L3b and L5 closed. Its design stances match ours: it ships no units, currencies or
 calendars (DP1), it distinguishes coarse values from unresolved ones, and its three-valued
 comparison gives referral a principled home. Building an equivalent from scratch would
 reproduce it.
@@ -280,11 +279,9 @@ reproduce it.
 Adoption has costs:
 
 - It imports LATTICE Foundation and Vocabulary, so it cannot be taken alone.
-- Its own acceptance criteria are not yet met. Its SHACL profile has four node shapes and its
+- Its own acceptance criteria are not yet met. Its SHACL profile has seven node shapes and its
   rule and structural shape files are empty, and it has no conformance corpus of its own (L13).
   The Foundation derived-artefact contract it depended on now exists (L4).
-- L2, L3b and L5 are needed before CBAA can rely on it for remuneration, business-day deadlines
-  and currency equivalents.
 
 ## 6. Authority: Data and Compiled Forms
 
@@ -517,6 +514,7 @@ Not yet applied. Applying DP1 and DP2 to the files in this directory:
 | D12 | LATTICE import confirmed after the [LATTICE design review](design-review.md), subject to the assurance gate of integration spec §3.3 (review of D7) | 2026-09-25 |
 | D13 | Instrument and Behaviour are imported without waiting, since L6 is fixed upstream (was I2) | 2026-09-25 |
 | D14 | Envelope and hierarchy classes come from LATTICE's OWL backend on the shared IR, ADR-A90 (was I4) | 2026-09-25 |
+| D15 | The repository is renamed Open CBAA, and its ontology IRIs move to `https://nebularis.github.io/open-cbaa/`, before version IRIs are assigned (§3.4 of the integration specification) | 2026-09-25 |
 
 ### Open
 

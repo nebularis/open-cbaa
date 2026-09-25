@@ -1,23 +1,23 @@
-@prefix : <https://nebularis.github.io/open-dare/ontology/lma-wim#> .
-@prefix core: <https://nebularis.github.io/open-dare/ontology/lma-wim/core#> .
-@prefix agr: <https://nebularis.github.io/open-dare/ontology/lma-wim/agreement#> .
-@prefix pol: <https://nebularis.github.io/open-dare/ontology/lma-wim/policy#> .
-@prefix cls: <https://nebularis.github.io/open-dare/ontology/lma-wim/clause#> .
-@prefix de: <https://nebularis.github.io/open-dare/ontology/lma-wim/data-element#> .
+@prefix : <https://nebularis.github.io/open-cbaa/ontology/lma-wim#> .
+@prefix core: <https://nebularis.github.io/open-cbaa/ontology/lma-wim/core#> .
+@prefix agr: <https://nebularis.github.io/open-cbaa/ontology/lma-wim/agreement#> .
+@prefix pol: <https://nebularis.github.io/open-cbaa/ontology/lma-wim/policy#> .
+@prefix cls: <https://nebularis.github.io/open-cbaa/ontology/lma-wim/clause#> .
+@prefix de: <https://nebularis.github.io/open-cbaa/ontology/lma-wim/data-element#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<https://nebularis.github.io/open-dare/ontology/lma-wim> a owl:Ontology ;
+<https://nebularis.github.io/open-cbaa/ontology/lma-wim> a owl:Ontology ;
     rdfs:label "LMA Wordings Information Model"@en ;
     rdfs:comment "Umbrella ontology importing the structural (OWL 2 DL) strata of the LMA Wordings Information Model: core, agreement, policy, clause, data-element. Later strata (e.g. criteria/coverage-logic modelling) may target OWL 2 EL for tractable reasoning and should import this ontology rather than being merged into it."@en ;
     owl:versionInfo "0.1.0" ;
-    owl:imports <https://nebularis.github.io/open-dare/ontology/lma-wim/core> ,
-                <https://nebularis.github.io/open-dare/ontology/lma-wim/agreement> ,
-                <https://nebularis.github.io/open-dare/ontology/lma-wim/policy> ,
-                <https://nebularis.github.io/open-dare/ontology/lma-wim/clause> ,
-                <https://nebularis.github.io/open-dare/ontology/lma-wim/data-element> .
+    owl:imports <https://nebularis.github.io/open-cbaa/ontology/lma-wim/core> ,
+                <https://nebularis.github.io/open-cbaa/ontology/lma-wim/agreement> ,
+                <https://nebularis.github.io/open-cbaa/ontology/lma-wim/policy> ,
+                <https://nebularis.github.io/open-cbaa/ontology/lma-wim/clause> ,
+                <https://nebularis.github.io/open-cbaa/ontology/lma-wim/data-element> .
 
 # Contract typing is either Agreement or Policy, never both (per the
 # top-level Typing column of the LMA WIM diagram). This is the one

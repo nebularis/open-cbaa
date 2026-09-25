@@ -24,7 +24,7 @@ and its outcome.
 | [lma-wim.ttl](lma-wim.ttl) | `.../lma-wim#` | Umbrella. Imports all of the above and adds the one cross-branch axiom (Agreement disjoint from Policy) |
 
 The four branch modules import only `core.ttl` and are independent of each other. Namespace
-base: `https://nebularis.github.io/open-dare/ontology/lma-wim`.
+base: `https://nebularis.github.io/open-cbaa/ontology/lma-wim`.
 
 ## OWL Profile
 

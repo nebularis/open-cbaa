@@ -1,16 +1,16 @@
-@prefix : <https://nebularis.github.io/open-dare/ontology/lma-wim/agreement#> .
-@prefix core: <https://nebularis.github.io/open-dare/ontology/lma-wim/core#> .
+@prefix : <https://nebularis.github.io/open-cbaa/ontology/lma-wim/agreement#> .
+@prefix core: <https://nebularis.github.io/open-cbaa/ontology/lma-wim/core#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 
-<https://nebularis.github.io/open-dare/ontology/lma-wim/agreement> a owl:Ontology ;
+<https://nebularis.github.io/open-cbaa/ontology/lma-wim/agreement> a owl:Ontology ;
     rdfs:label "LMA Wordings Information Model — Agreement"@en ;
     rdfs:comment "Agreement branch of the Contract typing: Binding Authority, Line Slip, Consortium, DCAA."@en ;
     owl:versionInfo "0.1.0" ;
-    owl:imports <https://nebularis.github.io/open-dare/ontology/lma-wim/core> .
+    owl:imports <https://nebularis.github.io/open-cbaa/ontology/lma-wim/core> .
 
 :Agreement a owl:Class ;
     rdfs:subClassOf core:Contract, core:AgreementRelated ;
