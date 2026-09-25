@@ -1,8 +1,9 @@
 # LATTICE Integration Specification
 
-Version 0.1, draft for review. Companion to the [design specification](design-spec.md), whose
+Version 0.2, draft for review. Companion to the [design specification](design-spec.md), whose
 principles (AP, DP) and decisions (D) it cites by number. Baseline: LATTICE `main` at
-`65ac4a8` (2026-09-24), which includes the scoped scheme binding patch.
+`aa6d669` (2026-09-25), which includes the scoped scheme binding patch and the semantic
+versioning baseline of ADR-A86 (every ontology document at `0.2.0`).
 
 Logical expressions use description logic notation: ⊑ subsumption, ≡ equivalence, ⊓ ⊔ ¬
 conjunction, disjunction and negation, ∃ ∀ restrictions, {a} a nominal, ⊥ ⊤ bottom and top,
@@ -24,23 +25,25 @@ It does not specify implementation (AP1).
 
 ## 2. Layers
 
-| Layer | Ontology IRI at baseline | Use | How |
+| Layer | `owl:versionIRI` at baseline | Use | How |
 |---|---|---|---|
-| Foundation | `…/foundation/0.0.7` | identity, versions, governance state, valid time, evidence | `owl:imports` |
-| Vocabulary | `…/vocabulary/0.0.2` | scheme contracts, editions, scoped bindings | `owl:imports` |
-| Quantification | `…/quantification/0.0.1` | amounts, bounds, ranges, recurrences, ordinals | `owl:imports`, after L1 |
-| Party | `…/party/0.0.3` | actors, roles, role occupancy, participation, delegation | `owl:imports` |
-| Eligibility | `…/eligibility/0.0.1` | authority scopes as admission profiles, three-valued decisions | `owl:imports`, after L7 |
-| Instrument | `…/instrument/0.0.1` | alignment of statement kinds | `owl:imports`, after L6 |
-| Behaviour | `…/behaviour/0.0.1` | lifecycle state spaces, triggers, guards, allowances | `owl:imports`, after L6 (it imports Instrument) |
-| Surface | `…/surface/0.0.1` | compilation contracts and derived records | imported by the compilation module only |
-| MORK and Executable | `http://www.nebularis.org/ontologies/Mork`, `…/lattice/executable/0.0.1` | mapping graph, compiler provenance | imported by the compilation module only |
-| Persistence | `…/lattice/persistence/0.1.0` | data-access profile | referenced by IRI, never imported (its own design, §7) |
-| SPC | provisional | protocol execution | reference only |
+| Foundation | `…/lattice/foundation/0.2.0` | identity, versions, governance state, valid time, evidence | `owl:imports` |
+| Vocabulary | `…/lattice/vocabulary/0.2.0` | scheme contracts, editions, scoped bindings | `owl:imports` |
+| Quantification | `…/lattice/quantification/0.2.0` | amounts, bounds, ranges, recurrences, ordinals | `owl:imports`, after L1 |
+| Party | `…/lattice/party/0.2.0` | actors, roles, role occupancy, participation, delegation | `owl:imports` |
+| Eligibility | `…/lattice/eligibility/0.2.0` | authority scopes as admission profiles, three-valued decisions | `owl:imports`, after L7 |
+| Instrument | `…/lattice/instrument/0.2.0` | alignment of statement kinds | `owl:imports`, after L6 |
+| Behaviour | `…/lattice/behaviour/0.2.0` | lifecycle state spaces, triggers, guards, allowances | `owl:imports`, after L6 (it imports Instrument) |
+| Surface | `…/lattice/surface/0.2.0` | compilation contracts and derived records | imported by the compilation module only |
+| MORK and Executable | `http://www.nebularis.org/ontologies/Mork/0.2.0`, `…/lattice/executable/0.2.0` | mapping graph, compiler provenance | imported by the compilation module only |
+| Persistence | `…/lattice/persistence/0.2.0` | data-access profile | referenced by IRI, never imported (its own design, §7) |
+| SPC | `http://example.org/spc/0.2.0` | protocol execution | reference only |
 
-`…` is `https://www.nebularis.org/neuro-semantic`. Ontology IRIs and term namespaces differ in
-LATTICE (ontology `…/foundation`, terms `…/lattice/foundation#`). Imports always use the
-`owl:versionIRI`.
+`…` is `https://www.nebularis.org/neuro-semantic`. Each layer's `spec` and `vocab` documents
+are versioned independently (the table lists `spec`). Imports always use the exact
+`owl:versionIRI`. The ontology IRIs themselves were not moved by the baseline reset
+(Foundation's is still `…/foundation`, not `…/lattice/foundation`), so version IRI and ontology
+IRI do not share a base (L11).
 
 ## 3. Repository Integration
 
@@ -48,8 +51,8 @@ LATTICE (ontology `…/foundation`, terms `…/lattice/foundation#`). Imports al
 
 | # | Requirement |
 |---|---|
-| R1 | Pin exact content, not a version label. Vocabulary's content changed at `65ac4a8` under an unchanged `0.0.2` versionIRI, so a versionIRI alone does not identify content |
-| R2 | Resolve `owl:imports` offline. LATTICE's versionIRIs did not resolve over the network when checked (2026-09-24) |
+| R1 | Pin exact content. Under ADR-A86 an ontology document's `owl:versionIRI` changes whenever its content does, so a version IRI identifies an ontology document's content. Files that declare no `owl:Ontology` (shapes, projections, generated execution artefacts) carry no version of their own and are identified only by commit |
+| R2 | Resolve `owl:imports` offline. LATTICE's version IRIs did not resolve over the network when checked (2026-09-24) |
 | R3 | Carry only what is used. LATTICE also holds platform code, applications and packages |
 | R4 | Keep the upstream patch flow short, since patches are expected (§8) |
 | R5 | Work with standard tooling (Protégé, OWL API, rdflib, HermiT) and no package manager |
@@ -63,27 +66,55 @@ LATTICE (ontology `…/foundation`, terms `…/lattice/foundation#`). Imports al
 | Submodule plus sparse checkout | commit pin | with a catalog | `ontology/` only | as above | sparse checkout is per-clone configuration, not versioned |
 | Git subtree | copied in | yes | prefix only | awkward (`subtree push`) | copies drift and invite local edits, against R6 |
 | Vendored snapshot plus lock file | hash pin | yes | chosen folders | copy back by hand | needs a sync tool, loses history |
-| Resolve by IRI over the network | none | no | n/a | n/a | fails R1 and R2 today |
+| Resolve by IRI over the network | version IRI | no | n/a | n/a | fails R2 today, and covers no unversioned files |
+| Pin by repository tag | tag | with a catalog | whole repository | as submodule | the existing tags (`v0.1.2`, `v0.1.3`) predate ADR-A86, and one repository tag cannot express per-document versions |
 
 ### 3.3 Recommendation
 
-1. **Submodule** at `imports/lattice`, pinned to a commit. Sparse checkout of `ontology/` is
+1. **Submodule** at `imports/lattice`, pinned to a commit. The commit pins everything,
+   including the unversioned shapes Open DARE validates with. Sparse checkout of `ontology/` is
    documented as optional.
-2. **Catalog.** An OASIS XML catalog, `ontology/catalog-v001.xml`, maps each LATTICE
-   versionIRI to its file under `imports/lattice/ontology/…`. Protégé and the OWL API read it
-   directly. The validation tools read the same file. LATTICE's own catalogs point at absolute
-   paths on one machine and are not used.
-3. **Lock record.** `ontology/lattice.lock.ttl` records, per imported module, the versionIRI,
-   the path, the submodule commit and the SHA-256 of the file. It is described in RDF using
-   Surface's read-set vocabulary (`srf:ReadSetEntry`, `srf:readHash`, `srf:readVersion`), so
-   the same staleness rule applies to our imports as to any compiled artefact: an import is
-   stale when its current hash differs from the recorded one.
-4. **Update procedure.** Move the submodule to a new commit, regenerate the lock record, run
-   the gate (HermiT classification and the SHACL suites over the import closure), and record the
-   change in the design specification's decision log.
+2. **Imports as the dependency statement.** Open DARE modules import LATTICE by exact version
+   IRI, as LATTICE's own layers do. Those imports, not a separate manifest, state which
+   document versions Open DARE depends on.
+3. **Catalog.** An OASIS XML catalog, `ontology/catalog-v001.xml`, maps each imported version
+   IRI to its file under `imports/lattice/ontology/…`. MORK's ontology IRI is mapped as well,
+   because `Executable.ttl` imports MORK unversioned, as the policy permits. Protégé and the
+   OWL API read the catalog directly, and the validation tools read the same file. LATTICE's own
+   catalogs point at absolute paths on one machine and are not used.
+4. **Gate.** Every version IRI Open DARE imports must be declared by the file the catalog maps
+   it to, and the import closure must classify with no unsatisfiable classes other than those
+   recorded as known upstream defects (§8), and pass the SHACL suites.
+5. **Upgrade procedure.** LATTICE's import-pinning cascade checklist, applied to Open DARE's
+   modules: move the submodule, list the imported documents whose version IRI changed, update
+   every Open DARE `owl:imports` naming them in the same change, re-run the enumeration until
+   no old IRI remains, and run the gate. Every LATTICE layer is at major version zero, where
+   SemVer promises no stability, so a MINOR or PATCH bump is gated exactly like a MAJOR one
+   until a layer reaches `1.0.0`. The change is recorded in the design specification's decision
+   log.
 
 Fallback if submodules prove unworkable for contributors: a vendored snapshot of the same
-folders with the same lock record. The catalog and lock format do not change.
+folders, with its source commit recorded. The catalog and gate do not change.
+
+### 3.4 Versioning Open DARE's own documents
+
+Open DARE's ontology documents currently carry `owl:versionInfo "0.1.0"` and no
+`owl:versionIRI`. The proposal (I5) is to adopt ADR-A86's policy for them unchanged:
+
+- one `owl:versionIRI` per `owl:Ontology` document, of the form
+  `https://nebularis.github.io/open-dare/ontology/<path>/<version>`, e.g.
+  `…/open-dare/ontology/lma-wim/core/0.1.0`, with `owl:versionInfo` dropped so the version IRI is
+  the single signal
+- LATTICE's MAJOR, MINOR and PATCH table, including its treatment of silent semantic
+  redefinition as MAJOR
+- the mechanical check reused from the submodule, with no copy in this repository:
+  `python imports/lattice/tools/ontology_version_check.py --root . --base-ref <ref>`, which
+  compares every `.ttl` under this repository's `ontology/` that declares `owl:Ontology` with
+  the given ref. It runs against this repository today. It ignores a document with no version
+  IRI, so it protects Open DARE's documents only once they carry one
+
+The reclassification (design-spec §11, D9) removes classes, which is MAJOR under the policy.
+At major version zero that is permitted, and it moves the affected documents to `0.2.0`.
 
 ## 4. What Open DARE Authors on LATTICE
 
@@ -343,8 +374,9 @@ Every compilation is declared in the graph before it runs:
 | What was produced | `srf:DerivedArtefact` records and `exe:` plans |
 | What was proven | `srf:LawDischarge` for runtime-conformance laws |
 
-The same staleness rule then covers every artefact and our LATTICE imports (§3.3): stale when
-any recorded read hash differs from the current one.
+The same staleness rule then covers every compiled artefact: stale when any recorded read hash
+differs from the current one. A read of a LATTICE ontology document can also record its version
+IRI (`srf:readVersion`), which under ADR-A86 changes whenever its content does.
 
 **Uniform provenance.** Surface, Executable and MORK each carry their own provenance terms and
 none is aligned with PROV-O, which Open DARE adopted (D5). L8 proposes the alignment
@@ -410,14 +442,14 @@ and the agreement aggregate holds references, so it can keep a patch log.
 | L8 | Surface, Executable, MORK | PROV-O alignment of derived records and plans | uniform provenance |
 | L9 | Surface, Eligibility | honour `voc:SchemeBinding` where they read `voc:boundScheme` | market-scoped vocabularies at compile time |
 | L10 | `mork_compilers` | set membership, hierarchical match, exclusion, profile aggregation, OWL backend | compiled forms 2 and 3 (§6.2) |
-| L11 | all | advance `owl:versionIRI` on content change and tag releases | using versionIRI as a content pin |
+| L11 | all | **largely done** by ADR-A86 at `aa6d669`. Remaining: run `check:ontology-versioning` in CI (the GitHub workflows do not call it today), move the four generated files under `surface/execution/job-family/` off the retired `surface/0.0.1` import, decide whether ontology IRIs follow version IRIs under `…/lattice/`, have the check flag an in-scope document that declares no version IRI (it passes one today), and align ADR-A86's status ("Proposed") with the policy document ("Decided") | nothing blocking. The CI check protects the content-pin guarantee §3.3 relies on |
 | L12 | Instrument | `ins:inProvision` is functional, so one obligation cannot be expressed by several provisions | aligning attachment with Instrument |
 
 ## 9. Sequencing
 
-1. Upstream L6, L1 and L11, which are small.
-2. Add the submodule, catalog and lock record, import Foundation, Vocabulary, Quantification and
-   Party, and run the gate.
+1. Upstream L6 and L1, which are one-line fixes.
+2. Add the submodule and catalog, give Open DARE's documents version IRIs (§3.4), import
+   Foundation, Vocabulary, Quantification and Party, and run the gate.
 3. Apply the reclassification (design-spec §11), with schemes as `voc:ConceptScheme` editions
    and properties bound by `voc:SchemeContract`.
 4. Add the meaning module (statement kinds, §5.5) on Party, Eligibility and Instrument.
@@ -434,3 +466,4 @@ Step 3 waits for step 2 because the reclassified schemes are `voc:` individuals.
 | I2 | Import Instrument and Behaviour before L6 lands | no, wait for L6 |
 | I3 | Agreement version boundary: named graph, or a composite boundary walking a shape over `directlyComprises` | named graph for accepted, immutable versions |
 | I4 | Envelope classes from an extended `mork_compilers` IR, or a new Surface backend | extend the IR (§6.2) |
+| I5 | Adopt ADR-A86's versioning policy for Open DARE's own ontology documents | yes (§3.4) |

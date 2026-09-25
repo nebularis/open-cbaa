@@ -533,4 +533,4 @@ Not yet applied. Applying DP1 and DP2 to the files in this directory:
 ### Open
 
 The integration specification's [open questions](lattice-integration.md#10-open-questions)
-(I1–I4).
+(I1–I5).

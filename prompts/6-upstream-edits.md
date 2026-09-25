@@ -1,0 +1,1 @@
+I have added a local folder containing a git clone of `lattice` to your context for convenience. Please note we now have an integration of semantic versioning as lattice policy. If this changes your position on integrating with the repository, please update your design accoringly, otherwise we will continue ideating.
