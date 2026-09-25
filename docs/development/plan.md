@@ -73,7 +73,7 @@ Then the gate decides timing, and nothing is waived. The gate's own conditions a
 | I8 | Statement scopes and slot conditions as profiles | profiles, or our own classes | profiles, with "Permitted = applies" stated once | step 4 |
 | I9 | Where sibling disjointness is declared | compile option, or a Vocabulary declaration | compile option, set in our compilation module per scheme. Split tree and groupings in the territory scheme | step 5 |
 | I6 | Obligation attachment | as recommended in §10 | accept | step 4 |
-| I10 | Suggested meaning, held apart from accepted statements (design-spec §3.7) | MORK uncertain mappings or hypotheses, or an Open CBAA suggestion class. Which plane | MORK's nodes in a staging graph, promoted to a statement on acceptance. The library plane holds only published versions | step 4 |
+| I10 | Suggested meaning, held apart from accepted statements (design-spec §3.7) | MORK nodes, proposed statement instances, or an Open CBAA suggestion class. Which plane | ADR-A13's Mapping graph role as a staging graph: MORK nodes for templates, proposed instances for bespoke clauses, promoted on acceptance. The library plane holds only published versions | step 4 |
 | I3 | Agreement version boundary | named graph, or composite boundary | named graph, as recommended | step 5 (Persistence) |
 | L11 | Whether ontology IRIs move under `…/lattice/` | move now, or leave | leave. It's a LATTICE-wide MAJOR change with no need from us | nothing |
 | I1 | Submodule path | `imports/lattice` | as recommended. A new top-level directory, so the README must document it | step 2 |

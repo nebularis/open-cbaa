@@ -191,19 +191,29 @@ wording object, each checks the other, and a disagreement is a signal for review
 
 Machine extraction is being developed around LATTICE, where MORK already maps external schemas
 to domain ontologies using LLMs. Extraction of whole contracts into the MERIDIAN ontologies has
-given high-quality OWL, but at about USD 300 per contract. The techniques under investigation to
-make it viable:
+given high-quality OWL, but at about USD 300 per contract. LATTICE's
+[ingestion vision](https://github.com/nebularis/lattice/blob/main/docs/architecture/ingestion-vision.md) sets out how to make it
+viable. Its central move is to route by reuse: output that will be reused goes through MORK's
+mapping, review and compile loop once, and output used once is extracted directly. For the CBAA
+that gives three cases:
 
-- **structure first**: pull the document apart before extraction, so each call sees one text
-  object and its variables. The WIM decomposition (Contract to Data Element) is that structure
-- **packaged ontologies**: LATTICE's MORK Teaching Pack technique, generalised so the authors of
-  any domain ontology can package it for extraction
-- **Graph RAG** over the contract as it is ingested, to answer questions about its state so far
-  (defined terms, variables, earlier clauses)
+| Output | CBAA case | Route | Review |
+|---|---|---|---|
+| structure mapping, per document type | the WIM decomposition (Contract to Data Element), declared by the library's object ids rather than discovered | none needed for library wording. Legacy documents need a structure mapping per document type | per item |
+| meaning template, per standard wording | the meaning of each library wording object version (§3.4), with its variables as slots | MORK intent nodes projected to statement templates | per item, since an error repeats in every agreement using the wording |
+| instance facts, per document | an agreement's variable values, which the assembly process already supplies, and the meaning of bespoke clauses (M3 3.7.1.3, M5 5.17, M12 12.24.1.5), which are rules used once | direct extraction to statements, grounded by the templates | per item for bespoke clauses. Calibrated batches only for bulk migration of legacy agreements |
 
-§3.4 amortises the cost further. Meaning is attached once per library wording object version,
-so the standard language is extracted once for the market, and per-contract extraction is
-limited to bespoke clauses.
+So the standard language is extracted once for the market, and per-agreement extraction is
+limited to bespoke clauses. The techniques that keep each call small and grounded:
+
+- **structure first**: each call sees one text object and its variables, never the document
+- **a packaged target ontology**, in tiers by risk: a mechanically generated codebook and
+  structural index of the target ontologies first, Graph RAG over that index and over confirmed
+  mappings second, doctrine written by an ontology's own authors third. Doctrine drafted by a
+  model is deferred and gated, since generated guidance for an ontology nobody reviewed produces
+  confident, wrong proposals. Retrieval indexes are versioned and hashed, so runs reproduce
+- **document memory** over the contract as it is ingested, answering questions about its state
+  so far (defined terms, variables, earlier clauses) from the partially built graph
 
 What the vision requires of this design:
 
@@ -212,10 +222,10 @@ What the vision requires of this design:
    Output in that form enters the compilation pipeline (§6.5) unchanged, which makes it the
    ingestion mechanism.
 2. **The original text is kept.** A proposal never replaces the wording it came from (DP3).
-3. **A proposal is not meaning.** MORK, or a similar mechanism, holds each proposed statement
-   as a suggestion node with provenance: the text object version, the extraction activity, and
-   the model and packaged ontology it used (§9). How suggestions are held apart from accepted
-   statements is open (integration spec I10).
+3. **A proposal is not meaning.** A proposed meaning template is a set of MORK mapping nodes. A
+   proposed bespoke statement is a statement instance marked as proposed. Both carry provenance:
+   the text object version, the extraction activity, the model, and the pack and index hashes
+   it used (§9). How proposals are held apart from accepted statements is integration spec I10.
 4. **A person validates every proposal.** Only an accepted proposal becomes a statement. The
    acceptance, or the rejection, is an activity by a named agent. Its governance and assurance
    stay outside this repository (AP4).
@@ -503,7 +513,7 @@ PROV-O is adopted.
 | Statement derived from wording | `prov:wasDerivedFrom` the wording object version |
 | Meaning extraction, compilation, acceptance, amendment | `prov:Activity`, `prov:wasGeneratedBy` |
 | Drafter, extraction tool, reviewer, signatory, platform | `prov:Agent` |
-| Suggested statement (§3.7) | `prov:Entity`, `prov:wasDerivedFrom` its text object version, `prov:wasGeneratedBy` the extraction activity |
+| Suggested statement or template (§3.7) | `prov:Entity`, `prov:wasDerivedFrom` its text object version, `prov:wasGeneratedBy` the extraction activity, which records the model and the pack and index hashes |
 | Review of a suggestion | `prov:Activity` associated with the reviewer. An accepted statement `prov:wasGeneratedBy` it and `prov:wasDerivedFrom` the suggestion |
 | Compiled artefact to its inputs | `prov:wasDerivedFrom` each input, plus the generation profile |
 
