@@ -1,6 +1,6 @@
 # Open DARE Semantic Design Specification
 
-Version 0.1, draft for review. Nothing here has been applied to the `*.ttl` files yet. Section
+Version 0.2, draft for review. Nothing here has been applied to the `*.ttl` files yet. Section
 [12](#12-decision-log) records what is decided and what is open.
 
 Inputs: the CBAA module drafts M1–M14 (evidence in
@@ -8,7 +8,8 @@ Inputs: the CBAA module drafts M1–M14 (evidence in
 [design review](../README.md#design-review-cbaa-modules-m1m14), the MERIDIAN CSO, FBO and
 unified architecture documents, the SPC description logic encoding and its reference
 architecture, and the LATTICE Foundation, Vocabulary, Quantification and Instrument layers and
-RDF/SPARQL Operational Patterns Guide (commit `558650b`).
+RDF/SPARQL Operational Patterns Guide (commit `558650b`). LATTICE facts in §5 and §10 are
+revised against `f55c7d2`, the [integration specification](lattice-integration.md)'s baseline.
 
 ---
 
@@ -249,38 +250,41 @@ subsumption-aware membership (MERIDIAN Rule 2: flat membership produces false ne
 |---|---|---|
 | Amount with ISO currency (M6, M9, M14) | `Quantity` on a currency `ValueSpace` with `UnitContract` | yes |
 | "or equivalent in other currencies" (M9 9.1.3) | `Conversion` of kind `Contextual`, `ConversionContext` at a date | yes. A missing rate yields `Undetermined`, which maps to referral |
-| Authored equivalents in several currencies (M5 SoUA row 42) | none | **gap** (L5) |
+| Authored equivalents in several currencies (M5 SoUA row 42) | none. ADR-A95 proposes alternative bounds | **gap** (L5) |
 | Comparator as a variable, "equal to" or "not exceeding" (M6 6.1B) | `Bound` with `boundSense` and `boundClosure`, degenerate `Range` for equality | yes |
 | Limits, maximum durations, advance binding days (M5) | `Range`, `Bound` | yes |
 | Levels of authority and complaints authority as ordered values (M3 3.9.1.6, M5, M9) | `OrdinalValue` on a `TotalOrder` space | yes |
-| Percentage of a base: commission 5% of each GWP, leader fee 10% of GWP, GWP trigger % (M6, M5) | `OperationCapability` of kind `Ratio` only. Derived rate spaces are open question 4 | **gap** (L2) |
+| Percentage of a base: commission 5% of each GWP, leader fee 10% of GWP, GWP trigger % (M6, M5) | `OperationCapability` of kind `Ratio` only. ADR-A93 proposes derived rate spaces | **gap** (L2) |
 | Relative change: increase of more than 10% (M3 3.9.1.1B) | `AnchorBinding` with a `Proportional` offset on the old value | yes |
 | Deadlines relative to an event: within 1 business day of receipt, 10 business days before binding (M8, M4) | `AnchorBinding` of a temporal `Range` on the trigger occurrence | yes |
-| Business vs calendar days, per jurisdiction (M3, M8, M12) | `UnitContract` plus `ConversionContext`. Calendar binding is open question 2 | **gap** (L3) |
+| Business vs calendar days, per jurisdiction (M3, M8, M12) | `UnitContract` plus `ConversionContext`. ADR-A94 proposes calendar binding | **gap** (L3b) |
 | Recurring obligations: monthly, within 15 days of period end (M10), annual testing (M14) | `Recurrence`, `RecurrenceBin`, then `AnchorBinding` on the bin end | yes |
 | Year of account and anniversary transfer (M2 2.9) | `Recurrence` with anchor | yes |
 | 24:00 end-of-day convention (M2 guidance) | `Bound` closure and granularity | yes |
-| Local time at the Coverholder's address (M2 2.1) | contextual conversion with a time-zone context | yes, via L3 |
+| Local time at the Coverholder's address (M2 2.1) | contextual conversion with a time-zone context | yes, via L3b |
 | Loss ratio below 50% (M12 12.24.2.4.2) | `Quantity` in a ratio space | yes |
 | Variable value constraints: at least 7 years, at least 24 hours (M10, M13) | `Range` as the admissible set of a variable declaration | yes |
-| Unknown or disputed values, e.g. a complainant's eligibility in doubt (M9 9.2.9) | `UnresolvedValue` | **defect** (L1) |
+| Unknown or disputed values, e.g. a complainant's eligibility in doubt (M9 9.2.9) | `UnresolvedValue` | yes, since L1 was fixed |
 | Totals across policies bound: GWP income limits (M5) | none, by design | out of scope. Belongs to criteria (§6.4) |
 | Retained, explained results | `Comparison` with `OperationalProfile` | yes |
 
 ### 5.2 Verdict
 
-LATTICE Quantification is a suitable starting point. It covers 13 of the 18 in-scope
-requirements above directly, and a fourteenth once L3 lands. Its design stances match ours: it ships no units, currencies or
+LATTICE Quantification is a suitable starting point. It covers 14 of the 18 in-scope
+requirements above directly, and a fifteenth once L3b lands. ADRs for the remaining three are
+drafted upstream. Its design stances match ours: it ships no units, currencies or
 calendars (DP1), it distinguishes coarse values from unresolved ones, and its three-valued
 comparison gives referral a principled home. Building an equivalent from scratch would
 reproduce it.
 
 Adoption has costs:
 
-- It imports LATTICE Foundation 0.0.7 and Vocabulary 0.0.2, so it cannot be taken alone.
-- Its own acceptance criteria are not yet met. The SHACL shapes are mostly empty, and it
-  records a blocking dependency on a Foundation derived-artefact contract that does not exist.
-- The patches in §10 are needed before CBAA can rely on it.
+- It imports LATTICE Foundation and Vocabulary, so it cannot be taken alone.
+- Its own acceptance criteria are not yet met. Its SHACL profile has four node shapes and its
+  rule and structural shape files are empty, and it has no conformance corpus of its own (L13).
+  The Foundation derived-artefact contract it depended on now exists (L4).
+- L2, L3b and L5 are needed before CBAA can rely on it for remuneration, business-day deadlines
+  and currency equivalents.
 
 ## 6. Authority: Data and Compiled Forms
 
@@ -462,39 +466,20 @@ modelled (AP4).
 
 ## 10. LATTICE
 
-### 10.1 Assessment
+### 10.1 Position
 
-| Layer | Version | Use here | Notes |
-|---|---|---|---|
-| Foundation | 0.0.7 | adopt | identity vs version, supersession, governance state, valid time and PROV-O alignment match §8 and §9. Missing: derived artefacts, agreed and operational dates |
-| Vocabulary | 0.0.2 | adopt with L3 | scheme contracts are DP8's mechanism |
-| Quantification | 0.0.1 | adopt with L1, L2, L4, L5 | §5 |
-| Party | 0.0.3 | reference | role occupancy is a candidate for bearer and counterparty |
-| Eligibility | 0.0.1 | reference | three-valued decisions and match strategies align with §6.3 |
-| Instrument | 0.0.1 | reference | models obligations only. Defect L6 |
-| SPC | provisional namespace | reference | §8.7 |
+LATTICE is imported (D7). A review of that decision, recorded with its reasons in the
+[LATTICE design review](design-review.md), confirmed it and added an assurance gate (D12).
 
-HermiT classification of Foundation through Instrument, run for this review, found two
-unsatisfiable-class defects (L1, L6).
+HermiT classification of Foundation through Instrument at `558650b` found two
+unsatisfiable-class defects (L1, L6). Both are fixed, and the Foundation-through-Behaviour
+closure at the integration baseline classifies with none.
 
-### 10.2 Proposed upstream changes
+### 10.2 Integration
 
-| # | Layer | Change |
-|---|---|---|
-| L1 | Quantification | **Defect.** `qnt:unresolvedReason` has domain `qnt:Comparison`, and `qnt:UnresolvedValue` requires one, so every unresolved value is inferred to be a Comparison, which is disjoint from Value. `UnresolvedValue` is unsatisfiable. Widen the domain to `Comparison ⊔ UnresolvedValue` |
-| L2 | Quantification | Derived rate spaces (its open question 4): a proportional value, ratio times a referenced base, for commission and fees as a percentage of GWP |
-| L3 | Quantification, Vocabulary | Calendar binding (its open question 2): business-day extents converted against a jurisdiction's calendar. The scoped scheme binding part is done (D10) |
-| L4 | Foundation | The derived-artefact contract Quantification already depends on, reused for our compiled plane |
-| L5 | Quantification | Authored equivalents on a bound: one limit stated in several currencies without conversion |
-| L6 | Instrument | **Defect.** `Provision`, `Obligation` and `Qualifier` are subclasses of `Element` but listed with it in one `AllDisjointClasses`, so all three are unsatisfiable. Remove `Element` from the disjointness axiom |
-
-### 10.3 Integration
-
-Decided (D7). How LATTICE is brought in, which layers are imported, how Open DARE uses their
-T-Box and assertions, the description logic encoding, toolchain reuse and the upstream changes
-still needed are specified in the [LATTICE integration specification](lattice-integration.md).
-It supersedes the table in §10.1 for Party, Eligibility, Instrument and Behaviour, whose fit
-against CBAA content it establishes, and replaces §10.2's list with its own §8.
+How LATTICE is brought in, which layers are imported and for what, the description logic
+encoding, toolchain reuse, the gate, and the register of upstream changes (L1–L14) with their
+status are specified in the [LATTICE integration specification](lattice-integration.md).
 
 ## 11. Consequences for the Current Ontology
 
@@ -529,8 +514,11 @@ Not yet applied. Applying DP1 and DP2 to the files in this directory:
 | D9 | Apply §11 to the current ontology (was O4). Sequenced after LATTICE is imported, since the reclassified schemes are `voc:` individuals (integration spec §9) | 2026-09-24 |
 | D10 | Scoped scheme binding patched upstream, LATTICE `65ac4a8` (was O5) | 2026-09-24 |
 | D11 | AP1–AP4 recorded in `.github/copilot-instructions.md` (was O6) | 2026-09-24 |
+| D12 | LATTICE import confirmed after the [LATTICE design review](design-review.md), subject to the assurance gate of integration spec §3.3 (review of D7) | 2026-09-25 |
+| D13 | Instrument and Behaviour are imported without waiting, since L6 is fixed upstream (was I2) | 2026-09-25 |
+| D14 | Envelope and hierarchy classes come from LATTICE's OWL backend on the shared IR, ADR-A90 (was I4) | 2026-09-25 |
 
 ### Open
 
 The integration specification's [open questions](lattice-integration.md#10-open-questions)
-(I1–I5).
+(I1, I3, I5, I6).

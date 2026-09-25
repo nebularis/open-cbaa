@@ -8,7 +8,9 @@ below assesses it against the CBAA module drafts (M1–M14) and proposes further
 [design specification](design/design-spec.md) turns that review into a concrete design, with
 the agreed architecture principles and a decision log, and the
 [LATTICE integration specification](design/lattice-integration.md) covers how LATTICE is
-brought in and the description logic encoding. Neither is implemented yet.
+brought in and the description logic encoding. Neither is implemented yet. The
+[LATTICE design review](design/design-review.md) records the challenge to depending on LATTICE
+and its outcome.
 
 ## Files
 

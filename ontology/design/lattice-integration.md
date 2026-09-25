@@ -1,9 +1,10 @@
 # LATTICE Integration Specification
 
-Version 0.2, draft for review. Companion to the [design specification](design-spec.md), whose
+Version 0.3, draft for review. Companion to the [design specification](design-spec.md), whose
 principles (AP, DP) and decisions (D) it cites by number. Baseline: LATTICE `main` at
-`aa6d669` (2026-09-25), which includes the scoped scheme binding patch and the semantic
-versioning baseline of ADR-A86 (every ontology document at `0.2.0`).
+`f55c7d2` (2026-09-25). Since the design specification's baseline (`558650b`) LATTICE has
+taken scoped scheme binding, semantic versioning (ADR-A86), consumer import resolution
+(ADR-A88) and the applied ontology readiness unit, which closed most of §8.
 
 Logical expressions use description logic notation: ⊑ subsumption, ≡ equivalence, ⊓ ⊔ ¬
 conjunction, disjunction and negation, ∃ ∀ restrictions, {a} a nominal, ⊥ ⊤ bottom and top,
@@ -27,15 +28,15 @@ It does not specify implementation (AP1).
 
 | Layer | `owl:versionIRI` at baseline | Use | How |
 |---|---|---|---|
-| Foundation | `…/lattice/foundation/0.2.0` | identity, versions, governance state, valid time, evidence | `owl:imports` |
-| Vocabulary | `…/lattice/vocabulary/0.2.0` | scheme contracts, editions, scoped bindings | `owl:imports` |
-| Quantification | `…/lattice/quantification/0.2.0` | amounts, bounds, ranges, recurrences, ordinals | `owl:imports`, after L1 |
-| Party | `…/lattice/party/0.2.0` | actors, roles, role occupancy, participation, delegation | `owl:imports` |
-| Eligibility | `…/lattice/eligibility/0.2.0` | authority scopes as admission profiles, three-valued decisions | `owl:imports`, after L7 |
-| Instrument | `…/lattice/instrument/0.2.0` | alignment of statement kinds | `owl:imports`, after L6 |
-| Behaviour | `…/lattice/behaviour/0.2.0` | lifecycle state spaces, triggers, guards, allowances | `owl:imports`, after L6 (it imports Instrument) |
-| Surface | `…/lattice/surface/0.2.0` | compilation contracts and derived records | imported by the compilation module only |
-| MORK and Executable | `http://www.nebularis.org/ontologies/Mork/0.2.0`, `…/lattice/executable/0.2.0` | mapping graph, compiler provenance | imported by the compilation module only |
+| Foundation | `…/lattice/foundation/0.3.0` | identity, versions, governance state, valid time, evidence, derived artefacts | `owl:imports` |
+| Vocabulary | `…/lattice/vocabulary/0.3.0` | scheme contracts, editions, scoped bindings | `owl:imports` |
+| Quantification | `…/lattice/quantification/0.4.0` | amounts, bounds, ranges, recurrences, ordinals | `owl:imports` (Party, Eligibility and later layers import it too) |
+| Party | `…/lattice/party/0.4.0` | actors, roles, role occupancy, participation, delegation | `owl:imports` |
+| Eligibility | `…/lattice/eligibility/0.5.0` | authority scopes as admission profiles, three-valued decisions | `owl:imports` |
+| Instrument | `…/lattice/instrument/0.5.0` | alignment of statement kinds | `owl:imports` |
+| Behaviour | `…/lattice/behaviour/0.5.0` | lifecycle state spaces, triggers, guards, allowances | `owl:imports` |
+| Surface | `…/lattice/surface/0.4.0` | compilation contracts and derived records | imported by the compilation module only |
+| MORK and Executable | `http://www.nebularis.org/ontologies/Mork/0.3.0`, `…/lattice/executable/0.4.0` | mapping graph, compiler provenance | imported by the compilation module only |
 | Persistence | `…/lattice/persistence/0.2.0` | data-access profile | referenced by IRI, never imported (its own design, §7) |
 | SPC | `http://example.org/spc/0.2.0` | protocol execution | reference only |
 
@@ -45,6 +46,10 @@ are versioned independently (the table lists `spec`). Imports always use the exa
 (Foundation's is still `…/foundation`, not `…/lattice/foundation`), so version IRI and ontology
 IRI do not share a base (L11).
 
+HermiT classification of Foundation through Behaviour at the baseline, spec and vocab documents
+merged, finds no unsatisfiable classes. A mutation probe that restores the pre-L6 disjointness
+axiom makes `ins:Obligation` unsatisfiable, so the check detects the defect class it guards.
+
 ## 3. Repository Integration
 
 ### 3.1 Requirements
@@ -52,7 +57,7 @@ IRI do not share a base (L11).
 | # | Requirement |
 |---|---|
 | R1 | Pin exact content. Under ADR-A86 an ontology document's `owl:versionIRI` changes whenever its content does, so a version IRI identifies an ontology document's content. Files that declare no `owl:Ontology` (shapes, projections, generated execution artefacts) carry no version of their own and are identified only by commit |
-| R2 | Resolve `owl:imports` offline. LATTICE's version IRIs did not resolve over the network when checked (2026-09-24) |
+| R2 | Resolve `owl:imports` offline. LATTICE's version IRIs do not dereference, and publishing them is deferred (ADR-A88) |
 | R3 | Carry only what is used. LATTICE also holds platform code, applications and packages |
 | R4 | Keep the upstream patch flow short, since patches are expected (§8) |
 | R5 | Work with standard tooling (Protégé, OWL API, rdflib, HermiT) and no package manager |
@@ -77,20 +82,32 @@ IRI do not share a base (L11).
 2. **Imports as the dependency statement.** Open DARE modules import LATTICE by exact version
    IRI, as LATTICE's own layers do. Those imports, not a separate manifest, state which
    document versions Open DARE depends on.
-3. **Catalog.** An OASIS XML catalog, `ontology/catalog-v001.xml`, maps each imported version
-   IRI to its file under `imports/lattice/ontology/…`. MORK's ontology IRI is mapped as well,
-   because `Executable.ttl` imports MORK unversioned, as the policy permits. Protégé and the
-   OWL API read the catalog directly, and the validation tools read the same file. LATTICE's own
-   catalogs point at absolute paths on one machine and are not used.
-4. **Gate.** Every version IRI Open DARE imports must be declared by the file the catalog maps
-   it to, and the import closure must classify with no unsatisfiable classes other than those
-   recorded as known upstream defects (§8), and pass the SHACL suites.
+3. **Catalog.** ADR-A88's consumer pattern. An OASIS XML catalog, `ontology/catalog-v001.xml`,
+   maps Open DARE's own ontology and version IRIs and chains to LATTICE's generated root
+   catalog, `imports/lattice/ontology/catalog-v001.xml`, with `nextCatalog`. LATTICE's catalog
+   maps every LATTICE IRI, including MORK's unversioned one. Protégé and the OWL API follow
+   the chain. Python tooling uses the resolver in LATTICE's `tools/ontology_catalog.py`,
+   since `rdflib` has no catalog support. That tool generates Open DARE's own entries, but
+   cannot yet emit the chain entry (L14).
+4. **Gate.** Checked before any LATTICE layer is first imported and on every upgrade (D12):
+   - *resolution*: every version IRI Open DARE imports is declared by the file the catalog
+     chain maps it to
+   - *classification*: the import closure classifies with no unsatisfiable classes other than
+     known upstream defects recorded in §8, and passes the SHACL suites
+   - *ratification*: every LATTICE ADR whose decision an imported term depends on is Accepted
+   - *automation*: LATTICE's versioning and catalog checks run in its CI
+   - *conformance*: where Open DARE relies on a layer's evaluation semantics (comparison,
+     matching, resolution, transitions), a non-domain conformance case upstream covers it. Terms
+     used only for typing need only the classification check
 5. **Upgrade procedure.** LATTICE's import-pinning cascade checklist, applied to Open DARE's
    modules: move the submodule, list the imported documents whose version IRI changed, update
    every Open DARE `owl:imports` naming them in the same change, re-run the enumeration until
    no old IRI remains, and run the gate. Every LATTICE layer is at major version zero, where
    SemVer promises no stability, so a MINOR or PATCH bump is gated exactly like a MAJOR one
-   until a layer reaches `1.0.0`. The change is recorded in the design specification's decision
+   until a layer reaches `1.0.0`. The pin moves at LATTICE milestones, a completed work unit
+   whose ADRs are accepted, not at every commit. A single day of upstream work cascaded MINOR
+   bumps through 12 and then 17 documents (`9a12da4`, `54caeb6`), so per-commit pinning would
+   repeat that cascade here. The change is recorded in the design specification's decision
    log.
 
 Fallback if submodules prove unworkable for contributors: a vendored snapshot of the same
@@ -99,7 +116,8 @@ folders, with its source commit recorded. The catalog and gate do not change.
 ### 3.4 Versioning Open DARE's own documents
 
 Open DARE's ontology documents currently carry `owl:versionInfo "0.1.0"` and no
-`owl:versionIRI`. The proposal (I5) is to adopt ADR-A86's policy for them unchanged:
+`owl:versionIRI`. The proposal (I5) is to adopt ADR-A86's policy for them unchanged, once
+ADR-A86 is Accepted upstream (it is still Proposed):
 
 - one `owl:versionIRI` per `owl:Ontology` document, of the form
   `https://nebularis.github.io/open-dare/ontology/<path>/<version>`, e.g.
@@ -110,8 +128,10 @@ Open DARE's ontology documents currently carry `owl:versionInfo "0.1.0"` and no
 - the mechanical check reused from the submodule, with no copy in this repository:
   `python imports/lattice/tools/ontology_version_check.py --root . --base-ref <ref>`, which
   compares every `.ttl` under this repository's `ontology/` that declares `owl:Ontology` with
-  the given ref. It runs against this repository today. It ignores a document with no version
-  IRI, so it protects Open DARE's documents only once they carry one
+  the given ref. It runs against this repository today and passes its six documents. It
+  reports a document with no version IRI only under a `spec/` or `vocab/` directory, which
+  Open DARE's flat layout does not use. So it protects Open DARE's documents only once they
+  carry version IRIs, or once they move into that layout
 
 The reclassification (design-spec §11, D9) removes classes, which is MAJOR under the policy.
 At major version zero that is permitted, and it moves the affected documents to `0.2.0`.
@@ -129,6 +149,7 @@ individuals of LATTICE classes. It never restates or redefines a LATTICE term.
 | `fnd:Version`, `fnd:Governable` | published library object versions and their authoring state | WOL |
 | `fnd:TemporallyScoped` | effective periods of agreement versions, amendments, role occupancies | M2, M3 |
 | `fnd:Evidence` | acceptance and signature evidence | M2 2.3–2.8 |
+| `fnd:DerivedArtefact`, `fnd:DerivationRun` | compiled artefacts and the runs that produce them, as `prov:Entity` and `prov:Activity` | design-spec §6.5, §9 |
 
 Foundation has no term for the date an amendment was agreed or the date it is operationally
 implemented before its legal effect (M3 3.22). Open DARE declares both locally.
@@ -152,7 +173,10 @@ implemented before its legal effect (M3 3.22). Open DARE declares both locally.
 | `qnt:AnchorBinding` | deadlines relative to a trigger | M8, M10 |
 | `qnt:Recurrence` | reporting periods, year of account | M10, M2 2.9 |
 | `qnt:OrdinalValue` | levels of underwriting and complaints authority on ordered spaces | M5, M9 |
-| `qnt:Comparison` | recorded quantitative outcomes, including `Undetermined` | design-spec §6.3 |
+| `qnt:Comparison`, `qnt:UnresolvedValue` | recorded quantitative outcomes, including `Undetermined`, and values known to be unknown | design-spec §6.3, M9 9.2.9 |
+
+Percentages of a base, business-day extents and one limit stated in several currencies wait on
+ADR-A93, A-94 and A-95 (L2, L3b, L5).
 
 ### 4.4 Party
 
@@ -174,12 +198,21 @@ An `AuthorityGrant`'s scope (design-spec §6.2) is an `elg:AdmissionProfile` wit
 
 | Dimension kind | Condition | Strategy |
 |---|---|---|
-| flat concept set (contract type, policyholder class) | `elg:SetMembershipCondition` | `elg:SetMembership` |
-| hierarchical concept set (territory, insurable interest, peril) | condition with `elg:constrainedByContract` naming the dimension's scheme contract | `elg:HierarchicalMatch` |
+| flat concept set (contract type, policyholder class) | `elg:SetMembershipCondition` with `elg:requiredConcept` and `elg:excludedConcept` | `elg:SetMembership` |
+| hierarchical concept set (territory, insurable interest, peril) | condition with `elg:constrainedByContract` naming the dimension's scheme contract, and required and excluded concepts | `elg:HierarchicalMatch` |
 | bound (limit, duration, advance days) | `elg:IntervalCondition` with a `qnt:RangeSet` | `elg:IntervalContainment` |
 
+Exclusions follow ADR-A87's decision table: an exclusion beats an inclusion, and a case valued
+strictly above an excluded concept (France, where Corsica is excluded) is `Undetermined`. The
+SoUA territory tables' include and exclude rows at every level map directly.
+
+Candidates are read from the case through an `elg:EvidenceBinding` on Open DARE's own
+properties (`riskLocation`, `sumInsured`), not from `elg:Question` individuals (ADR-A91). Scheme
+resolution needs an explicit instant and scope (ADR-A89), which come from the bindings the
+agreement version was made under (design-spec §4.2).
+
 Outcomes are `elg:EligibilityDecision` individuals valued `elg:Permitted`, `elg:Denied` or
-`elg:Undetermined`. Exclusions ("but excluding") have no Eligibility construct today (L7).
+`elg:Undetermined`.
 
 ### 4.6 Behaviour
 
@@ -198,11 +231,12 @@ statement to the states in which it applies. It is not part of any envelope clas
 
 ### 4.7 Instrument
 
-After L6, Open DARE's `Obligation` is a subclass of `ins:Obligation`, and bound statements use
+Open DARE's `Obligation` is a subclass of `ins:Obligation`, and bound statements use
 `ins:obligor`/`ins:obligee` to role occupancies. Open DARE does not use `ins:inProvision` for
 attaching meaning: it is functional, so one obligation could not be expressed by two wording
 variants, which the CBAA needs (M9 9.2.8A and B). Attachment stays with Open DARE's `expresses`
-(design-spec §3.4). L12 raises this upstream.
+(design-spec §3.4). ADR-A96 (Proposed) makes `ins:inProvision` non-functional. Whether
+attachment then aligns with it is I6.
 
 ### 4.8 Surface, MORK and Persistence
 
@@ -264,7 +298,7 @@ Statement kinds are pairwise disjoint classes:
 
     Disj(Obligation, Prohibition, Permission, Power, AuthorityGrant,
          Definition, Classification, Precedence)
-    Obligation ⊑ ins:Obligation                              (after L6)
+    Obligation ⊑ ins:Obligation
 
 Library templates and agreement-bound statements are distinguished orthogonally to kind:
 
@@ -305,6 +339,11 @@ All three forms are in OWL 2 EL. This is where subsumption-aware matching (desig
 enters the T-Box. Without the partition declaration, the checks below err towards reporting an
 overlap or an expansion, never towards missing one.
 
+These forms, the condition and profile classes below, and the three reasoner tasks in the
+table are those of LATTICE's design-time OWL backend (ADR-A90, Accepted). Open DARE uses that
+backend and does not generate the classes itself (D14). Its implementation waits on ADR-A83's
+reasoning harness and a path-encoding decision (L10).
+
 **Envelope classes.** For each bound authority grant g, one class over the static dimensions
 (modes A and Q only, DP6). For a grant covering insurance, risks in France except Corsica, and
 sums insured up to GBP 5,000,000:
@@ -340,22 +379,23 @@ These are SHACL, SPARQL or compiled evaluators, each with PROV-O provenance.
 
 | Component | Input | Output | Provenance |
 |---|---|---|---|
-| `tools/mork_compilers` | `elg:IntervalCondition` declarations | a shared IR (`IntervalPlan`), then SPARQL `mork:QueryTemplate`, SHACL shapes (readiness and containment), structured SWRL | `exe:ExecutablePlan`, `exe:producesArtefact`, `exe:derivedFrom…Node` |
-| `tools/surface` | `srf:IndexContract`, `srf:PromotionContract`, `srf:ProjectionContract`, `srf:SurfaceProfile` | generated symbols (nominal classes, memberships, closure relations, promoted properties), and lowering of projections into MORK | `srf:GeneratedSurface`, `srf:ReadSetEntry` with content hashes, `srf:LawDischarge` |
+| `tools/mork_compilers` | Eligibility conditions (interval, exact, set membership, hierarchical match, with required and excluded concepts) and `AllRequired`/`AnySufficient` profiles, with candidates read through evidence bindings | a shared IR (interval and concept plans), then SPARQL `mork:QueryTemplate` for all three outcomes, SHACL shapes, structured SWRL | `exe:ExecutablePlan`, `exe:ConceptMatchPlan`, `exe:producesArtefact`, `exe:derivedFrom…Node`, aligned to PROV-O. Every `Undetermined` carries an `exe:Diagnostic` |
+| `tools/surface` | `srf:IndexContract`, `srf:PromotionContract`, `srf:ProjectionContract`, `srf:SurfaceProfile` | generated symbols (nominal classes, memberships, closure relations, promoted properties), and lowering of projections into MORK | `srf:GeneratedSurface`, `srf:ReadSetEntry` with content hashes and the scheme binding each read resolved under, `srf:LawDischarge` |
 | MORK ontology | mapping graph | `mork:GenerativeMapping` kinds (projection, rule, shape, transform), `mork:OwlAxiom`/`mork:OwlClass` for T-Box generation, intent nodes, uncertain mappings | generative mappings are `fnd:Version` and `fnd:Governable` |
 | `tools/persistence` | `dal:` profiles | SPARQL operation templates, identity-minting recipes | compiled profile records |
+| `tools/ontology_catalog.py`, `tools/ontology_version_check.py` | a repository's ontology documents | catalogs, import closures, version-bump findings | none |
 
-Current limits of `mork_compilers`: only interval containment is compiled. Set membership,
-hierarchical match, exclusion and profile-level aggregation are not, and there is no OWL-class
-backend.
+Current limits of `mork_compilers`: there is no OWL backend yet (ADR-A90, L10). SHACL and SWRL
+compile concept conditions only over `Expanded` closures, enumerated from one scheme edition at
+compile time. `elg:DimensionConsistent` profiles are refused, having no evaluable definition.
 
 ### 6.2 Open DARE's compiled forms
 
 | Compiled form (design-spec §6.5) | Route | Reuse |
 |---|---|---|
-| Runtime envelope table | Surface `IndexContract` with `ClosureRelation` over `skos:broader` and a `ContractBoundPopulation` per hierarchical dimension. `PromotionContract` flattens grant parameters. A `ProjectionContract` (`JoinProjection`) assembles rows, lowered to MORK, compiled to SPARQL | full |
-| SHACL validation of bordereau rows | `mork_compilers` shared IR and SHACL backend over the grant's Eligibility conditions | IR and backend, extended by L10 |
-| Envelope and hierarchy classes (§5.6) | the same shared IR with a new OWL backend, emitting `mork:OwlClass` nodes under a `mork:GenerativeMapping` | IR, extended by L10 |
+| Runtime envelope table | Surface `IndexContract` with `ClosureRelation` over `skos:broader` and a `ContractBoundPopulation` per hierarchical dimension. `PromotionContract` flattens grant parameters. A `ProjectionContract` (`JoinProjection`) assembles rows, lowered to MORK, compiled to SPARQL | Surface as it stands, not yet exercised on an Open DARE contract |
+| SHACL validation of bordereau rows | `mork_compilers` shared IR and SHACL backend over the grant's Eligibility conditions | as it stands, `Expanded` closure over the pinned edition |
+| Envelope and hierarchy classes (§5.6) | the same shared IR with ADR-A90's OWL backend | once L10 is complete |
 
 Routing all three through one IR gives one reading of a grant's conditions. The lookup table,
 the shapes and the classes cannot then disagree about what a grant means, which is the reason
@@ -370,7 +410,7 @@ Every compilation is declared in the graph before it runs:
 | What to compile | a Surface contract or a MORK mapping, authored in an Open DARE compilation module |
 | Order | `mork:dependsOnMapping`, a declared DAG |
 | How | an `srf:SurfaceProfile`: generator version, canonicalisation version, entailment regime, naming. A profile change is a new profile version and a full regeneration |
-| What was read | `srf:ReadSetEntry` per input, with its content hash |
+| What was read | `srf:ReadSetEntry` per input, with its content hash and, for a scheme, the instant, scope and binding it was resolved under |
 | What was produced | `srf:DerivedArtefact` records and `exe:` plans |
 | What was proven | `srf:LawDischarge` for runtime-conformance laws |
 
@@ -378,11 +418,12 @@ The same staleness rule then covers every compiled artefact: stale when any reco
 differs from the current one. A read of a LATTICE ontology document can also record its version
 IRI (`srf:readVersion`), which under ADR-A86 changes whenever its content does.
 
-**Uniform provenance.** Surface, Executable and MORK each carry their own provenance terms and
-none is aligned with PROV-O, which Open DARE adopted (D5). L8 proposes the alignment
-(`srf:DerivedArtefact ⊑ prov:Entity`, a generation run as `prov:Activity`,
-`exe:derivedFrom…Node ⊑ prov:wasDerivedFrom`). One query then answers "where did this come from"
-across meaning extraction, compilation and runtime decisions.
+**Uniform provenance.** Foundation's derived-artefact contract is aligned with PROV-O, which
+Open DARE adopted (D5): `fnd:DerivedArtefact ⊑ prov:Entity`, `fnd:DerivationRun ⊑
+prov:Activity`, and `srf:DerivedArtefact ⊑ fnd:DerivedArtefact`. Executable aligns directly:
+`exe:ExecutablePlan` and `exe:GeneratedArtefact ⊑ prov:Entity`, `exe:derivedFrom…Node ⊑
+prov:wasDerivedFrom` (ADR-A92). One query then answers "where did this come from" across
+meaning extraction, compilation and runtime decisions.
 
 **Meaning extraction.** MORK's uncertain mappings, hypotheses and intent nodes are a ready
 home for meanings proposed by LLM extraction and later validated (AP4). Open DARE records only
@@ -429,41 +470,50 @@ and the agreement aggregate holds references, so it can keep a patch log.
 
 ## 8. Upstream Changes
 
-| # | Layer | Change | Blocks |
-|---|---|---|---|
-| L1 | Quantification | widen `qnt:unresolvedReason`'s domain so `UnresolvedValue` is satisfiable | referral on unresolved values |
-| L2 | Quantification | derived rate values (a percentage of a base) | remuneration (M6) |
-| L3a | Vocabulary | scoped, time-bounded binding | **done** at `65ac4a8` |
-| L3b | Quantification | calendar binding for business-day extents | deadlines in business days |
-| L4 | Foundation | derived-artefact contract. Surface's `srf:DerivedArtefact` now serves, so this lowers to lifting it into Foundation | nothing for Open DARE |
-| L5 | Quantification | one bound stated in several currencies | M5 SoUA equivalents |
-| L6 | Instrument | remove `ins:Element` from the disjointness axiom that makes its subclasses unsatisfiable | importing Instrument and Behaviour |
-| L7 | Eligibility | an exclusion construct, e.g. an excluded set on a condition or a none-matching operation | authority scopes |
-| L8 | Surface, Executable, MORK | PROV-O alignment of derived records and plans | uniform provenance |
-| L9 | Surface, Eligibility | honour `voc:SchemeBinding` where they read `voc:boundScheme` | market-scoped vocabularies at compile time |
-| L10 | `mork_compilers` | set membership, hierarchical match, exclusion, profile aggregation, OWL backend | compiled forms 2 and 3 (§6.2) |
-| L11 | all | **largely done** by ADR-A86 at `aa6d669`. Remaining: run `check:ontology-versioning` in CI (the GitHub workflows do not call it today), move the four generated files under `surface/execution/job-family/` off the retired `surface/0.0.1` import, decide whether ontology IRIs follow version IRIs under `…/lattice/`, have the check flag an in-scope document that declares no version IRI (it passes one today), and align ADR-A86's status ("Proposed") with the policy document ("Decided") | nothing blocking. The CI check protects the content-pin guarantee §3.3 relies on |
-| L12 | Instrument | `ins:inProvision` is functional, so one obligation cannot be expressed by several provisions | aligning attachment with Instrument |
+Status at the baseline. Items closed upstream stay listed, since other documents cite them by
+number.
+
+| # | Layer | Change | Status | Blocks while open |
+|---|---|---|---|---|
+| L1 | Quantification | widen `qnt:unresolvedReason`'s domain so `UnresolvedValue` is satisfiable | done, `9a12da4` | |
+| L2 | Quantification | derived rate values (a percentage of a base) | ADR-A93 Proposed | remuneration (M6) |
+| L3a | Vocabulary | scoped, time-bounded binding | done, `65ac4a8`, ADR-A85 | |
+| L3b | Quantification | calendar binding for business-day extents | ADR-A94 Proposed | deadlines in business days |
+| L4 | Foundation | derived-artefact contract | done, `54caeb6`, ADR-A92 | |
+| L5 | Quantification | one bound stated in several currencies | ADR-A95 Proposed | M5 SoUA equivalents |
+| L6 | Instrument | remove `ins:Element` from the disjointness axiom that makes its subclasses unsatisfiable | done, `9a12da4` | |
+| L7 | Eligibility | an exclusion construct | done, `9a12da4`, ADR-A87 | |
+| L8 | Surface, Executable | PROV-O alignment of derived records and plans | done, `54caeb6`, ADR-A92 | |
+| L9 | Surface, Eligibility | honour `voc:SchemeBinding` where they read `voc:boundScheme` | done, `284dbe5`, `0742073` | |
+| L10 | `mork_compilers` | set membership, hierarchical match, exclusion, profile aggregation, OWL backend | done except the OWL backend, `6e9acb1`, ADR-A89, A-91. The OWL backend (ADR-A90, Accepted) waits on ADR-A83 and a path-encoding decision | design-time classes (§5.6) |
+| L11 | all | semantic versioning and its enforcement | policy and consumer catalog in place (ADR-A86, A-88). Open: ratify ADR-A86, run the versioning and catalog checks in CI (both workflows are manual-only), decide whether ontology IRIs move under `…/lattice/`, and extend the missing-version-IRI check beyond `spec/` and `vocab/` directories for consumers | the gate's ratification and automation conditions (§3.3) |
+| L12 | Instrument | `ins:inProvision` is functional, so one obligation cannot be expressed by several provisions | ADR-A96 Proposed | I6 |
+| L13 | Quantification | a non-domain conformance corpus, its own acceptance criterion (README §14) | open | the gate's conformance condition for comparisons (design-spec §6.3, mode Q) |
+| L14 | tools | `ontology_catalog.py write` emits a consumer's `nextCatalog` chain and takes the consumer's external imports | open | a generated Open DARE catalog with no hand edits |
 
 ## 9. Sequencing
 
-1. Upstream L6 and L1, which are one-line fixes.
+1. Upstream: ratify ADR-A86 and run the versioning and catalog checks in CI (L11), and L14.
+   These meet the gate's ratification and automation conditions for every layer.
 2. Add the submodule and catalog, give Open DARE's documents version IRIs (§3.4), import
-   Foundation, Vocabulary, Quantification and Party, and run the gate.
+   Foundation, Vocabulary and Party (Party brings Quantification), and run the gate.
 3. Apply the reclassification (design-spec §11), with schemes as `voc:ConceptScheme` editions
    and properties bound by `voc:SchemeContract`.
 4. Add the meaning module (statement kinds, §5.5) on Party, Eligibility and Instrument.
-5. Add the compilation module (Surface contracts, profile) and the Persistence profile module.
+5. Upstream L13. Add the compilation module (Surface contracts, profile) and the Persistence
+   profile module. The design-time classes (§5.6) follow L10.
 6. Declare the lifecycles on Behaviour (M12, M3, referral, FNOL, complaints).
 
-Step 3 waits for step 2 because the reclassified schemes are `voc:` individuals.
+Step 3 waits for step 2 because the reclassified schemes are `voc:` individuals. Remuneration,
+business-day deadlines and SoUA currency equivalents follow ADR-A93 to A-95 (L2, L3b, L5).
 
 ## 10. Open Questions
 
 | # | Question | Recommendation |
 |---|---|---|
-| I1 | Submodule path and catalog location | `imports/lattice`, `ontology/catalog-v001.xml` (§3.3) |
-| I2 | Import Instrument and Behaviour before L6 lands | no, wait for L6 |
+| I1 | Submodule path and catalog location | `imports/lattice`, `ontology/catalog-v001.xml` chained to LATTICE's catalog (§3.3) |
+| I2 | Import Instrument and Behaviour before L6 lands | closed: L6 is fixed (D13) |
 | I3 | Agreement version boundary: named graph, or a composite boundary walking a shape over `directlyComprises` | named graph for accepted, immutable versions |
-| I4 | Envelope classes from an extended `mork_compilers` IR, or a new Surface backend | extend the IR (§6.2) |
-| I5 | Adopt ADR-A86's versioning policy for Open DARE's own ontology documents | yes (§3.4) |
+| I4 | Envelope classes from an extended `mork_compilers` IR, or a new Surface backend | closed: ADR-A90 extends the IR (D14) |
+| I5 | Adopt ADR-A86's versioning policy for Open DARE's own ontology documents | yes, once ADR-A86 is Accepted (§3.4) |
+| I6 | Once ADR-A96 is accepted, align attachment with Instrument | yes for obligations only: a sub-property of both `expressedBy` and `ins:inProvision`, with WIM objects that express obligations typed `ins:Provision`. Other statement kinds keep `expressedBy` alone |
