@@ -1,4 +1,4 @@
-Let's worth through the pushback your co-agent outlined in `ontology/design/design-review.md`. 
+Let's worth through the pushback your co-agent outlined in `docs/design/design-review.md`. 
 
 ## Clarifying Context
 

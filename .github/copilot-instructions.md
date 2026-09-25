@@ -17,7 +17,7 @@ DO NOT make design decisions unilaterally without consulting your user for archi
 
 ### Architecture Principles
 
-These govern all work in this repository. The [design specification](../ontology/design/design-spec.md#1-architecture-principles) is authoritative if the two ever differ.
+These govern all work in this repository. The [design specification](../docs/design/design-spec.md#1-architecture-principles) is authoritative if the two ever differ.
 
 1. The ontological design is completed before a reference implementation is attempted. This repository holds semantic specifications and the tools used to produce and check them (`tools/`). It holds no implementation of the reference architecture.
 2. The ontological layers stand on their own. Software built on them is governed by their architecture and design, not the reverse.
