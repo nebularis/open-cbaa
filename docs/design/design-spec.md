@@ -601,3 +601,10 @@ gives the reasoning.
 
 The integration specification's [open questions](lattice-integration.md#10-open-questions)
 (I1, I3, I5 to I10). D20 and D22 to D24 propose answers to I6 to I8.
+
+LATTICE's [peril structure whitepaper](https://github.com/nebularis/lattice/blob/main/docs/developer/sketches/peril-structure-whitepaper.md#9-proposed-decisions)
+proposes D27 to D37 on perils, pools, causation, exposure units, scheme tiers, optional
+compilation and liability direction, for this decision log once agreed. Its open questions, and
+those of the [term parameters](https://github.com/nebularis/lattice/blob/main/docs/developer/sketches/term-parameters.md#10-open-questions) and
+[MORK bridge](https://github.com/nebularis/lattice/blob/main/docs/developer/sketches/mork-bridge.md#9-open-questions) sketches, are tracked in LATTICE's
+[applied insurance reference epic](https://github.com/nebularis/lattice/blob/main/docs/developer/plans/applied-insurance-reference.md#6-open-questions-carried-from-the-sketches).
