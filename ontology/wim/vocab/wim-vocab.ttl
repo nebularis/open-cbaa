@@ -1,0 +1,119 @@
+@prefix wim:  <https://nebularis.github.io/open-cbaa/ontology/wim#> .
+@prefix lma:  <https://nebularis.github.io/open-cbaa/ontology/schemes/lma#> .
+@prefix fnd:  <https://www.nebularis.org/neuro-semantic/lattice/foundation#> .
+@prefix voc:  <https://www.nebularis.org/neuro-semantic/lattice/vocabulary#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+# Open CBAA — Wording structure vocabulary.
+#
+# V1 (mechanism-intrinsic) enumerations, which change only with an ontology
+# release, and the scheme contracts that bind each WIM typing property to a
+# concept scheme (DP8). The contracts default to the provisional LMA schemes
+# in ontology/schemes/, which the LMA's published editions will replace.
+
+<https://nebularis.github.io/open-cbaa/ontology/wim-vocab> a owl:Ontology ;
+    rdfs:label "Open CBAA — Wording structure vocabulary"@en ;
+    owl:versionIRI <https://nebularis.github.io/open-cbaa/ontology/wim-vocab/0.1.0> ;
+    owl:imports <https://nebularis.github.io/open-cbaa/ontology/wim/0.2.0> ,
+                <https://www.nebularis.org/neuro-semantic/lattice/foundation-vocab/0.3.0> .
+
+#################################################################
+# Inclusion modes (cbaa.md, design-spec §3.6)
+#################################################################
+
+wim:Mandatory a owl:NamedIndividual , wim:InclusionMode ;
+    rdfs:label "Mandatory"@en ;
+    rdfs:comment "Always present in an agreement that includes its parent."@en .
+
+wim:Variation a owl:NamedIndividual , wim:InclusionMode ;
+    rdfs:label "Variation"@en ;
+    rdfs:comment "One of several variants of a variation slot. Exactly one variant per slot is included, chosen by condition or by the Contract Creator."@en .
+
+wim:Optional a owl:NamedIndividual , wim:InclusionMode ;
+    rdfs:label "Optional"@en ;
+    rdfs:comment "Included at the Contract Creator's choice."@en .
+
+wim:Conditional a owl:NamedIndividual , wim:InclusionMode ;
+    rdfs:label "Conditional"@en ;
+    rdfs:comment "Included when its inclusion condition (wim:includedWhen) holds over the agreement's governing variables."@en .
+
+[] a owl:AllDifferent ; owl:distinctMembers ( wim:Mandatory wim:Variation wim:Optional wim:Conditional ) .
+
+#################################################################
+# Population methods (cbaa-spec-observations, Variables)
+#################################################################
+
+wim:FreeEntry a owl:NamedIndividual , wim:PopulationMethod ;
+    rdfs:label "Free entry"@en .
+wim:PickList a owl:NamedIndividual , wim:PopulationMethod ;
+    rdfs:label "Pick list"@en ;
+    rdfs:comment "Chosen from the concepts of the variable's value contract."@en .
+wim:ReferenceTableLookup a owl:NamedIndividual , wim:PopulationMethod ;
+    rdfs:label "Reference table lookup"@en ;
+    rdfs:comment "Looked up from a reference table, such as the Coverholder details."@en .
+wim:TablePopulated a owl:NamedIndividual , wim:PopulationMethod ;
+    rdfs:label "Populated from a table"@en ;
+    rdfs:comment "Filled from a table object, such as the Insurer Capacity Table."@en .
+wim:SignatureProcess a owl:NamedIndividual , wim:PopulationMethod ;
+    rdfs:label "From the signature process"@en ;
+    rdfs:comment "Supplied by digital signature, such as acceptance dates (M2)."@en .
+wim:DerivedByRule a owl:NamedIndividual , wim:PopulationMethod ;
+    rdfs:label "Derived by rule"@en .
+wim:DefaultedOverridable a owl:NamedIndividual , wim:PopulationMethod ;
+    rdfs:label "Defaulted, overridable"@en ;
+    rdfs:comment "Defaulted from facts but overridable within the admissible values (M14 14.5)."@en .
+wim:FromAnotherVariable a owl:NamedIndividual , wim:PopulationMethod ;
+    rdfs:label "From another variable"@en ;
+    rdfs:comment "Takes the value of the variable named by wim:populatedFrom."@en .
+
+[] a owl:AllDifferent ; owl:distinctMembers ( wim:FreeEntry wim:PickList wim:ReferenceTableLookup
+    wim:TablePopulated wim:SignatureProcess wim:DerivedByRule wim:DefaultedOverridable wim:FromAnotherVariable ) .
+
+#################################################################
+# Scheme contracts for the WIM typing properties (DP8)
+#################################################################
+
+wim:ContractCategoryContract a voc:SchemeContract ;
+    rdfs:label "Contract category contract"@en ;
+    fnd:hasIdentity wim:ContractCategoryContract-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    voc:constrainsProperty wim:contractCategory , wim:applicableTo ;
+    voc:boundScheme lma:ContractCategoryScheme ;
+    rdfs:comment "Also governs wim:applicableTo, whose values mark a typing concept as agreement-related, policy-related or both."@en .
+
+wim:ComponentGroupTypeContract a voc:SchemeContract ;
+    rdfs:label "Component group type contract"@en ;
+    fnd:hasIdentity wim:ComponentGroupTypeContract-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    voc:constrainsProperty wim:componentGroupType ;
+    voc:boundScheme lma:ComponentGroupTypeScheme .
+
+wim:ComponentTypeContract a voc:SchemeContract ;
+    rdfs:label "Component type contract"@en ;
+    fnd:hasIdentity wim:ComponentTypeContract-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    voc:constrainsProperty wim:componentType ;
+    voc:boundScheme lma:ComponentTypeScheme .
+
+wim:ClauseClassificationContract a voc:SchemeContract ;
+    rdfs:label "Clause classification contract"@en ;
+    fnd:hasIdentity wim:ClauseClassificationContract-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    voc:constrainsProperty wim:clauseClassification ;
+    voc:boundScheme lma:ClauseClassificationScheme .
+
+wim:ElementTypeContract a voc:SchemeContract ;
+    rdfs:label "Element type contract"@en ;
+    fnd:hasIdentity wim:ElementTypeContract-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    voc:constrainsProperty wim:elementType ;
+    voc:boundScheme lma:ElementTypeScheme .
+
+wim:DocumentKindContract a voc:SchemeContract ;
+    rdfs:label "Document kind contract"@en ;
+    fnd:hasIdentity wim:DocumentKindContract-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    voc:constrainsProperty wim:documentKind ;
+    voc:boundScheme lma:DocumentKindScheme .

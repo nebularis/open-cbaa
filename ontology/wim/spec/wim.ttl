@@ -1,0 +1,314 @@
+@prefix :     <https://nebularis.github.io/open-cbaa/ontology/wim#> .
+@prefix wim:  <https://nebularis.github.io/open-cbaa/ontology/wim#> .
+@prefix fnd:  <https://www.nebularis.org/neuro-semantic/lattice/foundation#> .
+@prefix voc:  <https://www.nebularis.org/neuro-semantic/lattice/vocabulary#> .
+@prefix qnt:  <https://www.nebularis.org/neuro-semantic/lattice/quantification#> .
+@prefix elg:  <https://www.nebularis.org/neuro-semantic/lattice/eligibility#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# Open CBAA — Wording structure (the LMA Wordings Information Model).
+#
+# The structural stratum: the WIM's four levels, the part-whole relation,
+# the data elements that carry text and variables, and the assembly
+# mechanism (variation slots, inclusion modes, inclusion conditions, text
+# segments). Typing and Sub-Typing are classifications, so they are SKOS
+# concepts in the provisional LMA schemes (ontology/schemes/), not classes
+# (design-spec §11, DP2). See ontology/README.md for the design.
+
+<https://nebularis.github.io/open-cbaa/ontology/wim> a owl:Ontology ;
+    rdfs:label "Open CBAA — Wording structure"@en ;
+    owl:versionIRI <https://nebularis.github.io/open-cbaa/ontology/wim/0.2.0> ;
+    owl:priorVersion <https://nebularis.github.io/open-cbaa/ontology/lma-wim/core> ;
+    owl:imports <https://www.nebularis.org/neuro-semantic/lattice/foundation/0.3.0> ,
+                <https://www.nebularis.org/neuro-semantic/lattice/vocabulary/0.3.0> ,
+                <https://www.nebularis.org/neuro-semantic/lattice/quantification/0.5.0> ,
+                <https://www.nebularis.org/neuro-semantic/lattice/eligibility/0.6.0> .
+
+#################################################################
+# The four levels
+#################################################################
+
+wim:WordingObject a owl:Class ;
+    rdfs:label "Wording object"@en ;
+    owl:equivalentClass [ a owl:Class ; owl:unionOf ( wim:Contract wim:ComponentGroup wim:Component wim:DataElement ) ] ;
+    rdfs:subClassOf fnd:Version , fnd:Governable ;
+    rdfs:comment "A node of the WIM's object class hierarchy: a contract, component group, component or data element. Each one is a published, immutable version of a persistent wording identity."@en ;
+    fnd:utility "Use fnd:hasIdentity for the object across its versions and wim:objectId for the WIM object id (C05.2, SC08.1.1). A new published text is a new version that supersedes the old one (fnd:supersededBy). Agreements keep pointing at the version they were made with."@en .
+
+wim:Contract a owl:Class ;
+    rdfs:label "Contract"@en ; skos:altLabel "CON" ;
+    rdfs:comment "The root of a WIM tree: a whole agreement or policy wording."@en .
+
+wim:ComponentGroup a owl:Class ;
+    rdfs:label "Component group"@en ; skos:altLabel "CGP" ;
+    rdfs:comment "A nestable grouping of components, such as a module, an endorsement or a schedule."@en .
+
+wim:Component a owl:Class ;
+    rdfs:label "Component"@en ; skos:altLabel "CMP" ;
+    rdfs:comment "A nestable unit of wording, such as a clause, a definition or guidance."@en .
+
+wim:DataElement a owl:Class ;
+    rdfs:label "Data element"@en ;
+    rdfs:comment "A leaf of the WIM tree: text, a table, a variable, metadata or a reference."@en .
+
+[] a owl:AllDisjointClasses ;
+    owl:members ( wim:Contract wim:ComponentGroup wim:Component wim:DataElement ) .
+
+#################################################################
+# Part-whole
+#################################################################
+
+wim:comprises a owl:ObjectProperty , owl:TransitiveProperty ;
+    rdfs:label "comprises"@en ;
+    rdfs:domain wim:WordingObject ; rdfs:range wim:WordingObject ;
+    rdfs:comment "The transitive part-whole relation over the WIM levels."@en ;
+    fnd:utility "Never assert it. Assert wim:directlyComprises and let a reasoner, or a compiled closure, supply skip-level containment."@en .
+
+wim:isComprisedBy a owl:ObjectProperty , owl:TransitiveProperty ;
+    rdfs:label "is comprised by"@en ;
+    owl:inverseOf wim:comprises .
+
+wim:directlyComprises a owl:ObjectProperty , owl:IrreflexiveProperty , owl:AsymmetricProperty ;
+    rdfs:label "directly comprises"@en ;
+    rdfs:subPropertyOf wim:comprises ;
+    rdfs:comment "A direct edge of the WIM tree."@en ;
+    fnd:utility "Kept simple (no transitive sub-property), so OWL 2 DL allows it to be irreflexive and asymmetric. Transitivity lives on wim:comprises only."@en .
+
+wim:isDirectlyComprisedBy a owl:ObjectProperty , owl:IrreflexiveProperty , owl:AsymmetricProperty ;
+    rdfs:label "is directly comprised by"@en ;
+    rdfs:subPropertyOf wim:isComprisedBy ;
+    owl:inverseOf wim:directlyComprises .
+
+# What each level may comprise. The restrictions are closed under
+# transitivity, so wim:comprises can never entail an out-of-hierarchy edge.
+wim:Contract rdfs:subClassOf [ a owl:Restriction ; owl:onProperty wim:comprises ;
+    owl:allValuesFrom [ a owl:Class ; owl:unionOf ( wim:ComponentGroup wim:Component wim:DataElement ) ] ] .
+wim:ComponentGroup rdfs:subClassOf [ a owl:Restriction ; owl:onProperty wim:comprises ;
+    owl:allValuesFrom [ a owl:Class ; owl:unionOf ( wim:ComponentGroup wim:Component wim:DataElement ) ] ] .
+wim:Component rdfs:subClassOf [ a owl:Restriction ; owl:onProperty wim:comprises ;
+    owl:allValuesFrom [ a owl:Class ; owl:unionOf ( wim:Component wim:DataElement ) ] ] .
+wim:DataElement rdfs:subClassOf [ a owl:Restriction ; owl:onProperty wim:comprises ; owl:allValuesFrom owl:Nothing ] .
+
+wim:rankKey a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "rank key"@en ;
+    rdfs:domain wim:WordingObject ; rdfs:range xsd:string ;
+    rdfs:comment "A lexicographic sort key placing a wording object among its siblings (design-spec §7)."@en ;
+    fnd:utility "Insert between two siblings by choosing a key between theirs, so unchanged siblings keep their keys and version diffs show only real changes. Clause numbers are never stored: they are computed after inclusion is resolved (DP10)."@en .
+
+wim:objectId a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "object id"@en ;
+    rdfs:domain wim:WordingObject ; rdfs:range xsd:string ;
+    rdfs:comment "The WIM object id, such as C05.2 or SC08.1.1. Identity, not position."@en .
+
+#################################################################
+# Typing, by classification (concepts in the provisional LMA schemes)
+#################################################################
+
+wim:contractCategory a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "contract category"@en ;
+    rdfs:domain wim:Contract ; rdfs:range skos:Concept ;
+    rdfs:comment "What kind of contract this is: Agreement or Policy at the top, and a narrower agreement type such as Binding Authority below Agreement."@en ;
+    fnd:utility "Values come from the scheme bound to wim:ContractCategoryContract. Functional, so a contract has one category. A generated class σ(BindingAuthority) ≡ Contract ⊓ ∃contractCategory.{BindingAuthority} stands in for the old subclass where a class is needed."@en .
+
+wim:componentGroupType a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "component group type"@en ;
+    rdfs:domain wim:ComponentGroup ; rdfs:range skos:Concept ;
+    rdfs:comment "Module, Endorsement or Complex Component, or Schedule."@en .
+
+wim:componentType a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "component type"@en ;
+    rdfs:domain wim:Component ; rdfs:range skos:Concept ;
+    rdfs:comment "Clause, Definition, System Guidance or Technical Guidance."@en .
+
+wim:clauseClassification a owl:ObjectProperty ;
+    rdfs:label "clause classification"@en ;
+    rdfs:domain wim:Component ; rdfs:range skos:Concept ;
+    rdfs:comment "Where a clause sits in the WIM clause sub-typing (Scope of Authority, Scope of Coverage, Contractual Provision and their leaves)."@en ;
+    fnd:utility "Only for components whose type is Clause. Not functional: the clause scheme is a polyhierarchy, and a clause may carry a leaf that sits under two parents."@en .
+
+wim:elementType a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "element type"@en ;
+    rdfs:domain wim:DataElement ; rdfs:range skos:Concept ;
+    rdfs:comment "The sub-typing of a data element: Title, Paragraph, Numbered Clause, Dynamic Table and so on."@en .
+
+wim:applicableTo a owl:ObjectProperty ;
+    rdfs:label "applicable to"@en ;
+    rdfs:domain skos:Concept ; rdfs:range skos:Concept ;
+    rdfs:comment "Marks a WIM typing concept as belonging to agreement wordings, policy wordings or both, replacing the AgreementRelated and PolicyRelated mixins."@en .
+
+#################################################################
+# Data elements
+#################################################################
+
+wim:Text a owl:Class ; rdfs:subClassOf wim:DataElement ;
+    rdfs:label "Text"@en ; skos:altLabel "TXT" ;
+    rdfs:comment "A text object: a numbered clause, paragraph, title or list. Its content is an ordered sequence of segments."@en .
+
+wim:Table a owl:Class ; rdfs:subClassOf wim:DataElement ;
+    rdfs:label "Table"@en ;
+    rdfs:comment "A table object. A dynamic table's variables are fully reportable."@en .
+
+wim:Variable a owl:Class ; rdfs:subClassOf wim:DataElement ;
+    rdfs:label "Variable"@en ; skos:altLabel "VAR" ;
+    rdfs:comment "A variable declaration: what an agreement must supply, how it is populated and which values are admissible. Its value for an agreement is an agr:VariableValue."@en .
+
+wim:EmbeddedVariable a owl:Class ; rdfs:subClassOf wim:Variable ;
+    rdfs:label "Embedded variable"@en ;
+    rdfs:comment "A variable shown within wording text (red in the drafts)."@en .
+
+wim:GoverningVariable a owl:Class ; rdfs:subClassOf wim:Variable ;
+    rdfs:label "Governing variable"@en ;
+    rdfs:comment "A variable that governs optionality: inclusion conditions read it (the drafts' GOV nn)."@en .
+
+[] a owl:AllDisjointClasses ; owl:members ( wim:EmbeddedVariable wim:GoverningVariable ) .
+
+wim:Metadata a owl:Class ; rdfs:subClassOf wim:DataElement ;
+    rdfs:label "Metadata"@en .
+
+wim:Reference a owl:Class ; rdfs:subClassOf wim:DataElement ;
+    rdfs:label "Reference"@en ;
+    rdfs:comment "A link from wording to a definition, another wording object, a table, a document object or an external document."@en .
+
+[] a owl:AllDisjointClasses ; owl:members ( wim:Text wim:Table wim:Variable wim:Metadata wim:Reference ) .
+
+wim:DocumentObject a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "Document object"@en ;
+    rdfs:comment "An analogue attachment referenced from wording: a schedule document, contract jacket, certificate, IPID, list of benefits, notice or assessment. Its content is not digitised."@en .
+
+wim:ExternalDocument a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:label "External document"@en ;
+    rdfs:comment "A document outside the contract, such as a regulation or a separate agreement."@en .
+
+wim:documentKind a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "document kind"@en ;
+    rdfs:domain wim:DocumentObject ; rdfs:range skos:Concept .
+
+wim:linksTo a owl:ObjectProperty ;
+    rdfs:label "links to"@en ;
+    rdfs:domain wim:Reference ;
+    rdfs:range [ a owl:Class ; owl:unionOf ( wim:WordingObject wim:DocumentObject wim:ExternalDocument ) ] .
+
+#################################################################
+# Text segments
+#################################################################
+
+wim:Segment a owl:Class ;
+    rdfs:label "Segment"@en ;
+    rdfs:comment "One inline piece of a text object: literal text, a variable reference or an object reference."@en ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty wim:segmentIndex ; owl:cardinality "1"^^xsd:nonNegativeInteger ] ;
+    fnd:utility "Exactly one of wim:segmentText, wim:refersToVariable or wim:refersToObject (checked in SHACL). Indices run 0..n-1 without gaps, which SHACL checks, giving closed-world order without rdf:List."@en .
+
+wim:hasSegment a owl:ObjectProperty , owl:InverseFunctionalProperty ;
+    rdfs:label "has segment"@en ;
+    rdfs:domain wim:Text ; rdfs:range wim:Segment .
+
+wim:segmentIndex a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "segment index"@en ;
+    rdfs:domain wim:Segment ; rdfs:range xsd:nonNegativeInteger .
+
+wim:segmentText a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "segment text"@en ;
+    rdfs:domain wim:Segment ; rdfs:range xsd:string .
+
+wim:refersToVariable a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "refers to variable"@en ;
+    rdfs:domain wim:Segment ; rdfs:range wim:Variable .
+
+wim:refersToObject a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "refers to object"@en ;
+    rdfs:domain wim:Segment ;
+    rdfs:range [ a owl:Class ; owl:unionOf ( wim:WordingObject wim:DocumentObject wim:ExternalDocument ) ] .
+
+#################################################################
+# Assembly: inclusion modes, variation slots, inclusion conditions
+#################################################################
+
+wim:InclusionMode a owl:Class ;
+    rdfs:label "Inclusion mode"@en ;
+    rdfs:comment "How a wording object comes to be in an agreement: mandatory, one variant of a slot, optional, or conditional. A closed set of named individuals (wim-vocab)."@en .
+
+wim:inclusionMode a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "inclusion mode"@en ;
+    rdfs:domain wim:WordingObject ; rdfs:range wim:InclusionMode .
+
+wim:VariationSlot a owl:Class ;
+    rdfs:label "Variation slot"@en ;
+    rdfs:comment "A position in the wording that holds exactly one of several variants in any agreement (M1 1.4 with variants 1.4A, 1.4B, 1.4C)."@en ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty wim:hasVariant ; owl:minCardinality "1"^^xsd:nonNegativeInteger ] ;
+    fnd:utility "Variants are ordinary wording objects comprised by the slot's parent, each with wim:variantOf the slot and inclusion mode Variation. Variants have no order: the slot holds the position. An agreement includes exactly one variant per slot, checked in the agreement shapes."@en .
+
+wim:hasVariant a owl:ObjectProperty ;
+    rdfs:label "has variant"@en ;
+    rdfs:domain wim:VariationSlot ; rdfs:range wim:WordingObject .
+
+wim:variantOf a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "variant of"@en ;
+    owl:inverseOf wim:hasVariant .
+
+wim:includedWhen a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "included when"@en ;
+    rdfs:domain wim:WordingObject ; rdfs:range elg:AdmissionProfile ;
+    rdfs:comment "The inclusion condition of a conditional wording object or a variant: an admission profile over the agreement's governing variables (design-spec §3.6)."@en ;
+    fnd:utility "Evaluated once, at assembly and on amendment, in question form: each condition reads one governing variable (wim:readsVariable), and assembly poses the agreement's value for it as an elg:Question. It is never evaluated per operational event, which is what a statement's applicability scope is for."@en .
+
+wim:readsVariable a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "reads variable"@en ;
+    rdfs:domain elg:Condition ; rdfs:range wim:Variable ;
+    rdfs:comment "The variable whose agreement value an inclusion condition, or a statement template parameter, is evaluated against."@en .
+
+#################################################################
+# Variable declarations
+#################################################################
+
+wim:PopulationMethod a owl:Class ;
+    rdfs:label "Population method"@en ;
+    rdfs:comment "How a variable's value is obtained: entered, picked from a list, looked up, pulled from another module, derived by rule, and so on. A closed set of named individuals (wim-vocab)."@en .
+
+wim:variableKey a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "variable key"@en ;
+    rdfs:domain wim:Variable ; rdfs:range xsd:string ;
+    rdfs:comment "The variable's stable id, scoped by module (6.11, GOV 7)."@en .
+
+wim:populationMethod a owl:ObjectProperty ;
+    rdfs:label "population method"@en ;
+    rdfs:domain wim:Variable ; rdfs:range wim:PopulationMethod .
+
+wim:populatedFrom a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "populated from"@en ;
+    rdfs:domain wim:Variable ; rdfs:range wim:Variable ;
+    rdfs:comment "Another variable, often in another module, whose value this one takes (M12's broker name from M1)."@en .
+
+wim:valueContract a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "value contract"@en ;
+    rdfs:domain wim:Variable ; rdfs:range voc:SchemeContract ;
+    rdfs:comment "For a concept-valued variable, the scheme contract its values are drawn under (DP8)."@en .
+
+wim:valueSpace a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "value space"@en ;
+    rdfs:domain wim:Variable ; rdfs:range qnt:ValueSpace ;
+    rdfs:comment "For a quantity-valued variable, the value space its values are in."@en .
+
+wim:admissibleValues a owl:ObjectProperty ;
+    rdfs:label "admissible values"@en ;
+    rdfs:domain wim:Variable ; rdfs:range qnt:RangeSet ;
+    rdfs:comment "A range set the value must fall in (retention of at least 7 years, M10 10.3)."@en .
+
+wim:multiValued a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "multi-valued"@en ;
+    rdfs:domain wim:Variable ; rdfs:range xsd:boolean ;
+    rdfs:comment "True when an agreement may supply several values (trading locations, data recipients). Single-valued when absent."@en .
+
+#################################################################
+# Disjointness across the module's classes
+#################################################################
+
+[] a owl:AllDisjointClasses ;
+    owl:members ( wim:WordingObject wim:DocumentObject wim:ExternalDocument wim:Segment
+                  wim:VariationSlot wim:InclusionMode wim:PopulationMethod ) .

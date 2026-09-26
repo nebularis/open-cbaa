@@ -1,0 +1,78 @@
+@prefix rsk:  <https://nebularis.github.io/open-cbaa/ontology/risk#> .
+@prefix agr:  <https://nebularis.github.io/open-cbaa/ontology/agreement#> .
+@prefix fnd:  <https://www.nebularis.org/neuro-semantic/lattice/foundation#> .
+@prefix voc:  <https://www.nebularis.org/neuro-semantic/lattice/vocabulary#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+# Open CBAA — Risks vocabulary.
+#
+# One scheme contract per concept-valued case property (DP8, design-spec
+# §4.5), and the contract-type scheme, which is mechanism-intrinsic (tier V1)
+# and so authored here. Territories, perils, insurable interests, customer
+# types and risk codes are market standards (tier V2): their contracts are
+# left unbound here and bound by a deployment, per market scope and period,
+# with voc:SchemeBinding.
+
+<https://nebularis.github.io/open-cbaa/ontology/risk-vocab> a owl:Ontology ;
+    rdfs:label "Open CBAA — Risks vocabulary"@en ;
+    owl:versionIRI <https://nebularis.github.io/open-cbaa/ontology/risk-vocab/0.1.0> ;
+    owl:imports <https://nebularis.github.io/open-cbaa/ontology/risk/0.1.0> ,
+                <https://www.nebularis.org/neuro-semantic/lattice/foundation-vocab/0.3.0> .
+
+rsk:TerritoryContract a voc:SchemeContract ;
+    rdfs:label "Territory contract"@en ;
+    fnd:hasIdentity rsk:TerritoryContract-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    voc:constrainsProperty rsk:riskLocation , rsk:policyholderLocation , rsk:territorialLimit ;
+    rdfs:comment "ISO 3166 countries and subdivisions (V2), extended by regulatory groupings such as Europe A where no market body publishes one (V3). Hierarchical: matched with elg:HierarchicalMatch."@en .
+
+rsk:InsurableInterestContract a voc:SchemeContract ;
+    rdfs:label "Insurable interest contract"@en ;
+    fnd:hasIdentity rsk:InsurableInterestContract-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    voc:constrainsProperty rsk:insurableInterest ;
+    rdfs:comment "The CDR insurable interest scheme (V2). Hierarchical."@en .
+
+rsk:PerilContract a voc:SchemeContract ;
+    rdfs:label "Peril contract"@en ;
+    fnd:hasIdentity rsk:PerilContract-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    voc:constrainsProperty rsk:peril ;
+    rdfs:comment "The CDR peril scheme (V2). Hierarchical."@en .
+
+rsk:PolicyholderClassificationContract a voc:SchemeContract ;
+    rdfs:label "Policyholder classification contract"@en ;
+    fnd:hasIdentity rsk:PolicyholderClassificationContract-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    voc:constrainsProperty rsk:policyholderClassification .
+
+rsk:RiskCodeContract a voc:SchemeContract ;
+    rdfs:label "Risk code contract"@en ;
+    fnd:hasIdentity rsk:RiskCodeContract-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    voc:constrainsProperty rsk:riskCode ;
+    rdfs:comment "Lloyd's risk codes (V2), bound only in the agr:LloydsMarket scope."@en .
+
+rsk:ContractTypeContract a voc:SchemeContract ;
+    rdfs:label "Contract type contract"@en ;
+    fnd:hasIdentity rsk:ContractTypeContract-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    voc:constrainsProperty rsk:contractType ;
+    voc:boundScheme rsk:ContractTypeScheme .
+
+#################################################################
+# Contract types (V1)
+#################################################################
+
+rsk:ContractTypeScheme a voc:ConceptScheme ;
+    skos:prefLabel "Contract types"@en ;
+    fnd:hasIdentity rsk:ContractTypeScheme-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    skos:hasTopConcept rsk:Insurance , rsk:Reinsurance .
+
+rsk:Insurance a skos:Concept ; skos:prefLabel "Insurance"@en ;
+    skos:inScheme rsk:ContractTypeScheme ; skos:topConceptOf rsk:ContractTypeScheme .
+rsk:Reinsurance a skos:Concept ; skos:prefLabel "Reinsurance"@en ;
+    skos:inScheme rsk:ContractTypeScheme ; skos:topConceptOf rsk:ContractTypeScheme .

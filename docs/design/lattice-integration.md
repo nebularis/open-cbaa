@@ -1,11 +1,12 @@
 # LATTICE Integration Specification
 
-Version 0.4, draft for review. Companion to the [design specification](design-spec.md), whose
+Version 0.5, draft for review. The Open CBAA ontologies in [`ontology/`](../../ontology/README.md)
+now build on these layers as specified here, except where §5.5 and §10 record a refinement. Companion to the [design specification](design-spec.md), whose
 principles (AP, DP) and decisions (D) it cites by number. Baseline: LATTICE `main` at
 `ddeaecf` (2026-09-25). Since the design specification's baseline (`558650b`) LATTICE has
 taken scoped scheme binding, semantic versioning (ADR-A86), consumer import resolution
 (ADR-A88), the applied ontology readiness unit and a test-only reasoning harness (ADR-A83).
-Of §8, only L11's CI enforcement, L13 and L14 remain open.
+Of §8, L11's CI enforcement, L13, and the L15 to L17 found while authoring the ontologies remain open.
 
 Logical expressions use description logic notation: ⊑ subsumption, ≡ equivalence, ⊓ ⊔ ¬
 conjunction, disjunction and negation, ∃ ∀ restrictions, {a} a nominal, ⊥ ⊤ bottom and top,
@@ -31,7 +32,7 @@ It does not specify implementation (AP1).
 |---|---|---|---|
 | Foundation | `…/lattice/foundation/0.3.0` | identity, versions, governance state, valid time, evidence, derived artefacts | `owl:imports` |
 | Vocabulary | `…/lattice/vocabulary/0.3.0` | scheme contracts, editions, scoped bindings | `owl:imports` |
-| Quantification | `…/lattice/quantification/0.5.0` | amounts, bounds, ranges, recurrences, ordinals | `owl:imports` (Party, Eligibility and later layers import it too) |
+| Quantification | `…/lattice/quantification/0.5.0` | amounts, bounds, ranges, recurrences, ordinals | `owl:imports` |
 | Party | `…/lattice/party/0.5.0` | actors, roles, role occupancy, participation, delegation | `owl:imports` |
 | Eligibility | `…/lattice/eligibility/0.6.0` | authority scopes as admission profiles, three-valued decisions | `owl:imports` |
 | Instrument | `…/lattice/instrument/0.6.0` | alignment of statement kinds | `owl:imports` |
@@ -41,7 +42,8 @@ It does not specify implementation (AP1).
 | Persistence | `…/lattice/persistence/0.2.1` | data-access profile | referenced by IRI, never imported (its own design, §7) |
 | SPC | `http://example.org/spc/0.2.0` | protocol execution | reference only |
 
-`…` is `https://www.nebularis.org/neuro-semantic`. Each layer's `spec` and `vocab` documents
+`…` is `https://www.nebularis.org/neuro-semantic`. Each LATTICE layer imports only Foundation
+(Vocabulary imports only SKOS), so a consumer imports every layer it uses explicitly. Each layer's `spec` and `vocab` documents
 are versioned independently (the table lists `spec`). Imports always use the exact
 `owl:versionIRI`. The ontology IRIs themselves were not moved by the baseline reset
 (Foundation's is still `…/foundation`, not `…/lattice/foundation`), so version IRI and ontology
@@ -120,26 +122,23 @@ folders, with its source commit recorded. The catalog and gate do not change.
 
 ### 3.4 Versioning Open CBAA's own documents
 
-Open CBAA's ontology documents currently carry `owl:versionInfo "0.1.0"` and no
-`owl:versionIRI`. The proposal (I5) is to adopt ADR-A86's policy for them unchanged, now that
-ADR-A86 is Accepted upstream:
+Applied (I5): Open CBAA's documents follow ADR-A86's policy unchanged, in LATTICE's module
+layout ([ontology/README.md §2](../../ontology/README.md#2-iris-and-versions)):
 
 - one `owl:versionIRI` per `owl:Ontology` document, of the form
   `https://nebularis.github.io/open-cbaa/ontology/<path>/<version>`, e.g.
-  `…/open-cbaa/ontology/lma-wim/core/0.1.0`, with `owl:versionInfo` dropped so the version IRI is
-  the single signal
+  `…/open-cbaa/ontology/wim/0.2.0`, with no `owl:versionInfo`, so the version IRI is the single
+  signal
 - LATTICE's MAJOR, MINOR and PATCH table, including its treatment of silent semantic
   redefinition as MAJOR
 - the mechanical check reused from the submodule, with no copy in this repository:
   `python imports/lattice/tools/ontology_version_check.py --root . --base-ref <ref>`, which
   compares every `.ttl` under this repository's `ontology/` that declares `owl:Ontology` with
-  the given ref. It runs against this repository today and passes its six documents. It
-  reports a document with no version IRI only under a `spec/` or `vocab/` directory, which
-  Open CBAA's flat layout does not use. So it protects Open CBAA's documents only once they
-  carry version IRIs, or once they move into that layout
+  the given ref. Open CBAA's documents now sit in `spec/` and `vocab/` directories and carry
+  version IRIs, so it protects all of them
 
-The reclassification (design-spec §11, D9) removes classes, which is MAJOR under the policy.
-At major version zero that is permitted, and it moves the affected documents to `0.2.0`.
+The reclassification (design-spec §11, D9) removed classes, which is MAJOR under the policy.
+At major version zero that is permitted, and it moved the WIM structure to `wim/0.2.0`.
 
 ## 4. What Open CBAA Authors on LATTICE
 
@@ -236,11 +235,11 @@ statement to the states in which it applies. It is not part of any envelope clas
 
 ### 4.7 Instrument
 
-Open CBAA's `Obligation` is a subclass of `ins:Obligation`, and bound statements use
-`ins:obligor`/`ins:obligee` to role occupancies. Attachment to wording is Open CBAA's
+An Open CBAA bound `Obligation` is an `ins:Obligation` (§5.5), with `ins:obligor` and
+`ins:obligee` naming role occupancies. Attachment to wording is Open CBAA's
 `expresses` (design-spec §3.4). ADR-A96 made `ins:inProvision` non-functional, so one
 obligation can be expressed by two wording variants (M9 9.2.8A and B). Whether attachment
-aligns with it is I6.
+aligns with it is I6, which D23 proposes not to adopt for now.
 
 ### 4.8 Surface, MORK and Persistence
 
@@ -302,7 +301,6 @@ Statement kinds are pairwise disjoint classes:
 
     Disj(Obligation, Prohibition, Permission, Power, AuthorityGrant,
          Definition, Classification, Precedence)
-    Obligation ⊑ ins:Obligation
 
 Library templates and agreement-bound statements are distinguished orthogonally to kind:
 
@@ -314,15 +312,23 @@ Attachment to wording is provenance:
 
     expressedBy ≡ expresses⁻
     expressedBy ⊑ prov:wasDerivedFrom
-    StatementTemplate ⊑ ∃expressedBy.WimObject
+    StatementTemplate ⊑ ∃expressedBy.WordingObject
 
 Parameters sit on the statement as nodes (DP4). Templates name roles, bound statements name
 occupancies:
 
-    Obligation ⊓ StatementTemplate ⊑ =1 bearer.pty:Role ⊓ =1 activity.⊤
-    Obligation ⊓ BoundStatement    ⊑ =1 ins:obligor.pty:RoleOccupancy
-    AuthorityGrant ⊑ =1 activity.⊤ ⊓ =1 grantee.pty:Role
-                     ⊓ =1 scope.elg:AdmissionProfile ⊓ ≤1 level.qnt:OrdinalValue
+    PrescriptiveStatement ≡ Obligation ⊔ Prohibition ⊔ Permission ⊔ Power ⊔ AuthorityGrant
+    PrescriptiveStatement ⊓ StatementTemplate ⊑ =1 bearer.pty:Role ⊓ =1 activity.⊤
+    PrescriptiveStatement ⊓ BoundStatement    ⊑ =1 activity.⊤
+    Obligation ⊓ BoundStatement ⊑ ins:Obligation ⊓ =1 ins:obligor.pty:RoleOccupancy
+    (Prohibition ⊔ Permission ⊔ Power ⊔ AuthorityGrant) ⊓ BoundStatement
+        ⊑ =1 bearerOccupancy.pty:RoleOccupancy
+    AuthorityGrant ⊓ BoundStatement ⊑ =1 scope.elg:AdmissionProfile
+    level is functional, with domain AuthorityGrant and range qnt:OrdinalValue
+
+Only bound obligations are `ins:Obligation`s: Instrument requires occupancies as obligor and
+obligee, and a template names roles. `bearer` names a grant's grantee as it names every other
+kind's bearer, so there is no separate `grantee`.
 
 DL gives kinds and parameter structure. It does not give deontic semantics: an obligation and a
 prohibition over the same activity are not a DL inconsistency. Conflict detection uses
@@ -507,13 +513,16 @@ them by number.
 | L12 | Instrument | `ins:inProvision` is functional, so one obligation cannot be expressed by several provisions | done, `ddeaecf`, ADR-A96 | |
 | L13 | Quantification | a non-domain conformance corpus, its own acceptance criterion (README §14) | open | the gate's conformance condition for comparisons (design-spec §6.3, mode Q) |
 | L14 | tools | `ontology_catalog.py write` emits a consumer's `nextCatalog` chain and takes the consumer's external imports | superseded for Open CBAA: its catalog maps LATTICE's release tags directly (D16) | |
+| L15 | Behaviour | `bhv:forSubject`'s range is `pty:RoleOccupancy`, so an agreement version cannot be the subject of its lifecycle state occupancy | open | runtime state for the M12 lifecycle (design-spec §8.7) |
+| L16 | Quantification | the vocab document has no `owl:Ontology` header or version IRI, so it cannot be imported, and its individuals resolve only by IRI | open | nothing. Consumers use the IRIs |
+| L17 | Quantification | `qnt:OperationCapabilityMeetShape`'s SPARQL uses `qnt:` without declaring it, so it fails unless the data graph binds the prefix | open | nothing. `tools/ontology_check.py` binds it |
 
 ## 9. Sequencing
 
 1. Upstream: run the versioning and catalog checks in CI and extend the version check to
    consumers (L11). These meet the gate's automation condition for every layer.
 2. Add the submodule and catalog, give Open CBAA's documents version IRIs (§3.4), import
-   Foundation, Vocabulary and Party (Party brings Quantification), and run the gate.
+   Foundation, Vocabulary and Party, and run the gate.
 3. Apply the reclassification (design-spec §11), with schemes as `voc:ConceptScheme` editions
    and properties bound by `voc:SchemeContract`.
 4. Add the meaning module (statement kinds, §5.5) on Party, Eligibility and Instrument.
@@ -524,6 +533,12 @@ them by number.
 Step 3 waits for step 2 because the reclassified schemes are `voc:` individuals. Step 5's
 design-time classes need I7 and I8 settled.
 
+Status (2026-09-26). The catalog and version IRIs of step 2 are in place, and steps 3 and 4
+are authored as static ontologies with shapes and a worked example
+([ontology/README.md](../../ontology/README.md)), validated by `tools/ontology_check.py`
+against LATTICE's release tags. Step 6 has M12. Not done: step 1, the submodule, the gate run
+of step 2, and step 5 (no compilation yet).
+
 ## 10. Open Questions
 
 | # | Question | Recommendation |
@@ -532,9 +547,9 @@ design-time classes need I7 and I8 settled.
 | I2 | Import Instrument and Behaviour before L6 lands | closed: L6 is fixed (D13) |
 | I3 | Agreement version boundary: named graph, or a composite boundary walking a shape over `directlyComprises` | named graph for accepted, immutable versions |
 | I4 | Envelope classes from an extended `mork_compilers` IR, or a new Surface backend | closed: ADR-A90 extends the IR (D14) |
-| I5 | Adopt ADR-A86's versioning policy for Open CBAA's own ontology documents | yes, ADR-A86 is Accepted (§3.4) |
-| I6 | Align attachment with Instrument, now that ADR-A96 is accepted | yes for obligations only: a sub-property of both `expressedBy` and `ins:inProvision`, with WIM objects that express obligations typed `ins:Provision`. Other statement kinds keep `expressedBy` alone |
-| I7 | Dimensions on which a case holds several values (risk locations, perils, classes of business) have no design-time class under single-valued paths (§5.6) | open |
-| I8 | Author variation-slot inclusion conditions and statement scopes as `elg:AdmissionProfile`s, so the last two checks of §5.6 come from the same backend | open |
+| I5 | Adopt ADR-A86's versioning policy for Open CBAA's own ontology documents | closed: applied (§3.4) |
+| I6 | Align attachment with Instrument, now that ADR-A96 is accepted | proposed no for now (D23): `ins:ProvisionShape` requires an `ins:Obligation`, which library wording has only as templates. The earlier recommendation was yes for obligations only: a sub-property of both `expressedBy` and `ins:inProvision`, with WIM objects that express obligations typed `ins:Provision`. Other statement kinds keep `expressedBy` alone |
+| I7 | Dimensions on which a case holds several values (risk locations, perils, classes of business) have no design-time class under single-valued paths (§5.6) | proposed (D24): the case is the risk, with its deemed location. Perils, risk codes and territorial limits remain to be surveyed |
+| I8 | Author variation-slot inclusion conditions and statement scopes as `elg:AdmissionProfile`s, so the last two checks of §5.6 come from the same backend | proposed yes (D20, D22). Statement scopes carry evidence bindings. Slot conditions are evaluated in question form, since a path cannot pick one variable's value, so their design-time checks need a Surface promotion |
 | I9 | Where sibling disjointness is declared: an option of each compilation, or a Vocabulary declaration on the scheme edition (ADR-A90's open question) | open |
 | I10 | How suggested meaning (design-spec §3.7) is held apart from accepted statements, and in which plane (design-spec §8.1) | open. Leaning to LATTICE's ADR-A13 Mapping graph role as a staging graph outside the library plane, which holds only published versions: MORK nodes for proposed templates, proposed statement instances for bespoke clauses, each promoted on acceptance |

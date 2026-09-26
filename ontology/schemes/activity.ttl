@@ -1,0 +1,70 @@
+@prefix act:  <https://nebularis.github.io/open-cbaa/ontology/schemes/activity#> .
+@prefix lma:  <https://nebularis.github.io/open-cbaa/ontology/schemes/lma#> .
+@prefix fnd:  <https://www.nebularis.org/neuro-semantic/lattice/foundation#> .
+@prefix voc:  <https://www.nebularis.org/neuro-semantic/lattice/vocabulary#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+# Provisional activity scheme: what a statement's bearer must, must not, or may
+# do (design-spec §4.5, tier V2, provisional). No market body publishes one
+# yet. The concepts follow the CBAA modules' operational areas and are
+# hierarchical, so an authority grant over claims handling covers FNOL
+# handling. Replace with a published edition when one exists.
+
+<https://nebularis.github.io/open-cbaa/ontology/schemes/activity> a owl:Ontology ;
+    rdfs:label "Provisional CBAA activity scheme"@en ;
+    owl:versionIRI <https://nebularis.github.io/open-cbaa/ontology/schemes/activity/0.1.0> ;
+    owl:imports <https://www.nebularis.org/neuro-semantic/lattice/vocabulary/0.3.0> ,
+                <https://www.nebularis.org/neuro-semantic/lattice/foundation-vocab/0.3.0> .
+
+act:ActivityScheme a voc:ConceptScheme ;
+    skos:prefLabel "CBAA activities (provisional)"@en ;
+    skos:editorialNote "Provisional edition authored by Open CBAA pending a market publication."@en ;
+    fnd:hasIdentity act:ActivityScheme-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    skos:hasTopConcept act:Underwriting , act:PolicyAdministration , act:ClaimsHandling ,
+        act:ComplaintsHandling , act:Reporting , act:DataProcessing , act:ManagementOfMonies .
+
+act:Underwriting a skos:Concept ; skos:prefLabel "Underwriting"@en ;
+    skos:inScheme act:ActivityScheme ; skos:topConceptOf act:ActivityScheme ; skos:scopeNote "M5"@en .
+act:Quoting a skos:Concept ; skos:prefLabel "Quoting"@en ; skos:inScheme act:ActivityScheme ; skos:broader act:Underwriting .
+act:Binding a skos:Concept ; skos:prefLabel "Binding"@en ; skos:inScheme act:ActivityScheme ; skos:broader act:Underwriting .
+act:AmendingPolicies a skos:Concept ; skos:prefLabel "Amending policies"@en ; skos:inScheme act:ActivityScheme ; skos:broader act:Underwriting .
+act:Renewing a skos:Concept ; skos:prefLabel "Renewing"@en ; skos:inScheme act:ActivityScheme ; skos:broader act:Underwriting .
+
+act:PolicyAdministration a skos:Concept ; skos:prefLabel "Policy administration"@en ;
+    skos:inScheme act:ActivityScheme ; skos:topConceptOf act:ActivityScheme ; skos:scopeNote "M4, M7"@en .
+act:IssuingDocuments a skos:Concept ; skos:prefLabel "Issuing policy documents"@en ; skos:inScheme act:ActivityScheme ; skos:broader act:PolicyAdministration .
+act:Cancelling a skos:Concept ; skos:prefLabel "Cancelling policies"@en ; skos:inScheme act:ActivityScheme ; skos:broader act:PolicyAdministration .
+
+act:ClaimsHandling a skos:Concept ; skos:prefLabel "Claims handling"@en ;
+    skos:inScheme act:ActivityScheme ; skos:topConceptOf act:ActivityScheme ; skos:scopeNote "M8"@en .
+act:FNOLHandling a skos:Concept ; skos:prefLabel "FNOL handling"@en ; skos:inScheme act:ActivityScheme ; skos:broader act:ClaimsHandling .
+act:FNOLOnwardTransfer a skos:Concept ; skos:prefLabel "FNOL onward transfer"@en ; skos:inScheme act:ActivityScheme ; skos:broader act:FNOLHandling .
+act:ClaimsDeterminationAndSettlement a skos:Concept ; skos:prefLabel "Claims determination and settlement"@en ; skos:inScheme act:ActivityScheme ; skos:broader act:ClaimsHandling .
+
+act:ComplaintsHandling a skos:Concept ; skos:prefLabel "Complaints handling"@en ;
+    skos:inScheme act:ActivityScheme ; skos:topConceptOf act:ActivityScheme ; skos:scopeNote "M9"@en .
+act:OfferingRedress a skos:Concept ; skos:prefLabel "Offering redress"@en ; skos:inScheme act:ActivityScheme ; skos:broader act:ComplaintsHandling .
+
+act:Reporting a skos:Concept ; skos:prefLabel "Reporting"@en ;
+    skos:inScheme act:ActivityScheme ; skos:topConceptOf act:ActivityScheme ; skos:scopeNote "M10"@en .
+act:BordereauSubmission a skos:Concept ; skos:prefLabel "Bordereau submission"@en ; skos:inScheme act:ActivityScheme ; skos:broader act:Reporting .
+
+act:DataProcessing a skos:Concept ; skos:prefLabel "Data processing"@en ;
+    skos:inScheme act:ActivityScheme ; skos:topConceptOf act:ActivityScheme ; skos:scopeNote "M13"@en .
+act:BreachNotification a skos:Concept ; skos:prefLabel "Data breach notification"@en ; skos:inScheme act:ActivityScheme ; skos:broader act:DataProcessing .
+
+act:ManagementOfMonies a skos:Concept ; skos:prefLabel "Management of monies"@en ;
+    skos:inScheme act:ActivityScheme ; skos:topConceptOf act:ActivityScheme ; skos:scopeNote "M11 (not yet published)"@en .
+act:PremiumCollection a skos:Concept ; skos:prefLabel "Premium collection"@en ; skos:inScheme act:ActivityScheme ; skos:broader act:ManagementOfMonies .
+
+# Alignment with the WIM clause classification (design-spec §11): a
+# contractual provision about an activity is classified by the matching
+# lma: concept. closeMatch, since one classifies clauses and the other
+# names what a bearer does.
+act:ClaimsHandling skos:closeMatch lma:Claims .
+act:ComplaintsHandling skos:closeMatch lma:Complaints .
+act:Cancelling skos:closeMatch lma:Cancellation .
+act:PremiumCollection skos:closeMatch lma:Payment .

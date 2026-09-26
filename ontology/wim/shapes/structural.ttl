@@ -1,0 +1,71 @@
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix wim:  <https://nebularis.github.io/open-cbaa/ontology/wim#> .
+@prefix fnd:  <https://www.nebularis.org/neuro-semantic/lattice/foundation#> .
+@prefix voc:  <https://www.nebularis.org/neuro-semantic/lattice/vocabulary#> .
+@prefix qnt:  <https://www.nebularis.org/neuro-semantic/lattice/quantification#> .
+@prefix elg:  <https://www.nebularis.org/neuro-semantic/lattice/eligibility#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# Wording structure: per-node shapes. Targets name each level, since a
+# SHACL engine sees rdfs:subClassOf but not the owl:unionOf that defines
+# wim:WordingObject.
+
+wim:WordingObjectProperties a sh:NodeShape ;
+    sh:targetClass wim:Contract , wim:ComponentGroup , wim:Component , wim:DataElement ;
+    sh:property [ sh:path fnd:hasIdentity ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:message "A wording object is a version of exactly one persistent identity." ] ;
+    sh:property [ sh:path fnd:hasGovernanceState ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path wim:objectId ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path wim:rankKey ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path wim:inclusionMode ; sh:maxCount 1 ;
+                  sh:in ( wim:Mandatory wim:Variation wim:Optional wim:Conditional ) ] ;
+    sh:property [ sh:path wim:variantOf ; sh:maxCount 1 ; sh:class wim:VariationSlot ] ;
+    sh:property [ sh:path wim:includedWhen ; sh:maxCount 1 ; sh:class elg:AdmissionProfile ] .
+
+wim:ContractShape a sh:NodeShape ;
+    sh:targetClass wim:Contract ;
+    sh:property [ sh:path wim:contractCategory ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:message "A contract has exactly one contract category." ] .
+
+wim:ComponentGroupShape a sh:NodeShape ;
+    sh:targetClass wim:ComponentGroup ;
+    sh:property [ sh:path wim:componentGroupType ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+wim:ComponentShape a sh:NodeShape ;
+    sh:targetClass wim:Component ;
+    sh:property [ sh:path wim:componentType ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+wim:DataElementShape a sh:NodeShape ;
+    sh:targetClass wim:DataElement ;
+    sh:property [ sh:path wim:elementType ; sh:maxCount 1 ] .
+
+wim:TextShape a sh:NodeShape ;
+    sh:targetClass wim:Text ;
+    sh:property [ sh:path wim:elementType ; sh:minCount 1 ] ;
+    sh:property [ sh:path wim:hasSegment ; sh:class wim:Segment ] .
+
+wim:SegmentShape a sh:NodeShape ;
+    sh:targetClass wim:Segment ;
+    sh:property [ sh:path wim:segmentIndex ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:nonNegativeInteger ] ;
+    sh:xone (
+        [ sh:property [ sh:path wim:segmentText ; sh:minCount 1 ] ]
+        [ sh:property [ sh:path wim:refersToVariable ; sh:minCount 1 ] ]
+        [ sh:property [ sh:path wim:refersToObject ; sh:minCount 1 ] ]
+    ) ;
+    sh:message "A segment is exactly one of literal text, a variable reference or an object reference." .
+
+wim:VariationSlotShape a sh:NodeShape ;
+    sh:targetClass wim:VariationSlot ;
+    sh:property [ sh:path wim:hasVariant ; sh:minCount 1 ] .
+
+wim:VariableShape a sh:NodeShape ;
+    sh:targetClass wim:Variable ;
+    sh:property [ sh:path wim:variableKey ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path wim:valueContract ; sh:maxCount 1 ; sh:class voc:SchemeContract ] ;
+    sh:property [ sh:path wim:valueSpace ; sh:maxCount 1 ; sh:class qnt:ValueSpace ] ;
+    sh:property [ sh:path wim:admissibleValues ; sh:class qnt:RangeSet ] ;
+    sh:property [ sh:path wim:multiValued ; sh:maxCount 1 ; sh:datatype xsd:boolean ] .
+
+wim:DocumentObjectShape a sh:NodeShape ;
+    sh:targetClass wim:DocumentObject ;
+    sh:property [ sh:path wim:documentKind ; sh:minCount 1 ; sh:maxCount 1 ] .

@@ -65,6 +65,20 @@ Then the gate decides timing, and nothing is waived. The gate's own conditions a
 | 5 | LATTICE, then here | L13 upstream first. Then the compilation module (Surface contracts, profile), the Persistence profile module and the design-time classes | L13, I7, I9 |
 | 6 | here | Lifecycles on Behaviour (M12, M3, referral, FNOL, complaints) | step 4 |
 
+### Status (2026-09-26)
+
+| Step | State |
+|---|---|
+| 1 | not started |
+| 2 | the catalog (D16) and version IRIs are done. The ontologies import Foundation, Vocabulary, Quantification, Party, Eligibility, Instrument and Behaviour by release tag. The submodule and the gate run are not |
+| 3 | done statically: `ontology/wim` 0.2.0 and the provisional schemes (D18) |
+| 4 | done statically: `ontology/statement`, with `ontology/agreement` and `ontology/risk`, shapes and the worked example BA-2026-001. Proposed decisions D17 to D26 answer I6 to I8 for this step, pending ratification |
+| 5 | not started. No compilation yet |
+| 6 | M12 declared in agreement-vocab. M3, referral, FNOL and complaints remain |
+
+[ontology/README.md](../../ontology/README.md) describes the result, and
+`tools/ontology_check.py` validates it (HermiT, SHACL, 25 probes).
+
 ## Decisions
 
 | # | Decision | Options | My recommendation | Blocks |
@@ -72,7 +86,7 @@ Then the gate decides timing, and nothing is waived. The gate's own conditions a
 | I7 | Multi-valued dimensions | (a) the case is the risk, with finer cases where needed, (b) upstream "every/some value" readings | (a) now: the case is the risk, and location is its deemed location. Survey which dimensions remain multi-valued, and raise (b) only if some do | step 5 classes |
 | I8 | Statement scopes and slot conditions as profiles | profiles, or our own classes | profiles, with "Permitted = applies" stated once | step 4 |
 | I9 | Where sibling disjointness is declared | compile option, or a Vocabulary declaration | compile option, set in our compilation module per scheme. Split tree and groupings in the territory scheme | step 5 |
-| I6 | Obligation attachment | as recommended in §10 | accept | step 4 |
+| I6 | Obligation attachment | as recommended in §10 | revised: not now (D23), since `ins:ProvisionShape` needs an `ins:Obligation` that library wording has only as a template | step 4 |
 | I10 | Suggested meaning, held apart from accepted statements (design-spec §3.7) | MORK nodes, proposed statement instances, or an Open CBAA suggestion class. Which plane | ADR-A13's Mapping graph role as a staging graph: MORK nodes for templates, proposed instances for bespoke clauses, promoted on acceptance. The library plane holds only published versions | step 4 |
 | I3 | Agreement version boundary | named graph, or composite boundary | named graph, as recommended | step 5 (Persistence) |
 | L11 | Whether ontology IRIs move under `…/lattice/` | move now, or leave | leave. It's a LATTICE-wide MAJOR change with no need from us | nothing |
@@ -80,4 +94,4 @@ Then the gate decides timing, and nothing is waived. The gate's own conditions a
 
 ## Next Steps
 
-The next concrete work is step 1 in LATTICE. That needs a LATTICE plan and ADR check under its own rules, and I'll draft it once you've answered I7 to I9. None of those block step 1, so we could start it now if you prefer.
+Ratify or amend D17 to D26 (design-spec §12). Then the next concrete work is step 1 in LATTICE. That needs a LATTICE plan and ADR check under its own rules, and I'll draft it once you've answered I7 to I9. None of those block step 1, so we could start it now if you prefer.

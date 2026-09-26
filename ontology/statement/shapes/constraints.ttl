@@ -1,0 +1,114 @@
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix stm:  <https://nebularis.github.io/open-cbaa/ontology/statement#> .
+
+# Meaning: whole-graph constraints (SHACL-SPARQL). A statement's kind is a
+# class, so the kind-dependent rules below test rdf:type in SPARQL rather
+# than target an intersection of classes, which SHACL cannot.
+
+stm:PrescriptiveTemplateShape a sh:NodeShape ;
+    sh:targetClass stm:StatementTemplate ;
+    sh:sparql [
+        sh:message "A prescriptive template names exactly one bearer role and one activity." ;
+        sh:select """
+            PREFIX stm: <https://nebularis.github.io/open-cbaa/ontology/statement#>
+            SELECT $this WHERE {
+                $this a ?kind .
+                FILTER (?kind IN (stm:Obligation, stm:Prohibition, stm:Permission, stm:Power, stm:AuthorityGrant))
+                FILTER (NOT EXISTS { $this stm:bearer ?bearer } || NOT EXISTS { $this stm:activity ?activity })
+            }
+        """ ;
+    ] .
+
+stm:ObligationTemplateCounterpartyShape a sh:NodeShape ;
+    sh:targetClass stm:Obligation ;
+    sh:sparql [
+        sh:message "An obligation template names the role it is owed to (stm:counterparty), since its bound form must name an obligee." ;
+        sh:select """
+            PREFIX stm: <https://nebularis.github.io/open-cbaa/ontology/statement#>
+            SELECT $this WHERE {
+                $this a stm:StatementTemplate .
+                FILTER NOT EXISTS { $this stm:counterparty ?role }
+            }
+        """ ;
+    ] .
+
+stm:GrantTemplateScopeShape a sh:NodeShape ;
+    sh:targetClass stm:AuthorityGrant ;
+    sh:sparql [
+        sh:message "An authority grant template states its scope, either directly (stm:scope) or through scope parameter bindings." ;
+        sh:select """
+            PREFIX stm: <https://nebularis.github.io/open-cbaa/ontology/statement#>
+            SELECT $this WHERE {
+                $this a stm:StatementTemplate .
+                FILTER NOT EXISTS { $this stm:scope ?scope }
+                FILTER NOT EXISTS {
+                    $this stm:hasParameterBinding ?binding .
+                    ?binding stm:parameterKind ?kind .
+                    FILTER (?kind IN (stm:ScopeInclusion, stm:ScopeLimit))
+                }
+            }
+        """ ;
+    ] .
+
+stm:BoundPrescriptiveShape a sh:NodeShape ;
+    sh:targetClass stm:BoundStatement ;
+    sh:sparql [
+        sh:message "A bound prescriptive statement names its activity, and its bearer: ins:obligor and ins:obligee for an obligation, stm:bearerOccupancy otherwise." ;
+        sh:select """
+            PREFIX stm: <https://nebularis.github.io/open-cbaa/ontology/statement#>
+            PREFIX ins: <https://www.nebularis.org/neuro-semantic/lattice/instrument#>
+            SELECT $this WHERE {
+                $this a ?kind .
+                FILTER (?kind IN (stm:Obligation, stm:Prohibition, stm:Permission, stm:Power, stm:AuthorityGrant))
+                FILTER (
+                    NOT EXISTS { $this stm:activity ?activity }
+                    || (?kind = stm:Obligation && (NOT EXISTS { $this ins:obligor ?o } || NOT EXISTS { $this ins:obligee ?e }))
+                    || (?kind != stm:Obligation && NOT EXISTS { $this stm:bearerOccupancy ?b })
+                )
+            }
+        """ ;
+    ] .
+
+stm:BoundGrantScopeShape a sh:NodeShape ;
+    sh:targetClass stm:AuthorityGrant ;
+    sh:sparql [
+        sh:message "A bound authority grant has exactly one scope." ;
+        sh:select """
+            PREFIX stm: <https://nebularis.github.io/open-cbaa/ontology/statement#>
+            SELECT $this WHERE {
+                $this a stm:BoundStatement .
+                FILTER NOT EXISTS { $this stm:scope ?scope }
+            }
+        """ ;
+    ] .
+
+stm:KindMatchesTemplateShape a sh:NodeShape ;
+    sh:targetClass stm:BoundStatement ;
+    sh:sparql [
+        sh:message "A bound statement has exactly the kind of the template it was bound from." ;
+        sh:select """
+            PREFIX stm: <https://nebularis.github.io/open-cbaa/ontology/statement#>
+            SELECT $this ?value WHERE {
+                $this stm:boundFrom ?template .
+                { ?template a ?value . FILTER NOT EXISTS { $this a ?value } }
+                UNION
+                { $this a ?value . FILTER NOT EXISTS { ?template a ?value } }
+                FILTER (?value IN (stm:Obligation, stm:Prohibition, stm:Permission, stm:Power,
+                                   stm:AuthorityGrant, stm:Definition, stm:Classification, stm:Precedence))
+            }
+        """ ;
+    ] .
+
+stm:ScopeBindingShape a sh:NodeShape ;
+    sh:targetClass stm:ParameterBinding ;
+    sh:sparql [
+        sh:message "A scope parameter names the case it evaluates (stm:scopeSubject), the path to the value it reads (stm:scopeStep), and how it matches (stm:scopeStrategy)." ;
+        sh:select """
+            PREFIX stm: <https://nebularis.github.io/open-cbaa/ontology/statement#>
+            SELECT $this WHERE {
+                $this stm:parameterKind ?kind .
+                FILTER (?kind IN (stm:ScopeInclusion, stm:ScopeExclusion, stm:ScopeLimit))
+                FILTER (NOT EXISTS { $this stm:scopeSubject ?c } || NOT EXISTS { $this stm:scopeStep ?step } || NOT EXISTS { $this stm:scopeStrategy ?s })
+            }
+        """ ;
+    ] .

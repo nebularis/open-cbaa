@@ -1,0 +1,41 @@
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix voc:  <https://www.nebularis.org/neuro-semantic/lattice/vocabulary#> .
+@prefix cbg:  <https://nebularis.github.io/open-cbaa/ontology/governance#> .
+
+# Governance shapes run over the union of the T-Box, the vocabularies and the
+# data, since they relate terms declared in one module to values asserted in
+# another. They discharge DP8: every concept-valued property names a scheme
+# contract, and its values come from a scheme bound to that contract.
+
+cbg:SchemeMembershipShape a sh:NodeShape ;
+    sh:targetClass voc:SchemeContract ;
+    sh:sparql [
+        sh:message "A value of a property this contract governs is not in the contract's bound scheme, nor in any scheme a binding for the contract supplies." ;
+        sh:select """
+            PREFIX voc:  <https://www.nebularis.org/neuro-semantic/lattice/vocabulary#>
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            SELECT $this ?value WHERE {
+                $this voc:constrainsProperty ?property .
+                ?subject ?property ?value .
+                FILTER EXISTS { { $this voc:boundScheme ?any } UNION { ?anyBinding voc:forContract $this } }
+                FILTER NOT EXISTS { $this voc:boundScheme ?scheme . ?value skos:inScheme ?scheme }
+                FILTER NOT EXISTS { ?binding voc:forContract $this ; voc:bindsScheme ?bound . ?value skos:inScheme ?bound }
+            }
+        """ ;
+    ] .
+
+cbg:ConceptPropertyHasContractShape a sh:NodeShape ;
+    sh:targetSubjectsOf <http://www.w3.org/2000/01/rdf-schema#range> ;
+    sh:sparql [
+        sh:message "An Open CBAA property whose range is skos:Concept names no scheme contract (DP8)." ;
+        sh:select """
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            PREFIX voc:  <https://www.nebularis.org/neuro-semantic/lattice/vocabulary#>
+            SELECT $this WHERE {
+                $this rdfs:range skos:Concept .
+                FILTER (STRSTARTS(STR($this), "https://nebularis.github.io/open-cbaa/"))
+                FILTER NOT EXISTS { ?contract voc:constrainsProperty $this }
+            }
+        """ ;
+    ] .

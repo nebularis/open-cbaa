@@ -1,0 +1,175 @@
+@prefix agr:  <https://nebularis.github.io/open-cbaa/ontology/agreement#> .
+@prefix fnd:  <https://www.nebularis.org/neuro-semantic/lattice/foundation#> .
+@prefix voc:  <https://www.nebularis.org/neuro-semantic/lattice/vocabulary#> .
+@prefix pty:  <https://www.nebularis.org/neuro-semantic/lattice/party#> .
+@prefix bhv:  <https://www.nebularis.org/neuro-semantic/lattice/behaviour#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+# Open CBAA — Agreements vocabulary.
+#
+# The CBAA roles, the markets agreements are written in, amendment
+# materiality, and the agreement lifecycle of M12 declared on LATTICE
+# Behaviour. Declarations are data: a runtime interprets them, and nothing
+# here hard-codes a state machine (design-spec §8.7).
+
+<https://nebularis.github.io/open-cbaa/ontology/agreement-vocab> a owl:Ontology ;
+    rdfs:label "Open CBAA — Agreements vocabulary"@en ;
+    owl:versionIRI <https://nebularis.github.io/open-cbaa/ontology/agreement-vocab/0.1.0> ;
+    owl:imports <https://nebularis.github.io/open-cbaa/ontology/agreement/0.1.0> ,
+                <https://www.nebularis.org/neuro-semantic/lattice/foundation-vocab/0.3.0> ,
+                <https://www.nebularis.org/neuro-semantic/lattice/party-vocab/0.5.0> ,
+                <https://www.nebularis.org/neuro-semantic/lattice/behaviour-vocab/0.6.0> .
+
+#################################################################
+# CBAA roles (integration spec §4.4)
+#################################################################
+
+agr:Coverholder a owl:NamedIndividual , pty:Role ; rdfs:label "Coverholder"@en .
+agr:LeadInsurer a owl:NamedIndividual , pty:Role ; rdfs:label "Lead Insurer"@en .
+agr:FollowInsurer a owl:NamedIndividual , pty:Role ; rdfs:label "Follow Insurer"@en .
+agr:Broker a owl:NamedIndividual , pty:Role ; rdfs:label "Broker"@en .
+agr:ProducingIntermediary a owl:NamedIndividual , pty:Role ; rdfs:label "Producing Intermediary"@en .
+agr:DelegatedClaimsAdministrator a owl:NamedIndividual , pty:Role ; rdfs:label "Delegated Claims Administrator"@en ; skos:altLabel "DCA" .
+agr:FNOLHandlingParty a owl:NamedIndividual , pty:Role ; rdfs:label "FNOL Handling Party"@en .
+agr:ClaimsDeterminationAndSettlementParty a owl:NamedIndividual , pty:Role ; rdfs:label "Claims Determination and Settlement Party"@en .
+agr:DataFormatter a owl:NamedIndividual , pty:Role ; rdfs:label "Data Formatter"@en .
+agr:DataController a owl:NamedIndividual , pty:Role ; rdfs:label "Data Controller"@en .
+agr:DataProcessor a owl:NamedIndividual , pty:Role ; rdfs:label "Data Processor"@en .
+agr:RegulatoryBody a owl:NamedIndividual , pty:Role ; rdfs:label "Regulatory Body"@en .
+
+[] a owl:AllDifferent ; owl:distinctMembers ( agr:Coverholder agr:LeadInsurer agr:FollowInsurer agr:Broker
+    agr:ProducingIntermediary agr:DelegatedClaimsAdministrator agr:FNOLHandlingParty
+    agr:ClaimsDeterminationAndSettlementParty agr:DataFormatter agr:DataController agr:DataProcessor agr:RegulatoryBody ) .
+
+#################################################################
+# Markets, as binding scopes (integration spec §4.2)
+#################################################################
+
+agr:LloydsMarket a owl:NamedIndividual , voc:BindingScope ; rdfs:label "Lloyd's"@en ;
+    rdfs:comment "Schemes bound in this scope, such as Lloyd's risk codes, apply only to agreements using Lloyd's capacity."@en .
+agr:LloydsEurope a owl:NamedIndividual , voc:BindingScope ; rdfs:label "Lloyd's Europe"@en .
+agr:CompanyMarket a owl:NamedIndividual , voc:BindingScope ; rdfs:label "Company market"@en .
+
+#################################################################
+# Materiality (M3 3.9.1)
+#################################################################
+
+agr:Material a owl:NamedIndividual , agr:Materiality ; rdfs:label "Material"@en ;
+    rdfs:comment "Needs the approval M3 requires, such as an expansion of authority."@en .
+agr:NotMaterial a owl:NamedIndividual , agr:Materiality ; rdfs:label "Not material"@en .
+agr:MaterialityNotAssessed a owl:NamedIndividual , agr:Materiality ; rdfs:label "Not assessed"@en .
+
+[] a owl:AllDifferent ; owl:distinctMembers ( agr:Material agr:NotMaterial agr:MaterialityNotAssessed ) .
+
+#################################################################
+# The agreement lifecycle (M12)
+#################################################################
+
+agr:AgreementLifecycle a bhv:StateSpace ;
+    rdfs:label "Agreement lifecycle (M12)"@en ;
+    fnd:hasIdentity agr:AgreementLifecycle-identity ;
+    rdfs:comment "An accepted agreement's lifecycle: in force, automatically suspended, under notice, in run-off, closed. Termination and non-renewal are transitions into run-off, which begins on their effective date (M12 C20)."@en .
+
+agr:InForce a bhv:State ; bhv:inStateSpace agr:AgreementLifecycle ; rdfs:label "In force"@en .
+agr:AutomaticallySuspended a bhv:State ; bhv:inStateSpace agr:AgreementLifecycle ; rdfs:label "Automatically suspended"@en ;
+    rdfs:comment "No authority to bind, renew or amend while suspended (M12 12.16)."@en .
+agr:NoticeServed a bhv:State ; bhv:inStateSpace agr:AgreementLifecycle ; rdfs:label "Notice of termination served"@en ;
+    rdfs:comment "The notice period after termination with notice (M12 12.23, 12.24)."@en .
+agr:RunOff a bhv:State ; bhv:inStateSpace agr:AgreementLifecycle ; rdfs:label "Run-off"@en ;
+    rdfs:comment "After termination or non-renewal, until every policy has expired and every claim is resolved, or the maximum run-off period elapses (M12 C20, 12.X2)."@en .
+agr:Closed a bhv:State ; bhv:inStateSpace agr:AgreementLifecycle ; rdfs:label "Closed"@en .
+
+# Triggers
+agr:SuspensionEvent a bhv:TriggerDefinition ; bhv:triggerKind bhv:ExternalStimulus ;
+    rdfs:label "Automatic suspension event"@en ;
+    rdfs:comment "Insolvency, loss of regulation or licence, or another event listed in M12 12.15, 12.20 or 12.21."@en .
+agr:SuspensionResolved a bhv:TriggerDefinition ; bhv:triggerKind bhv:ExternalStimulus ;
+    rdfs:label "Suspension issue resolved"@en ;
+    rdfs:comment "Resolved within the specified period, to the Lead Insurer's or the Coverholder's satisfaction (M12 12.19)."@en .
+agr:ImmediateTerminationNotice a bhv:TriggerDefinition ; bhv:triggerKind bhv:ExternalStimulus ;
+    rdfs:label "Notice of immediate termination"@en ;
+    rdfs:comment "The Lead Insurer or the Coverholder exercises the right of immediate termination (M12 12.22)."@en .
+agr:TerminationNotice a bhv:TriggerDefinition ; bhv:triggerKind bhv:ExternalStimulus ;
+    rdfs:label "Notice of termination"@en ;
+    rdfs:comment "Either party gives notice of termination (M12 12.23)."@en .
+agr:NoticePeriodExpiry a bhv:TriggerDefinition ; bhv:triggerKind bhv:ScheduledTrigger ;
+    rdfs:label "Notice period expires"@en .
+agr:FixedTermExpiry a bhv:TriggerDefinition ; bhv:triggerKind bhv:ScheduledTrigger ;
+    rdfs:label "Fixed term expires without renewal"@en ;
+    rdfs:comment "Only for fixed-term agreements (M2 2.2A)."@en .
+agr:RunOffComplete a bhv:TriggerDefinition ; bhv:triggerKind bhv:DerivedTrigger ;
+    rdfs:label "Run-off complete"@en ;
+    rdfs:comment "Every policy bound has expired and every claim is resolved (M12 C20). Evaluated over operational data and delivered as an event (design-spec §8.7)."@en .
+agr:MaximumRunOffReached a bhv:TriggerDefinition ; bhv:triggerKind bhv:ScheduledTrigger ;
+    rdfs:label "Maximum run-off period reached"@en ;
+    rdfs:comment "The run-off period cannot exceed the stated maximum (M12 12.X2)."@en .
+
+# Effects
+agr:SuspendAuthority a bhv:EffectDefinition ; bhv:targetKind bhv:InstrumentTarget ;
+    rdfs:label "Suspend authority"@en ; rdfs:comment "M12 12.16."@en .
+agr:RestoreAuthority a bhv:EffectDefinition ; bhv:targetKind bhv:InstrumentTarget ;
+    rdfs:label "Restore authority"@en .
+agr:ApplyNoticePeriodTerms a bhv:EffectDefinition ; bhv:targetKind bhv:InstrumentTarget ;
+    rdfs:label "Apply notice period terms"@en ; rdfs:comment "M12 12.24."@en .
+agr:EndAuthority a bhv:EffectDefinition ; bhv:targetKind bhv:InstrumentTarget ;
+    rdfs:label "End authority, begin run-off"@en ; rdfs:comment "M12 12.26."@en .
+agr:CloseAgreement a bhv:EffectDefinition ; bhv:targetKind bhv:InstrumentTarget ;
+    rdfs:label "Close the agreement"@en .
+
+# Transitions
+agr:Suspend a bhv:TransitionDefinition ; fnd:hasIdentity agr:Suspend-identity ;
+    rdfs:label "Suspend automatically"@en ;
+    bhv:fromState agr:InForce ; bhv:toState agr:AutomaticallySuspended ;
+    bhv:hasTrigger agr:SuspensionEvent ; bhv:hasEffect agr:SuspendAuthority ;
+    bhv:selectionPolicy bhv:SingleMatch ; bhv:activationPolicy bhv:ImmediateActivation .
+
+agr:Reinstate a bhv:TransitionDefinition ; fnd:hasIdentity agr:Reinstate-identity ;
+    rdfs:label "Reinstate after suspension"@en ;
+    bhv:fromState agr:AutomaticallySuspended ; bhv:toState agr:InForce ;
+    bhv:hasTrigger agr:SuspensionResolved ; bhv:hasEffect agr:RestoreAuthority ;
+    bhv:selectionPolicy bhv:SingleMatch ; bhv:activationPolicy bhv:ManualActivation .
+
+agr:TerminateImmediately a bhv:TransitionDefinition ; fnd:hasIdentity agr:TerminateImmediately-identity ;
+    rdfs:label "Terminate immediately"@en ;
+    bhv:fromState agr:InForce ; bhv:toState agr:RunOff ;
+    bhv:hasTrigger agr:ImmediateTerminationNotice ; bhv:hasEffect agr:EndAuthority ;
+    bhv:selectionPolicy bhv:SingleMatch ; bhv:activationPolicy bhv:ManualActivation .
+
+agr:TerminateWhileSuspended a bhv:TransitionDefinition ; fnd:hasIdentity agr:TerminateWhileSuspended-identity ;
+    rdfs:label "Terminate an unresolved suspension"@en ;
+    rdfs:comment "M12 12.22.1."@en ;
+    bhv:fromState agr:AutomaticallySuspended ; bhv:toState agr:RunOff ;
+    bhv:hasTrigger agr:ImmediateTerminationNotice ; bhv:hasEffect agr:EndAuthority ;
+    bhv:selectionPolicy bhv:SingleMatch ; bhv:activationPolicy bhv:ManualActivation .
+
+agr:ServeNotice a bhv:TransitionDefinition ; fnd:hasIdentity agr:ServeNotice-identity ;
+    rdfs:label "Serve notice of termination"@en ;
+    bhv:fromState agr:InForce ; bhv:toState agr:NoticeServed ;
+    bhv:hasTrigger agr:TerminationNotice ; bhv:hasEffect agr:ApplyNoticePeriodTerms ;
+    bhv:selectionPolicy bhv:SingleMatch ; bhv:activationPolicy bhv:ManualActivation .
+
+agr:NoticeExpires a bhv:TransitionDefinition ; fnd:hasIdentity agr:NoticeExpires-identity ;
+    rdfs:label "Terminate at the end of notice"@en ;
+    bhv:fromState agr:NoticeServed ; bhv:toState agr:RunOff ;
+    bhv:hasTrigger agr:NoticePeriodExpiry ; bhv:hasEffect agr:EndAuthority ;
+    bhv:selectionPolicy bhv:SingleMatch ; bhv:activationPolicy bhv:ImmediateActivation .
+
+agr:Expire a bhv:TransitionDefinition ; fnd:hasIdentity agr:Expire-identity ;
+    rdfs:label "Expire without renewal"@en ;
+    bhv:fromState agr:InForce ; bhv:toState agr:RunOff ;
+    bhv:hasTrigger agr:FixedTermExpiry ; bhv:hasEffect agr:EndAuthority ;
+    bhv:selectionPolicy bhv:SingleMatch ; bhv:activationPolicy bhv:ImmediateActivation .
+
+agr:CloseAfterRunOff a bhv:TransitionDefinition ; fnd:hasIdentity agr:CloseAfterRunOff-identity ;
+    rdfs:label "Close when run-off is complete"@en ;
+    bhv:fromState agr:RunOff ; bhv:toState agr:Closed ;
+    bhv:hasTrigger agr:RunOffComplete ; bhv:hasEffect agr:CloseAgreement ;
+    bhv:selectionPolicy bhv:SingleMatch ; bhv:activationPolicy bhv:ImmediateActivation .
+
+agr:CloseAtMaximumRunOff a bhv:TransitionDefinition ; fnd:hasIdentity agr:CloseAtMaximumRunOff-identity ;
+    rdfs:label "Close at the maximum run-off period"@en ;
+    bhv:fromState agr:RunOff ; bhv:toState agr:Closed ;
+    bhv:hasTrigger agr:MaximumRunOffReached ; bhv:hasEffect agr:CloseAgreement ;
+    bhv:selectionPolicy bhv:SingleMatch ; bhv:activationPolicy bhv:ImmediateActivation .

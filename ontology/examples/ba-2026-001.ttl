@@ -1,0 +1,483 @@
+@prefix ex:   <https://nebularis.github.io/open-cbaa/ontology/examples/ba-2026-001#> .
+@prefix wim:  <https://nebularis.github.io/open-cbaa/ontology/wim#> .
+@prefix stm:  <https://nebularis.github.io/open-cbaa/ontology/statement#> .
+@prefix agr:  <https://nebularis.github.io/open-cbaa/ontology/agreement#> .
+@prefix rsk:  <https://nebularis.github.io/open-cbaa/ontology/risk#> .
+@prefix lma:  <https://nebularis.github.io/open-cbaa/ontology/schemes/lma#> .
+@prefix act:  <https://nebularis.github.io/open-cbaa/ontology/schemes/activity#> .
+@prefix fnd:  <https://www.nebularis.org/neuro-semantic/lattice/foundation#> .
+@prefix voc:  <https://www.nebularis.org/neuro-semantic/lattice/vocabulary#> .
+@prefix qnt:  <https://www.nebularis.org/neuro-semantic/lattice/quantification#> .
+@prefix pty:  <https://www.nebularis.org/neuro-semantic/lattice/party#> .
+@prefix elg:  <https://www.nebularis.org/neuro-semantic/lattice/eligibility#> .
+@prefix ins:  <https://www.nebularis.org/neuro-semantic/lattice/instrument#> .
+@prefix bhv:  <https://www.nebularis.org/neuro-semantic/lattice/behaviour#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# Worked example: binding authority BA-2026-001, the agreement the
+# architecture walkthrough (docs/architecture.md) follows.
+#
+#   1. Editions a deployment supplies: a territory subset and currencies.
+#   2. Library wording: M1 with a variation slot, M5's SoUA clause with an
+#      authority grant template, M8's FNOL clause with an obligation template.
+#   3. Agreement version 1: parties, variable values, bound statements.
+#   4. An amendment raising the limit, producing version 2 (material).
+#   5. A bound policy with four risks, and the decision each should get.
+#
+# The file is data. It validates against the Open CBAA shapes, the
+# governance shapes and LATTICE's layer shapes (ontology/README.md §Validation).
+
+<https://nebularis.github.io/open-cbaa/ontology/examples/ba-2026-001> a owl:Ontology ;
+    rdfs:label "Open CBAA — worked example BA-2026-001"@en ;
+    owl:versionIRI <https://nebularis.github.io/open-cbaa/ontology/examples/ba-2026-001/0.1.0> ;
+    owl:imports <https://nebularis.github.io/open-cbaa/ontology/open-cbaa/0.2.0> .
+
+#################################################################
+# 1. Editions
+#################################################################
+
+# A territory edition (tier V2, cut down). A deployment binds it to the
+# unbound territory contract for the Lloyd's market.
+ex:Territories a voc:ConceptScheme ;
+    skos:prefLabel "ISO 3166, 2026 edition (example subset)"@en ;
+    fnd:hasIdentity ex:Territories-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    skos:hasTopConcept ex:Europe , ex:UnitedStates .
+
+ex:Europe a skos:Concept ; skos:prefLabel "Europe"@en ; skos:inScheme ex:Territories ; skos:topConceptOf ex:Territories .
+ex:France a skos:Concept ; skos:prefLabel "France"@en ; skos:inScheme ex:Territories ; skos:broader ex:Europe .
+ex:Lyon a skos:Concept ; skos:prefLabel "Lyon"@en ; skos:inScheme ex:Territories ; skos:broader ex:France .
+ex:Nice a skos:Concept ; skos:prefLabel "Nice"@en ; skos:inScheme ex:Territories ; skos:broader ex:France .
+ex:Corsica a skos:Concept ; skos:prefLabel "Corsica"@en ; skos:inScheme ex:Territories ; skos:broader ex:France .
+ex:Ajaccio a skos:Concept ; skos:prefLabel "Ajaccio"@en ; skos:inScheme ex:Territories ; skos:broader ex:Corsica .
+ex:UnitedStates a skos:Concept ; skos:prefLabel "United States"@en ; skos:inScheme ex:Territories ; skos:topConceptOf ex:Territories .
+
+ex:TerritoryBinding a voc:SchemeBinding ;
+    voc:forContract rsk:TerritoryContract ;
+    voc:bindsScheme ex:Territories ;
+    voc:bindingScope agr:LloydsMarket ;
+    fnd:hasTemporalScope [ a fnd:TemporalScope ; fnd:validFrom "2026-01-01T00:00:00Z"^^xsd:dateTime ] .
+
+# The contract type scheme is Open CBAA's own (V1), bound everywhere. The
+# binding exists so agreement versions can record it as resolved.
+ex:ContractTypeBinding a voc:SchemeBinding ;
+    voc:forContract rsk:ContractTypeContract ;
+    voc:bindsScheme rsk:ContractTypeScheme ;
+    fnd:hasTemporalScope [ a fnd:TemporalScope ; fnd:validFrom "2026-01-01T00:00:00Z"^^xsd:dateTime ] .
+
+# Currencies (ISO 4217, tier V2), in the family stm:CurrencyUnitContract permits.
+ex:GBP a qnt:Unit ; rdfs:label "GBP" .
+ex:EUR a qnt:Unit ; rdfs:label "EUR" .
+ex:USD a qnt:Unit ; rdfs:label "USD" .
+
+#################################################################
+# 2. Library wording
+#################################################################
+
+# M1: the agreement type decides which variant of 1.4 an agreement carries.
+ex:M1 a wim:ComponentGroup ;
+    fnd:hasIdentity ex:M1-identity ; fnd:hasGovernanceState fnd:Active ;
+    wim:objectId "M1" ; wim:componentGroupType lma:Module ;
+    wim:directlyComprises ex:M1-GOV1 , ex:C01-4A , ex:C01-4B ;
+    stm:encodingStatus stm:NotYetAssessed .
+
+ex:M1-GOV1 a wim:GoverningVariable ;
+    fnd:hasIdentity ex:M1-GOV1-identity ; fnd:hasGovernanceState fnd:Active ;
+    wim:variableKey "M1.GOV1" ;
+    wim:populationMethod wim:PickList ;
+    wim:valueContract wim:ContractCategoryContract .
+
+ex:C01-4 a wim:VariationSlot ;
+    rdfs:label "1.4 Nature of the agreement"@en ;
+    wim:hasVariant ex:C01-4A , ex:C01-4B .
+
+ex:C01-4A a wim:Component ;
+    fnd:hasIdentity ex:C01-4A-identity ; fnd:hasGovernanceState fnd:Active ;
+    wim:objectId "1.4A" ; wim:componentType lma:Clause ;
+    wim:inclusionMode wim:Variation ; wim:variantOf ex:C01-4 ;
+    wim:includedWhen ex:WhenBindingAuthority ;
+    stm:encodingStatus stm:NoComputableContent .
+
+ex:C01-4B a wim:Component ;
+    fnd:hasIdentity ex:C01-4B-identity ; fnd:hasGovernanceState fnd:Active ;
+    wim:objectId "1.4B" ; wim:componentType lma:Clause ;
+    wim:inclusionMode wim:Variation ; wim:variantOf ex:C01-4 ;
+    wim:includedWhen ex:WhenLineSlip ;
+    stm:encodingStatus stm:NoComputableContent .
+
+# Inclusion conditions, evaluated in question form: assembly poses the
+# agreement's value for M1.GOV1 as an elg:Question (wim:includedWhen).
+ex:WhenBindingAuthority a elg:AdmissionProfile ;
+    elg:hasCondition ex:IsBindingAuthority ;
+    elg:matchStrategy elg:HierarchicalMatch ; elg:compatibilityOperation elg:AllRequired ; elg:wildcardSemantics elg:NoWildcard .
+ex:IsBindingAuthority a elg:Condition ;
+    elg:matchStrategy elg:HierarchicalMatch ; elg:compatibilityOperation elg:AllRequired ; elg:wildcardSemantics elg:NoWildcard ;
+    elg:constrainedByContract wim:ContractCategoryContract ;
+    elg:requiredConcept lma:BindingAuthority ;
+    wim:readsVariable ex:M1-GOV1 .
+
+ex:WhenLineSlip a elg:AdmissionProfile ;
+    elg:hasCondition ex:IsLineSlip ;
+    elg:matchStrategy elg:HierarchicalMatch ; elg:compatibilityOperation elg:AllRequired ; elg:wildcardSemantics elg:NoWildcard .
+ex:IsLineSlip a elg:Condition ;
+    elg:matchStrategy elg:HierarchicalMatch ; elg:compatibilityOperation elg:AllRequired ; elg:wildcardSemantics elg:NoWildcard ;
+    elg:constrainedByContract wim:ContractCategoryContract ;
+    elg:requiredConcept lma:LineSlip ;
+    wim:readsVariable ex:M1-GOV1 .
+
+# M5: the Scope of Underwriting Authority, reduced to one clause.
+ex:M5 a wim:ComponentGroup ;
+    fnd:hasIdentity ex:M5-identity ; fnd:hasGovernanceState fnd:Active ;
+    wim:objectId "M5" ; wim:componentGroupType lma:Module ;
+    wim:directlyComprises ex:C05-2 .
+
+ex:C05-2 a wim:Component ;
+    fnd:hasIdentity ex:C05-2-identity ; fnd:hasGovernanceState fnd:Active ;
+    wim:objectId "5.2" ; wim:rankKey "0002" ;
+    wim:componentType lma:Clause ;
+    wim:clauseClassification lma:GrantOfAuthority ;
+    wim:directlyComprises ex:C05-2-text , ex:C05-2-classes , ex:C05-2-territories , ex:C05-2-excluded , ex:C05-2-limit ;
+    stm:encodingStatus stm:Encoded ;
+    stm:expresses ex:SoUAGrant .
+
+ex:C05-2-text a wim:Text ;
+    fnd:hasIdentity ex:C05-2-text-identity ; fnd:hasGovernanceState fnd:Active ;
+    wim:elementType lma:NumberedClause ;
+    wim:hasSegment
+        [ a wim:Segment ; wim:segmentIndex "0"^^xsd:nonNegativeInteger ; wim:segmentText "The Coverholder may bind " ] ,
+        [ a wim:Segment ; wim:segmentIndex "1"^^xsd:nonNegativeInteger ; wim:refersToVariable ex:C05-2-classes ] ,
+        [ a wim:Segment ; wim:segmentIndex "2"^^xsd:nonNegativeInteger ; wim:segmentText " risks located in " ] ,
+        [ a wim:Segment ; wim:segmentIndex "3"^^xsd:nonNegativeInteger ; wim:refersToVariable ex:C05-2-territories ] ,
+        [ a wim:Segment ; wim:segmentIndex "4"^^xsd:nonNegativeInteger ; wim:segmentText " excluding " ] ,
+        [ a wim:Segment ; wim:segmentIndex "5"^^xsd:nonNegativeInteger ; wim:refersToVariable ex:C05-2-excluded ] ,
+        [ a wim:Segment ; wim:segmentIndex "6"^^xsd:nonNegativeInteger ; wim:segmentText ", with a sum insured not exceeding " ] ,
+        [ a wim:Segment ; wim:segmentIndex "7"^^xsd:nonNegativeInteger ; wim:refersToVariable ex:C05-2-limit ] ,
+        [ a wim:Segment ; wim:segmentIndex "8"^^xsd:nonNegativeInteger ; wim:segmentText "." ] .
+
+ex:C05-2-classes a wim:EmbeddedVariable ;
+    fnd:hasIdentity ex:C05-2-classes-identity ; fnd:hasGovernanceState fnd:Active ;
+    wim:variableKey "M5.classes" ; wim:populationMethod wim:PickList ;
+    wim:valueContract rsk:ContractTypeContract ; wim:multiValued true .
+
+ex:C05-2-territories a wim:EmbeddedVariable ;
+    fnd:hasIdentity ex:C05-2-territories-identity ; fnd:hasGovernanceState fnd:Active ;
+    wim:variableKey "M5.territories" ; wim:populationMethod wim:PickList ;
+    wim:valueContract rsk:TerritoryContract ; wim:multiValued true .
+
+ex:C05-2-excluded a wim:EmbeddedVariable ;
+    fnd:hasIdentity ex:C05-2-excluded-identity ; fnd:hasGovernanceState fnd:Active ;
+    wim:variableKey "M5.excludedTerritories" ; wim:populationMethod wim:PickList ;
+    wim:valueContract rsk:TerritoryContract ; wim:multiValued true .
+
+ex:C05-2-limit a wim:EmbeddedVariable ;
+    fnd:hasIdentity ex:C05-2-limit-identity ; fnd:hasGovernanceState fnd:Active ;
+    wim:variableKey "M5.maxSumInsured" ; wim:populationMethod wim:FreeEntry ;
+    wim:valueSpace stm:MoneySpace .
+
+# The grant template names the Coverholder role and takes its scope from the
+# clause's variables. Each scope parameter says what the bound condition
+# reads: the risk's location, its policy's contract type, its sum insured.
+ex:SoUAGrant a stm:AuthorityGrant , stm:StatementTemplate ;
+    stm:bearer agr:Coverholder ;
+    stm:counterparty agr:LeadInsurer ;
+    stm:activity act:Binding ;
+    stm:hasParameterBinding ex:SoUAGrant-classes , ex:SoUAGrant-territories , ex:SoUAGrant-excluded , ex:SoUAGrant-limit .
+
+ex:SoUAGrant-classes a stm:ParameterBinding ;
+    stm:parameterKind stm:ScopeInclusion ; stm:fromVariable ex:C05-2-classes ;
+    stm:scopeSubject rsk:Risk ; stm:scopeStrategy elg:SetMembership ;
+    stm:scopeStep [ a elg:EvidenceStep ; elg:stepIndex 0 ; elg:stepProperty rsk:ofPolicy ; elg:stepDirection elg:Forward ] ,
+                  [ a elg:EvidenceStep ; elg:stepIndex 1 ; elg:stepProperty rsk:contractType ; elg:stepDirection elg:Forward ] .
+
+ex:SoUAGrant-territories a stm:ParameterBinding ;
+    stm:parameterKind stm:ScopeInclusion ; stm:fromVariable ex:C05-2-territories ;
+    stm:scopeSubject rsk:Risk ; stm:scopeStrategy elg:HierarchicalMatch ;
+    stm:scopeStep ex:RiskLocationStep .
+
+ex:SoUAGrant-excluded a stm:ParameterBinding ;
+    stm:parameterKind stm:ScopeExclusion ; stm:fromVariable ex:C05-2-excluded ;
+    stm:scopeSubject rsk:Risk ; stm:scopeStrategy elg:HierarchicalMatch ;
+    stm:scopeStep ex:RiskLocationStep .
+
+ex:SoUAGrant-limit a stm:ParameterBinding ;
+    stm:parameterKind stm:ScopeLimit ; stm:fromVariable ex:C05-2-limit ;
+    stm:scopeSubject rsk:Risk ; stm:scopeStrategy elg:IntervalContainment ;
+    stm:scopeStep [ a elg:EvidenceStep ; elg:stepIndex 0 ; elg:stepProperty rsk:sumInsured ; elg:stepDirection elg:Forward ] .
+
+ex:RiskLocationStep a elg:EvidenceStep ; elg:stepIndex 0 ; elg:stepProperty rsk:riskLocation ; elg:stepDirection elg:Forward .
+
+# M8: FNOL onward transfer within 1 business day (M8 8.1.2A).
+ex:M8 a wim:ComponentGroup ;
+    fnd:hasIdentity ex:M8-identity ; fnd:hasGovernanceState fnd:Active ;
+    wim:objectId "M8" ; wim:componentGroupType lma:Module ;
+    wim:directlyComprises ex:C08-1-2A .
+
+ex:C08-1-2A a wim:Component ;
+    fnd:hasIdentity ex:C08-1-2A-identity ; fnd:hasGovernanceState fnd:Active ;
+    wim:objectId "8.1.2A" ; wim:componentType lma:Clause ;
+    wim:clauseClassification lma:ConditionPrecedent ;
+    wim:directlyComprises ex:C08-1-2A-text , ex:C08-1-2A-deadline ;
+    stm:encodingStatus stm:Encoded ;
+    stm:expresses ex:FNOLTransfer .
+
+ex:C08-1-2A-text a wim:Text ;
+    fnd:hasIdentity ex:C08-1-2A-text-identity ; fnd:hasGovernanceState fnd:Active ;
+    wim:elementType lma:NumberedClause ;
+    wim:hasSegment
+        [ a wim:Segment ; wim:segmentIndex "0"^^xsd:nonNegativeInteger ; wim:segmentText "The Coverholder shall notify the Lead Insurer of any first notification of loss within " ] ,
+        [ a wim:Segment ; wim:segmentIndex "1"^^xsd:nonNegativeInteger ; wim:refersToVariable ex:C08-1-2A-deadline ] ,
+        [ a wim:Segment ; wim:segmentIndex "2"^^xsd:nonNegativeInteger ; wim:segmentText " of receipt." ] .
+
+ex:C08-1-2A-deadline a wim:EmbeddedVariable ;
+    fnd:hasIdentity ex:C08-1-2A-deadline-identity ; fnd:hasGovernanceState fnd:Active ;
+    wim:variableKey "M8.fnolDeadline" ; wim:populationMethod wim:DefaultedOverridable ;
+    wim:valueSpace stm:DurationSpace .
+
+ex:FNOLReceived a bhv:TriggerDefinition ; bhv:triggerKind bhv:ExternalStimulus ;
+    rdfs:label "First notification of loss received"@en .
+
+ex:FNOLTransfer a stm:Obligation , stm:StatementTemplate ;
+    stm:bearer agr:Coverholder ;
+    stm:counterparty agr:LeadInsurer ;
+    stm:activity act:FNOLOnwardTransfer ;
+    stm:trigger ex:FNOLReceived ;
+    stm:breachTreatment lma:ConditionPrecedent ;
+    stm:hasParameterBinding [ a stm:ParameterBinding ; stm:parameterKind stm:DeadlineParameter ; stm:fromVariable ex:C08-1-2A-deadline ] .
+
+#################################################################
+# 3. Agreement version 1
+#################################################################
+
+ex:BA-2026-001 a agr:AgreementIdentity ; rdfs:label "BA-2026-001"@en .
+
+ex:Harbour a pty:Actor ; rdfs:label "Harbour Underwriting Ltd"@en .
+ex:InsurerA a pty:Actor ; rdfs:label "Lead Insurer A"@en .
+ex:InsurerB a pty:Actor ; rdfs:label "Follow Insurer B"@en .
+ex:BrokerCo a pty:Actor ; rdfs:label "the Broker"@en .
+
+# Occupancies are shared by both versions: the parties do not change.
+ex:Coverholder-occ a pty:RoleOccupancy ;
+    fnd:hasIdentity ex:Coverholder-occ-identity ;
+    pty:inRole agr:Coverholder ; pty:occupiedBy ex:Harbour ;
+    fnd:hasTemporalScope ex:AgreementPeriod .
+ex:Lead-occ a pty:RoleOccupancy ;
+    fnd:hasIdentity ex:Lead-occ-identity ;
+    pty:inRole agr:LeadInsurer ; pty:occupiedBy ex:InsurerA ;
+    fnd:hasTemporalScope ex:AgreementPeriod .
+ex:Follow-occ a pty:RoleOccupancy ;
+    fnd:hasIdentity ex:Follow-occ-identity ;
+    pty:inRole agr:FollowInsurer ; pty:occupiedBy ex:InsurerB ;
+    fnd:hasTemporalScope ex:AgreementPeriod .
+ex:Broker-occ a pty:RoleOccupancy ;
+    fnd:hasIdentity ex:Broker-occ-identity ;
+    pty:inRole agr:Broker ; pty:occupiedBy ex:BrokerCo ;
+    fnd:hasTemporalScope ex:AgreementPeriod .
+
+ex:AgreementPeriod a fnd:TemporalScope ;
+    fnd:validFrom "2026-01-01T00:00:00Z"^^xsd:dateTime ; fnd:validTo "2027-01-01T00:00:00Z"^^xsd:dateTime .
+
+ex:Insurers a pty:ParticipationGroup ;
+    fnd:hasIdentity ex:Insurers-identity ;
+    pty:hasParticipant ex:Lead-line , ex:Follow-line ;
+    pty:hasCompositionRule pty:SeveralOnly .
+ex:Lead-line a pty:GroupMembership ; pty:memberOf ex:Insurers ; pty:memberOccupancy ex:Lead-occ ; pty:share 0.6 .
+ex:Follow-line a pty:GroupMembership ; pty:memberOf ex:Insurers ; pty:memberOccupancy ex:Follow-occ ; pty:share 0.4 .
+
+ex:BA-2026-001-v1 a agr:AgreementVersion ;
+    fnd:hasIdentity ex:BA-2026-001 ;
+    fnd:hasGovernanceState fnd:Superseded ;
+    fnd:supersededBy ex:BA-2026-001-v2 ;
+    fnd:hasTemporalScope [ a fnd:TemporalScope ;
+        fnd:validFrom "2026-01-01T00:00:00Z"^^xsd:dateTime ; fnd:validTo "2026-07-01T00:00:00Z"^^xsd:dateTime ] ;
+    wim:contractCategory lma:BindingAuthority ;
+    agr:umr "B1234ACME2026001" ;
+    agr:inMarket agr:LloydsMarket ;
+    voc:resolvedUnder ex:TerritoryBinding , ex:ContractTypeBinding ;
+    agr:includes ex:M1 , ex:M1-GOV1 , ex:C01-4A ,
+                 ex:M5 , ex:C05-2 , ex:C05-2-text , ex:C05-2-classes , ex:C05-2-territories , ex:C05-2-excluded , ex:C05-2-limit ,
+                 ex:M8 , ex:C08-1-2A , ex:C08-1-2A-text , ex:C08-1-2A-deadline ;
+    agr:hasOccupancy ex:Coverholder-occ , ex:Lead-occ , ex:Follow-occ , ex:Broker-occ ;
+    agr:insurers ex:Insurers ;
+    agr:hasVariableValue
+        [ a agr:VariableValue ; agr:forVariable ex:M1-GOV1 ; agr:value lma:BindingAuthority ] ,
+        [ a agr:VariableValue ; agr:forVariable ex:C05-2-classes ; agr:value rsk:Insurance ] ,
+        [ a agr:VariableValue ; agr:forVariable ex:C05-2-territories ; agr:value ex:France ] ,
+        [ a agr:VariableValue ; agr:forVariable ex:C05-2-excluded ; agr:value ex:Corsica ] ,
+        [ a agr:VariableValue ; agr:forVariable ex:C05-2-limit ; agr:value ex:v1-limit ] ,
+        [ a agr:VariableValue ; agr:forVariable ex:C08-1-2A-deadline ; agr:value ex:OneBusinessDay ] ;
+    agr:hasStatement ex:grant-uw , ex:fnol-transfer .
+
+# The limit: GBP 5,000,000 or EUR 5,750,000, as alternative bounds. A sum
+# insured is compared with the bound in its own currency, never converted.
+ex:v1-limit a qnt:RangeSet ; qnt:onSpace stm:MoneySpace ; qnt:hasRange ex:v1-limit-range .
+ex:v1-limit-range a qnt:Range ; qnt:onSpace stm:MoneySpace ;
+    qnt:upperBound ex:v1-limit-gbp ; qnt:hasBound ex:v1-limit-gbp , ex:v1-limit-eur .
+ex:v1-limit-gbp a qnt:Bound ; qnt:onSpace stm:MoneySpace ; qnt:boundSense qnt:Upper ; qnt:boundClosure qnt:Closed ;
+    qnt:boundValue [ a qnt:Quantity ; qnt:onSpace stm:MoneySpace ; qnt:numericValue 5000000.0 ; qnt:inUnit ex:GBP ] ;
+    qnt:alternativeBound ex:v1-limit-eur .
+ex:v1-limit-eur a qnt:Bound ; qnt:onSpace stm:MoneySpace ; qnt:boundSense qnt:Upper ; qnt:boundClosure qnt:Closed ;
+    qnt:boundValue [ a qnt:Quantity ; qnt:onSpace stm:MoneySpace ; qnt:numericValue 5750000.0 ; qnt:inUnit ex:EUR ] .
+
+ex:OneBusinessDay a qnt:Quantity ; qnt:onSpace stm:DurationSpace ; qnt:numericValue 1.0 ; qnt:inUnit stm:BusinessDay .
+
+# The bound grant: the Coverholder occupancy, and a scope that binding wrote from
+# the template's parameter bindings and the version's values.
+ex:grant-uw a stm:AuthorityGrant , stm:BoundStatement ;
+    stm:boundFrom ex:SoUAGrant ;
+    fnd:hasIdentity ex:SoUAGrant-identity ;
+    stm:bearerOccupancy ex:Coverholder-occ ;
+    stm:counterpartyOccupancy ex:Lead-occ ;
+    stm:activity act:Binding ;
+    stm:scope ex:scope-uw .
+
+ex:scope-uw a elg:AdmissionProfile ;
+    elg:hasCondition ex:InsuranceOnly , ex:FranceNotCorsica , ex:v1-limit-condition ;
+    elg:matchStrategy elg:HierarchicalMatch ; elg:compatibilityOperation elg:AllRequired ; elg:wildcardSemantics elg:NoWildcard .
+
+ex:InsuranceOnly a elg:SetMembershipCondition ;
+    elg:matchStrategy elg:SetMembership ; elg:compatibilityOperation elg:AllRequired ; elg:wildcardSemantics elg:NoWildcard ;
+    elg:constrainedByContract rsk:ContractTypeContract ;
+    elg:requiredConcept rsk:Insurance .
+
+# The inclusion and the exclusion read the same path, so they make one condition.
+ex:FranceNotCorsica a elg:Condition ;
+    elg:matchStrategy elg:HierarchicalMatch ; elg:compatibilityOperation elg:AllRequired ; elg:wildcardSemantics elg:NoWildcard ;
+    elg:constrainedByContract rsk:TerritoryContract ;
+    elg:requiredConcept ex:France ;
+    elg:excludedConcept ex:Corsica .
+
+ex:v1-limit-condition a elg:IntervalCondition ;
+    elg:matchStrategy elg:IntervalContainment ; elg:compatibilityOperation elg:AllRequired ; elg:wildcardSemantics elg:NoWildcard ;
+    elg:requiredRangeSet ex:v1-limit .
+
+# Evidence bindings: each condition evaluates rsk:Risk directly. Every path
+# is single-valued (a risk has one policy, one location, one sum insured),
+# so the design-time OWL backend can compile the scope into classes.
+ex:InsuranceOnly-evidence a elg:EvidenceBinding ;
+    elg:bindsCondition ex:InsuranceOnly ; elg:subjectClass rsk:Risk ; elg:singleValued true ;
+    elg:evidenceStep [ a elg:EvidenceStep ; elg:stepIndex 0 ; elg:stepProperty rsk:ofPolicy ; elg:stepDirection elg:Forward ] ,
+                     [ a elg:EvidenceStep ; elg:stepIndex 1 ; elg:stepProperty rsk:contractType ; elg:stepDirection elg:Forward ] .
+ex:FranceNotCorsica-evidence a elg:EvidenceBinding ;
+    elg:bindsCondition ex:FranceNotCorsica ; elg:subjectClass rsk:Risk ; elg:singleValued true ;
+    elg:evidenceStep ex:RiskLocationStep .
+ex:v1-limit-evidence a elg:EvidenceBinding ;
+    elg:bindsCondition ex:v1-limit-condition ; elg:subjectClass rsk:Risk ; elg:singleValued true ;
+    elg:evidenceStep [ a elg:EvidenceStep ; elg:stepIndex 0 ; elg:stepProperty rsk:sumInsured ; elg:stepDirection elg:Forward ] .
+
+# The bound obligation is an ins:Obligation: obligor and obligee are occupancies.
+ex:fnol-transfer a stm:Obligation , stm:BoundStatement ;
+    stm:boundFrom ex:FNOLTransfer ;
+    fnd:hasIdentity ex:FNOLTransfer-identity ;
+    ins:obligor ex:Coverholder-occ ;
+    ins:obligee ex:Lead-occ ;
+    stm:activity act:FNOLOnwardTransfer ;
+    stm:trigger ex:FNOLReceived ;
+    stm:breachTreatment lma:ConditionPrecedent ;
+    stm:deadline ex:WithinOneBusinessDay .
+
+ex:WithinOneBusinessDay a qnt:Range ; qnt:onSpace stm:DurationSpace ;
+    qnt:upperBound ex:WithinOneBusinessDay-upper ; qnt:hasBound ex:WithinOneBusinessDay-upper .
+ex:WithinOneBusinessDay-upper a qnt:Bound ; qnt:onSpace stm:DurationSpace ;
+    qnt:boundSense qnt:Upper ; qnt:boundClosure qnt:Closed ; qnt:boundValue ex:OneBusinessDay .
+
+#################################################################
+# 4. Amendment: the limit rises to GBP 7,500,000 or EUR 8,600,000
+#################################################################
+
+# The v2 envelope is not a subclass of the v1 envelope, so authority
+# expanded and the amendment is material.
+ex:Amendment1 a agr:Amendment ;
+    agr:amends ex:BA-2026-001-v1 ; agr:resultsIn ex:BA-2026-001-v2 ;
+    agr:agreedOn "2026-06-15"^^xsd:date ;
+    agr:materiality agr:Material .
+
+ex:BA-2026-001-v2 a agr:AgreementVersion ;
+    fnd:hasIdentity ex:BA-2026-001 ;
+    fnd:hasGovernanceState fnd:Active ;
+    fnd:hasTemporalScope [ a fnd:TemporalScope ;
+        fnd:validFrom "2026-07-01T00:00:00Z"^^xsd:dateTime ; fnd:validTo "2027-01-01T00:00:00Z"^^xsd:dateTime ] ;
+    wim:contractCategory lma:BindingAuthority ;
+    agr:umr "B1234ACME2026001" ;
+    agr:inMarket agr:LloydsMarket ;
+    voc:resolvedUnder ex:TerritoryBinding , ex:ContractTypeBinding ;
+    agr:includes ex:M1 , ex:M1-GOV1 , ex:C01-4A ,
+                 ex:M5 , ex:C05-2 , ex:C05-2-text , ex:C05-2-classes , ex:C05-2-territories , ex:C05-2-excluded , ex:C05-2-limit ,
+                 ex:M8 , ex:C08-1-2A , ex:C08-1-2A-text , ex:C08-1-2A-deadline ;
+    agr:hasOccupancy ex:Coverholder-occ , ex:Lead-occ , ex:Follow-occ , ex:Broker-occ ;
+    agr:insurers ex:Insurers ;
+    agr:hasVariableValue
+        [ a agr:VariableValue ; agr:forVariable ex:M1-GOV1 ; agr:value lma:BindingAuthority ] ,
+        [ a agr:VariableValue ; agr:forVariable ex:C05-2-classes ; agr:value rsk:Insurance ] ,
+        [ a agr:VariableValue ; agr:forVariable ex:C05-2-territories ; agr:value ex:France ] ,
+        [ a agr:VariableValue ; agr:forVariable ex:C05-2-excluded ; agr:value ex:Corsica ] ,
+        [ a agr:VariableValue ; agr:forVariable ex:C05-2-limit ; agr:value ex:v2-limit ] ,
+        [ a agr:VariableValue ; agr:forVariable ex:C08-1-2A-deadline ; agr:value ex:OneBusinessDay ] ;
+    agr:hasStatement ex:grant-uw-v2 , ex:fnol-transfer-v2 .
+
+ex:v2-limit a qnt:RangeSet ; qnt:onSpace stm:MoneySpace ; qnt:hasRange ex:v2-limit-range .
+ex:v2-limit-range a qnt:Range ; qnt:onSpace stm:MoneySpace ;
+    qnt:upperBound ex:v2-limit-gbp ; qnt:hasBound ex:v2-limit-gbp , ex:v2-limit-eur .
+ex:v2-limit-gbp a qnt:Bound ; qnt:onSpace stm:MoneySpace ; qnt:boundSense qnt:Upper ; qnt:boundClosure qnt:Closed ;
+    qnt:boundValue [ a qnt:Quantity ; qnt:onSpace stm:MoneySpace ; qnt:numericValue 7500000.0 ; qnt:inUnit ex:GBP ] ;
+    qnt:alternativeBound ex:v2-limit-eur .
+ex:v2-limit-eur a qnt:Bound ; qnt:onSpace stm:MoneySpace ; qnt:boundSense qnt:Upper ; qnt:boundClosure qnt:Closed ;
+    qnt:boundValue [ a qnt:Quantity ; qnt:onSpace stm:MoneySpace ; qnt:numericValue 8600000.0 ; qnt:inUnit ex:EUR ] .
+
+# Same statement identities as version 1: the comparison pairs ex:grant-uw with ex:grant-uw-v2.
+ex:grant-uw-v2 a stm:AuthorityGrant , stm:BoundStatement ;
+    stm:boundFrom ex:SoUAGrant ;
+    fnd:hasIdentity ex:SoUAGrant-identity ;
+    stm:bearerOccupancy ex:Coverholder-occ ;
+    stm:counterpartyOccupancy ex:Lead-occ ;
+    stm:activity act:Binding ;
+    stm:scope ex:scope-uw-v2 .
+
+ex:scope-uw-v2 a elg:AdmissionProfile ;
+    elg:hasCondition ex:InsuranceOnly , ex:FranceNotCorsica , ex:v2-limit-condition ;
+    elg:matchStrategy elg:HierarchicalMatch ; elg:compatibilityOperation elg:AllRequired ; elg:wildcardSemantics elg:NoWildcard .
+
+ex:v2-limit-condition a elg:IntervalCondition ;
+    elg:matchStrategy elg:IntervalContainment ; elg:compatibilityOperation elg:AllRequired ; elg:wildcardSemantics elg:NoWildcard ;
+    elg:requiredRangeSet ex:v2-limit .
+ex:v2-limit-evidence a elg:EvidenceBinding ;
+    elg:bindsCondition ex:v2-limit-condition ; elg:subjectClass rsk:Risk ; elg:singleValued true ;
+    elg:evidenceStep [ a elg:EvidenceStep ; elg:stepIndex 0 ; elg:stepProperty rsk:sumInsured ; elg:stepDirection elg:Forward ] .
+
+ex:fnol-transfer-v2 a stm:Obligation , stm:BoundStatement ;
+    stm:boundFrom ex:FNOLTransfer ;
+    fnd:hasIdentity ex:FNOLTransfer-identity ;
+    ins:obligor ex:Coverholder-occ ;
+    ins:obligee ex:Lead-occ ;
+    stm:activity act:FNOLOnwardTransfer ;
+    stm:trigger ex:FNOLReceived ;
+    stm:breachTreatment lma:ConditionPrecedent ;
+    stm:deadline ex:WithinOneBusinessDay .
+
+#################################################################
+# 5. A bound policy and its risks, with the expected v1 decisions
+#################################################################
+
+ex:Policy-0001 a rsk:BoundPolicy ;
+    rsk:boundUnder ex:BA-2026-001-v1 ;
+    rsk:boundAt "2026-03-02T09:30:00Z"^^xsd:dateTime ;
+    rsk:contractType rsk:Insurance .
+
+# Permitted: Lyon is under France, not under Corsica, and GBP 3m is within GBP 5m.
+ex:risk-lyon a rsk:Risk ; rsk:ofPolicy ex:Policy-0001 ; rsk:riskLocation ex:Lyon ;
+    rsk:sumInsured [ a qnt:Quantity ; qnt:onSpace stm:MoneySpace ; qnt:numericValue 3000000.0 ; qnt:inUnit ex:GBP ] .
+
+# Denied: Ajaccio is under the excluded Corsica.
+ex:risk-ajaccio a rsk:Risk ; rsk:ofPolicy ex:Policy-0001 ; rsk:riskLocation ex:Ajaccio ;
+    rsk:sumInsured [ a qnt:Quantity ; qnt:onSpace stm:MoneySpace ; qnt:numericValue 1000000.0 ; qnt:inUnit ex:GBP ] .
+
+# Undetermined: "France" stands above the Corsica exclusion, so the location
+# may or may not be excluded (ADR-A87).
+ex:risk-france a rsk:Risk ; rsk:ofPolicy ex:Policy-0001 ; rsk:riskLocation ex:France ;
+    rsk:sumInsured [ a qnt:Quantity ; qnt:onSpace stm:MoneySpace ; qnt:numericValue 2000000.0 ; qnt:inUnit ex:GBP ] .
+
+# Undetermined: the limit has no USD statement, and currencies are never converted (ADR-A95).
+ex:risk-nice-usd a rsk:Risk ; rsk:ofPolicy ex:Policy-0001 ; rsk:riskLocation ex:Nice ;
+    rsk:sumInsured [ a qnt:Quantity ; qnt:onSpace stm:MoneySpace ; qnt:numericValue 2000000.0 ; qnt:inUnit ex:USD ] .

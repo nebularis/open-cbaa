@@ -1,0 +1,34 @@
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix rsk:  <https://nebularis.github.io/open-cbaa/ontology/risk#> .
+
+# Risks and bound policies: whole-graph constraints (SHACL-SPARQL).
+
+rsk:BoundWhileValidShape a sh:NodeShape ;
+    sh:targetClass rsk:BoundPolicy ;
+    sh:sparql [
+        sh:message "A policy is bound under the agreement version valid at the time of binding." ;
+        sh:select """
+            PREFIX rsk: <https://nebularis.github.io/open-cbaa/ontology/risk#>
+            PREFIX fnd: <https://www.nebularis.org/neuro-semantic/lattice/foundation#>
+            SELECT $this ?value WHERE {
+                $this rsk:boundUnder ?value ; rsk:boundAt ?at .
+                ?value fnd:hasTemporalScope ?scope .
+                ?scope fnd:validFrom ?from .
+                OPTIONAL { ?scope fnd:validTo ?to }
+                FILTER (?at < ?from || (BOUND(?to) && ?at >= ?to))
+            }
+        """ ;
+    ] .
+
+rsk:MoneyAmountShape a sh:NodeShape ;
+    sh:targetObjectsOf rsk:sumInsured , rsk:grossPremium ;
+    sh:sparql [
+        sh:message "A sum insured or premium is a quantity on the money space, in one currency unit." ;
+        sh:select """
+            PREFIX qnt: <https://www.nebularis.org/neuro-semantic/lattice/quantification#>
+            PREFIX stm: <https://nebularis.github.io/open-cbaa/ontology/statement#>
+            SELECT $this WHERE {
+                FILTER (NOT EXISTS { $this qnt:onSpace stm:MoneySpace } || NOT EXISTS { $this qnt:inUnit ?unit })
+            }
+        """ ;
+    ] .

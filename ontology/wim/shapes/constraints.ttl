@@ -1,0 +1,83 @@
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix wim:  <https://nebularis.github.io/open-cbaa/ontology/wim#> .
+
+# Wording structure: whole-graph constraints (SHACL-SPARQL).
+
+wim:SegmentOrderShape a sh:NodeShape ;
+    sh:targetClass wim:Text ;
+    sh:sparql [
+        sh:message "Segment indices of a text object must be unique and run 0..n-1 without gaps (design-spec §7)." ;
+        sh:select """
+            PREFIX wim: <https://nebularis.github.io/open-cbaa/ontology/wim#>
+            SELECT $this WHERE {
+                {
+                    SELECT $this (COUNT(?segment) AS ?n) (COUNT(DISTINCT ?index) AS ?distinct) (MAX(?index) AS ?top)
+                    WHERE { $this wim:hasSegment ?segment . ?segment wim:segmentIndex ?index . }
+                    GROUP BY $this
+                }
+                FILTER (?distinct != ?n || ?top != ?n - 1)
+            }
+        """ ;
+    ] .
+
+wim:VariantModeShape a sh:NodeShape ;
+    sh:targetSubjectsOf wim:variantOf ;
+    sh:sparql [
+        sh:message "A variant of a slot has inclusion mode Variation." ;
+        sh:select """
+            PREFIX wim: <https://nebularis.github.io/open-cbaa/ontology/wim#>
+            SELECT $this WHERE { FILTER NOT EXISTS { $this wim:inclusionMode wim:Variation } }
+        """ ;
+    ] .
+
+wim:VariationNeedsSlotShape a sh:NodeShape ;
+    sh:targetSubjectsOf wim:inclusionMode ;
+    sh:sparql [
+        sh:message "A wording object with inclusion mode Variation is a variant of a slot." ;
+        sh:select """
+            PREFIX wim: <https://nebularis.github.io/open-cbaa/ontology/wim#>
+            SELECT $this WHERE {
+                $this wim:inclusionMode wim:Variation .
+                FILTER NOT EXISTS { $this wim:variantOf ?slot }
+            }
+        """ ;
+    ] .
+
+wim:ConditionalNeedsConditionShape a sh:NodeShape ;
+    sh:targetSubjectsOf wim:inclusionMode ;
+    sh:sparql [
+        sh:message "A conditional wording object states its inclusion condition (wim:includedWhen)." ;
+        sh:select """
+            PREFIX wim: <https://nebularis.github.io/open-cbaa/ontology/wim#>
+            SELECT $this WHERE {
+                $this wim:inclusionMode wim:Conditional .
+                FILTER NOT EXISTS { $this wim:includedWhen ?profile }
+            }
+        """ ;
+    ] .
+
+wim:InclusionConditionModeShape a sh:NodeShape ;
+    sh:targetSubjectsOf wim:includedWhen ;
+    sh:sparql [
+        sh:message "Only conditional wording objects and variants carry an inclusion condition." ;
+        sh:select """
+            PREFIX wim: <https://nebularis.github.io/open-cbaa/ontology/wim#>
+            SELECT $this WHERE {
+                FILTER NOT EXISTS { $this wim:inclusionMode ?mode . FILTER (?mode IN (wim:Conditional, wim:Variation)) }
+            }
+        """ ;
+    ] .
+
+wim:InclusionConditionReadsVariableShape a sh:NodeShape ;
+    sh:targetObjectsOf wim:includedWhen ;
+    sh:sparql [
+        sh:message "Each condition of an inclusion condition reads one governing variable, whose agreement value assembly poses as the question." ;
+        sh:select """
+            PREFIX wim: <https://nebularis.github.io/open-cbaa/ontology/wim#>
+            PREFIX elg: <https://www.nebularis.org/neuro-semantic/lattice/eligibility#>
+            SELECT $this ?value WHERE {
+                $this elg:hasCondition ?value .
+                FILTER NOT EXISTS { ?value wim:readsVariable ?variable . ?variable a wim:GoverningVariable }
+            }
+        """ ;
+    ] .

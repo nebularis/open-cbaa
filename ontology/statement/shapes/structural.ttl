@@ -1,0 +1,75 @@
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix stm:  <https://nebularis.github.io/open-cbaa/ontology/statement#> .
+@prefix wim:  <https://nebularis.github.io/open-cbaa/ontology/wim#> .
+@prefix fnd:  <https://www.nebularis.org/neuro-semantic/lattice/foundation#> .
+@prefix pty:  <https://www.nebularis.org/neuro-semantic/lattice/party#> .
+@prefix elg:  <https://www.nebularis.org/neuro-semantic/lattice/eligibility#> .
+@prefix ins:  <https://www.nebularis.org/neuro-semantic/lattice/instrument#> .
+@prefix qnt:  <https://www.nebularis.org/neuro-semantic/lattice/quantification#> .
+@prefix bhv:  <https://www.nebularis.org/neuro-semantic/lattice/behaviour#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# Meaning: per-node shapes.
+
+stm:StatementTemplateShape a sh:NodeShape ;
+    sh:targetClass stm:StatementTemplate ;
+    sh:property [ sh:path [ sh:alternativePath ( stm:expressedBy [ sh:inversePath stm:expresses ] ) ] ; sh:minCount 1 ;
+                  sh:message "A template is attached to at least one wording object (stm:expresses)." ] ;
+    sh:property [ sh:path stm:bearer ; sh:maxCount 1 ; sh:class pty:Role ] ;
+    sh:property [ sh:path stm:counterparty ; sh:class pty:Role ] ;
+    sh:property [ sh:path stm:hasParameterBinding ; sh:class stm:ParameterBinding ] ;
+    sh:property [ sh:path stm:bearerOccupancy ; sh:maxCount 0 ; sh:message "A template names roles, not occupancies." ] ;
+    sh:property [ sh:path stm:counterpartyOccupancy ; sh:maxCount 0 ; sh:message "A template names roles, not occupancies." ] ;
+    sh:property [ sh:path ins:obligor ; sh:maxCount 0 ; sh:message "A template names roles, not occupancies." ] ;
+    sh:property [ sh:path ins:obligee ; sh:maxCount 0 ; sh:message "A template names roles, not occupancies." ] .
+
+stm:BoundStatementShape a sh:NodeShape ;
+    sh:targetClass stm:BoundStatement ;
+    sh:property [ sh:path stm:boundFrom ; sh:minCount 1 ; sh:maxCount 1 ; sh:class stm:StatementTemplate ] ;
+    sh:property [ sh:path fnd:hasIdentity ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:message "A bound statement is a version of one persistent statement identity, the same across agreement versions." ] ;
+    sh:property [ sh:path stm:bearer ; sh:maxCount 0 ; sh:message "A bound statement names occupancies, not roles." ] ;
+    sh:property [ sh:path stm:counterparty ; sh:maxCount 0 ; sh:message "A bound statement names occupancies, not roles." ] ;
+    sh:property [ sh:path stm:hasParameterBinding ; sh:maxCount 0 ] ;
+    sh:property [ sh:path stm:bearerOccupancy ; sh:maxCount 1 ; sh:class pty:RoleOccupancy ] ;
+    sh:property [ sh:path stm:counterpartyOccupancy ; sh:class pty:RoleOccupancy ] .
+
+stm:ScopeShape a sh:NodeShape ;
+    sh:targetSubjectsOf stm:scope ;
+    sh:property [ sh:path stm:scope ; sh:maxCount 1 ; sh:class elg:AdmissionProfile ] .
+
+stm:ParametersShape a sh:NodeShape ;
+    sh:targetClass stm:Statement ;
+    sh:property [ sh:path stm:activity ; sh:maxCount 1 ] ;
+    sh:property [ sh:path stm:level ; sh:maxCount 1 ; sh:class qnt:OrdinalValue ] ;
+    sh:property [ sh:path stm:deadline ; sh:maxCount 1 ; sh:class qnt:Range ] ;
+    sh:property [ sh:path stm:recurrence ; sh:maxCount 1 ; sh:class qnt:Recurrence ] ;
+    sh:property [ sh:path stm:trigger ; sh:class bhv:TriggerDefinition ] ;
+    sh:property [ sh:path stm:appliesInState ; sh:class bhv:State ] .
+
+stm:ParameterBindingShape a sh:NodeShape ;
+    sh:targetClass stm:ParameterBinding ;
+    sh:property [ sh:path stm:parameterKind ; sh:minCount 1 ; sh:maxCount 1 ; sh:class stm:ParameterKind ] ;
+    sh:property [ sh:path stm:fromVariable ; sh:minCount 1 ; sh:maxCount 1 ; sh:class wim:Variable ] ;
+    sh:property [ sh:path stm:scopeSubject ; sh:maxCount 1 ] ;
+    sh:property [ sh:path stm:scopeStep ; sh:class elg:EvidenceStep ] ;
+    sh:property [ sh:path stm:scopeStrategy ; sh:maxCount 1 ;
+                  sh:in ( elg:ExactMatch elg:SetMembership elg:HierarchicalMatch elg:IntervalContainment ) ] .
+
+stm:DefinitionShape a sh:NodeShape ;
+    sh:targetClass stm:Definition ;
+    sh:property [ sh:path stm:definesTerm ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:string ] .
+
+stm:ClassificationShape a sh:NodeShape ;
+    sh:targetClass stm:Classification ;
+    sh:property [ sh:path stm:classifiedAs ; sh:minCount 1 ; sh:maxCount 1 ] .
+
+stm:PrecedenceShape a sh:NodeShape ;
+    sh:targetClass stm:Precedence ;
+    sh:property [ sh:path stm:prevails ; sh:minCount 1 ; sh:maxCount 1 ] ;
+    sh:property [ sh:path stm:over ; sh:minCount 1 ] .
+
+stm:EncodingStatusShape a sh:NodeShape ;
+    sh:targetSubjectsOf stm:encodingStatus ;
+    sh:property [ sh:path stm:encodingStatus ; sh:maxCount 1 ;
+                  sh:in ( stm:Encoded stm:NoComputableContent stm:NotYetAssessed ) ] .

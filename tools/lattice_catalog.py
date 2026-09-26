@@ -2,7 +2,7 @@
 """Writes ontology/catalog-v001.xml, the OASIS XML catalog Protégé and the OWL
 API read from the directory of the ontology they open.
 
-It maps each Open CBAA ontology IRI to its file here, and each released
+It maps each Open CBAA ontology and version IRI to its file here, and each released
 LATTICE ontology version IRI to the raw file at its release tag, read from
 LATTICE's release register. An ontology's own (unversioned) IRI maps to its
 latest release, since some LATTICE documents import one that way. External
@@ -30,6 +30,7 @@ EXTERNAL_RE = re.compile(r'<uri name="([^"]+)" uri="([a-z]+://[^"]+)"/>')
 # | name | version | tag | <version IRI> | [label](url) · ... |
 ROW_RE = re.compile(r"^\| ([a-z0-9-]+) \| (\d+)\.(\d+)\.(\d+) \| [^|]+ \| <([^>]+)> \| \[[^]]+\]\(([^)]+)\)")
 ONTOLOGY_RE = re.compile(r"<([^>]+)>\s+(?:a|rdf:type)\s+owl:Ontology")
+VERSION_RE = re.compile(r"owl:versionIRI\s+<([^>]+)>")
 
 
 def read(location: str) -> str:
@@ -61,9 +62,11 @@ def lattice_entries(register: str) -> dict[str, str]:
 
 def local_entries(root: Path) -> dict[str, str]:
     entries = {}
-    for path in sorted((root / "ontology").glob("*.ttl")):
-        for iri in ONTOLOGY_RE.findall(path.read_text(encoding="utf-8")):
-            entries[iri] = path.name
+    for path in sorted((root / "ontology").rglob("*.ttl")):
+        text = path.read_text(encoding="utf-8")
+        location = path.relative_to(root / "ontology").as_posix()
+        for iri in ONTOLOGY_RE.findall(text) + VERSION_RE.findall(text):
+            entries[iri] = location
     return entries
 
 

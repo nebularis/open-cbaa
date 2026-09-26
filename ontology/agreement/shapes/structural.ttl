@@ -1,0 +1,41 @@
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix agr:  <https://nebularis.github.io/open-cbaa/ontology/agreement#> .
+@prefix stm:  <https://nebularis.github.io/open-cbaa/ontology/statement#> .
+@prefix wim:  <https://nebularis.github.io/open-cbaa/ontology/wim#> .
+@prefix fnd:  <https://www.nebularis.org/neuro-semantic/lattice/foundation#> .
+@prefix voc:  <https://www.nebularis.org/neuro-semantic/lattice/vocabulary#> .
+@prefix pty:  <https://www.nebularis.org/neuro-semantic/lattice/party#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# Agreements: per-node shapes.
+
+agr:AgreementVersionShape a sh:NodeShape ;
+    sh:targetClass agr:AgreementVersion ;
+    sh:property [ sh:path fnd:hasTemporalScope ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:message "An agreement version states its valid time: the effective date, and the end where there is one." ] ;
+    sh:property [ sh:path agr:umr ; sh:maxCount 1 ; sh:datatype xsd:string ] ;
+    sh:property [ sh:path agr:inMarket ; sh:minCount 1 ; sh:class voc:BindingScope ] ;
+    sh:property [ sh:path agr:insurers ; sh:maxCount 1 ; sh:class pty:ParticipationGroup ] ;
+    sh:property [ sh:path agr:includes ; sh:minCount 1 ] ;
+    sh:property [ sh:path agr:hasOccupancy ; sh:minCount 1 ; sh:class pty:RoleOccupancy ] ;
+    sh:property [ sh:path agr:hasVariableValue ; sh:class agr:VariableValue ] ;
+    sh:property [ sh:path agr:hasStatement ; sh:class stm:BoundStatement ] ;
+    sh:property [ sh:path voc:resolvedUnder ; sh:class voc:SchemeBinding ] .
+
+agr:VariableValueShape a sh:NodeShape ;
+    sh:targetClass agr:VariableValue ;
+    sh:property [ sh:path agr:forVariable ; sh:minCount 1 ; sh:maxCount 1 ; sh:class wim:Variable ] ;
+    sh:xone (
+        [ sh:property [ sh:path agr:value ; sh:minCount 1 ] ]
+        [ sh:property [ sh:path agr:literalValue ; sh:minCount 1 ] ]
+    ) ;
+    sh:message "A variable value is either agr:value or agr:literalValue." .
+
+agr:AmendmentShape a sh:NodeShape ;
+    sh:targetClass agr:Amendment ;
+    sh:property [ sh:path agr:amends ; sh:minCount 1 ; sh:maxCount 1 ; sh:class agr:AgreementVersion ] ;
+    sh:property [ sh:path agr:resultsIn ; sh:minCount 1 ; sh:maxCount 1 ; sh:class agr:AgreementVersion ] ;
+    sh:property [ sh:path agr:agreedOn ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
+    sh:property [ sh:path agr:operationalFrom ; sh:maxCount 1 ; sh:datatype xsd:date ] ;
+    sh:property [ sh:path agr:materiality ; sh:maxCount 1 ;
+                  sh:in ( agr:Material agr:NotMaterial agr:MaterialityNotAssessed ) ] .

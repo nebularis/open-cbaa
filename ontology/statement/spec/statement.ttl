@@ -1,0 +1,304 @@
+@prefix stm:  <https://nebularis.github.io/open-cbaa/ontology/statement#> .
+@prefix wim:  <https://nebularis.github.io/open-cbaa/ontology/wim#> .
+@prefix fnd:  <https://www.nebularis.org/neuro-semantic/lattice/foundation#> .
+@prefix voc:  <https://www.nebularis.org/neuro-semantic/lattice/vocabulary#> .
+@prefix qnt:  <https://www.nebularis.org/neuro-semantic/lattice/quantification#> .
+@prefix pty:  <https://www.nebularis.org/neuro-semantic/lattice/party#> .
+@prefix elg:  <https://www.nebularis.org/neuro-semantic/lattice/eligibility#> .
+@prefix ins:  <https://www.nebularis.org/neuro-semantic/lattice/instrument#> .
+@prefix bhv:  <https://www.nebularis.org/neuro-semantic/lattice/behaviour#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# Open CBAA — Meaning (statements attached to wording).
+#
+# A statement is the unit of attached meaning (design-spec §3). Its kind
+# fixes its parameter structure. Meaning is attached once, to a library
+# wording object version, as a statement template. An agreement's statements
+# are bound from templates by supplying the agreement's variable values, so
+# extraction and review happen once per wording, not once per contract
+# (design-spec §3.4, §3.7). See ontology/README.md for the design.
+
+<https://nebularis.github.io/open-cbaa/ontology/statement> a owl:Ontology ;
+    rdfs:label "Open CBAA — Meaning"@en ;
+    owl:versionIRI <https://nebularis.github.io/open-cbaa/ontology/statement/0.1.0> ;
+    owl:imports <https://nebularis.github.io/open-cbaa/ontology/wim/0.2.0> ,
+                <https://www.nebularis.org/neuro-semantic/lattice/party/0.5.0> ,
+                <https://www.nebularis.org/neuro-semantic/lattice/instrument/0.6.0> ,
+                <https://www.nebularis.org/neuro-semantic/lattice/behaviour/0.6.0> .
+
+#################################################################
+# Statements: template or bound
+#################################################################
+
+stm:Statement a owl:Class ;
+    rdfs:subClassOf prov:Entity ;
+    rdfs:subClassOf [ a owl:Class ; owl:unionOf ( stm:StatementTemplate stm:BoundStatement ) ] ;
+    rdfs:label "Statement"@en ;
+    rdfs:comment "A unit of meaning attached to wording: an obligation, prohibition, permission, power, authority grant, definition, classification or precedence."@en ;
+    fnd:utility "Every statement is either a template (library meaning, naming roles and variables) or bound (an agreement's meaning, naming occupancies and values). Instantiate one kind class and one of the two."@en .
+
+stm:StatementTemplate a owl:Class ;
+    rdfs:subClassOf stm:Statement ,
+        [ a owl:Restriction ; owl:onProperty stm:expressedBy ; owl:someValuesFrom wim:WordingObject ] ;
+    rdfs:label "Statement template"@en ;
+    rdfs:comment "Meaning attached to a library wording object version. Names roles, not parties, and takes its variable parameters from the wording's variable declarations."@en .
+
+stm:BoundStatement a owl:Class ;
+    rdfs:subClassOf stm:Statement , fnd:Version ,
+        [ a owl:Restriction ; owl:onProperty stm:boundFrom ; owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass stm:StatementTemplate ] ;
+    rdfs:label "Bound statement"@en ;
+    rdfs:comment "An agreement version's statement, bound from one template with the agreement's occupancies and variable values."@en ;
+    fnd:utility "A fnd:Version: its fnd:hasIdentity is the same statement across agreement versions, so version 2's grant can be compared with version 1's (materiality, M3 3.9.1)."@en .
+
+[] a owl:AllDisjointClasses ; owl:members ( stm:StatementTemplate stm:BoundStatement ) .
+
+#################################################################
+# Kinds (design-spec §3.3). Pairwise disjoint.
+#################################################################
+
+stm:Obligation a owl:Class ; rdfs:subClassOf stm:Statement ;
+    rdfs:label "Obligation"@en ;
+    rdfs:comment "A bearer must perform an activity (FNOL onward transfer within 1 business day, M8 8.1.2A)."@en .
+stm:Prohibition a owl:Class ; rdfs:subClassOf stm:Statement ;
+    rdfs:label "Prohibition"@en ;
+    rdfs:comment "A bearer must not perform an activity (must not bind New York risks unless excess lines licensed, M5 5.15.10)."@en .
+stm:Permission a owl:Class ; rdfs:subClassOf stm:Statement ;
+    rdfs:label "Permission"@en ;
+    rdfs:comment "A bearer may perform an activity (may offer redress to resolve complaints, M9 9.1.2)."@en .
+stm:Power a owl:Class ; rdfs:subClassOf stm:Statement ;
+    rdfs:label "Power"@en ;
+    rdfs:comment "A bearer may change legal relations by an act (Right of Immediate Termination, M12 12.22)."@en .
+stm:AuthorityGrant a owl:Class ; rdfs:subClassOf stm:Statement ;
+    rdfs:label "Authority grant"@en ;
+    rdfs:comment "A power and permission delegated over an activity, with a scope, a level and limits (underwriting authority per the SoUA table, M5)."@en ;
+    fnd:utility "A named kind, not a Power plus a Permission, because the authority envelope hangs off it: its scope is an elg:AdmissionProfile over the case (rsk:Risk)."@en .
+stm:Definition a owl:Class ; rdfs:subClassOf stm:Statement ;
+    rdfs:label "Definition"@en ;
+    rdfs:comment "A term means something, optionally within a scope such as a jurisdiction (Complaint – United Kingdom, M9)."@en .
+stm:Classification a owl:Class ; rdfs:subClassOf stm:Statement ;
+    rdfs:label "Classification"@en ;
+    rdfs:comment "Something counts as a category (US Classification 'Surplus Lines', M4 4.3.36B)."@en .
+stm:Precedence a owl:Class ; rdfs:subClassOf stm:Statement ;
+    rdfs:label "Precedence"@en ;
+    rdfs:comment "One source prevails over another (the Agreement prevails over annexes, M1 1.2.1)."@en .
+
+[] a owl:AllDisjointClasses ;
+    owl:members ( stm:Obligation stm:Prohibition stm:Permission stm:Power stm:AuthorityGrant
+                  stm:Definition stm:Classification stm:Precedence ) .
+
+stm:PrescriptiveStatement a owl:Class ;
+    owl:equivalentClass [ a owl:Class ; owl:unionOf ( stm:Obligation stm:Prohibition stm:Permission stm:Power stm:AuthorityGrant ) ] ;
+    rdfs:label "Prescriptive statement"@en ;
+    rdfs:comment "The kinds that bind a bearer to an activity (the LegalRuleML prescriptive half)."@en .
+
+#################################################################
+# Attachment: wording expresses meaning
+#################################################################
+
+stm:expresses a owl:ObjectProperty ;
+    rdfs:label "expresses"@en ;
+    rdfs:domain wim:WordingObject ; rdfs:range stm:StatementTemplate ;
+    rdfs:comment "Attaches meaning to wording. Any WIM node may express meaning: a SoUA table expresses an authority grant's parameters, a clause expresses an obligation."@en .
+
+stm:expressedBy a owl:ObjectProperty ;
+    rdfs:label "expressed by"@en ;
+    owl:inverseOf stm:expresses ;
+    rdfs:subPropertyOf prov:wasDerivedFrom ;
+    rdfs:comment "The wording a template was derived from. A sub-property of prov:wasDerivedFrom, so provenance queries reach wording without knowing this vocabulary."@en .
+
+stm:boundFrom a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "bound from"@en ;
+    rdfs:subPropertyOf prov:wasDerivedFrom ;
+    rdfs:domain stm:BoundStatement ; rdfs:range stm:StatementTemplate ;
+    rdfs:comment "The template a bound statement was bound from. Its kind is the template's kind (checked in SHACL)."@en .
+
+#################################################################
+# Parameters of prescriptive statements (design-spec §3.5)
+#################################################################
+
+stm:bearer a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "bearer"@en ;
+    rdfs:domain stm:StatementTemplate ; rdfs:range pty:Role ;
+    rdfs:comment "On a template: the role that bears the statement (the Coverholder must, the Lead Insurer may). For an authority grant, the grantee."@en .
+
+stm:counterparty a owl:ObjectProperty ;
+    rdfs:label "counterparty"@en ;
+    rdfs:domain stm:StatementTemplate ; rdfs:range pty:Role ;
+    rdfs:comment "On a template: the role the statement is owed to or benefits."@en .
+
+stm:bearerOccupancy a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "bearer occupancy"@en ;
+    rdfs:domain stm:BoundStatement ; rdfs:range pty:RoleOccupancy ;
+    rdfs:comment "On a bound prohibition, permission, power or authority grant: who holds the bearer role in this agreement version."@en ;
+    fnd:utility "A bound obligation uses ins:obligor and ins:obligee instead, since it is an ins:Obligation."@en .
+
+stm:counterpartyOccupancy a owl:ObjectProperty ;
+    rdfs:label "counterparty occupancy"@en ;
+    rdfs:domain stm:BoundStatement ; rdfs:range pty:RoleOccupancy .
+
+stm:activity a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "activity"@en ;
+    rdfs:domain stm:PrescriptiveStatement ; rdfs:range skos:Concept ;
+    rdfs:comment "What the bearer must, must not, or may do, as a concept in the activity scheme (stm:ActivityContract)."@en .
+
+stm:scope a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "scope"@en ;
+    rdfs:domain stm:Statement ; rdfs:range elg:AdmissionProfile ;
+    rdfs:comment "Where the statement applies, as an admission profile. For an authority grant, the envelope of cases the grantee may act on. For a definition, the jurisdiction it holds in."@en ;
+    fnd:utility "The profile's decisions read 'applies' for Permitted, 'does not apply' for Denied, and 'cannot tell' for Undetermined. Profiles over the case (rsk:Risk) use evidence bindings, so LATTICE's compilers can turn them into SPARQL, SHACL and OWL classes (D14)."@en .
+
+stm:level a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "level"@en ;
+    rdfs:domain stm:AuthorityGrant ; rdfs:range qnt:OrdinalValue ;
+    rdfs:comment "The level of authority, as an ordinal value on an ordered space (complaints authority levels, M9)."@en .
+
+stm:trigger a owl:ObjectProperty ;
+    rdfs:label "trigger"@en ;
+    rdfs:domain stm:Statement ; rdfs:range bhv:TriggerDefinition ;
+    rdfs:comment "The event on which the statement becomes due or exercisable (receipt of an FNOL)."@en .
+
+stm:deadline a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "deadline"@en ;
+    rdfs:domain stm:Statement ; rdfs:range qnt:Range ;
+    rdfs:comment "When the statement must be discharged: a range anchored on the trigger's occurrence (qnt:relativeToAnchor), in calendar or business days."@en .
+
+stm:recurrence a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "recurrence"@en ;
+    rdfs:domain stm:Statement ; rdfs:range qnt:Recurrence ;
+    rdfs:comment "For a recurring duty: the recurrence whose bins it falls due in (monthly reporting, M10)."@en .
+
+stm:appliesInState a owl:ObjectProperty ;
+    rdfs:label "applies in state"@en ;
+    rdfs:domain stm:Statement ; rdfs:range bhv:State ;
+    rdfs:comment "A lifecycle state the statement applies in, such as run-off (M12 12.24). Absent means every state."@en ;
+    fnd:utility "State-dependent authority (evaluation mode S) is this property and nothing else. It never enters an authority envelope or a materiality comparison (DP6)."@en .
+
+stm:breachTreatment a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "breach treatment"@en ;
+    rdfs:domain stm:Obligation ; rdfs:range skos:Concept ;
+    rdfs:comment "How breach of the obligation is treated: condition precedent, warranty, or a bare condition. A classification, not a kind (design-spec §3.3)."@en .
+
+#################################################################
+# Parameter bindings: where a template takes values from variables
+#################################################################
+
+stm:ParameterBinding a owl:Class ;
+    rdfs:label "Parameter binding"@en ;
+    rdfs:comment "Says that one parameter of a template takes its value from one variable of the wording, such as the territories in a SoUA table row."@en ;
+    rdfs:subClassOf
+        [ a owl:Restriction ; owl:onProperty stm:parameterKind ; owl:cardinality "1"^^xsd:nonNegativeInteger ] ,
+        [ a owl:Restriction ; owl:onProperty stm:fromVariable ; owl:cardinality "1"^^xsd:nonNegativeInteger ] ;
+    fnd:utility "Binding a template for an agreement reads each variable's agr:VariableValue and writes the parameter on the bound statement. For a scope parameter it adds, to the bound statement's admission profile, a condition matching by stm:scopeStrategy, with an elg:EvidenceBinding whose subject is stm:scopeSubject and whose path is the stm:scopeStep sequence. An inclusion and an exclusion over the same subject and path make one condition, with required and excluded concepts."@en .
+
+stm:ParameterKind a owl:Class ;
+    rdfs:label "Parameter kind"@en ;
+    rdfs:comment "Which parameter a binding supplies. A closed set of named individuals (statement-vocab)."@en .
+
+stm:hasParameterBinding a owl:ObjectProperty , owl:InverseFunctionalProperty ;
+    rdfs:label "has parameter binding"@en ;
+    rdfs:domain stm:StatementTemplate ; rdfs:range stm:ParameterBinding .
+
+stm:parameterKind a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "parameter kind"@en ;
+    rdfs:domain stm:ParameterBinding ; rdfs:range stm:ParameterKind .
+
+stm:fromVariable a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "from variable"@en ;
+    rdfs:domain stm:ParameterBinding ; rdfs:range wim:Variable .
+
+stm:scopeSubject a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "scope subject"@en ;
+    rdfs:domain stm:ParameterBinding ;
+    rdfs:comment "For a scope parameter: the class of case the condition evaluates, usually rsk:Risk. The generated evidence binding's elg:subjectClass."@en .
+
+stm:scopeStep a owl:ObjectProperty ;
+    rdfs:label "scope step"@en ;
+    rdfs:domain stm:ParameterBinding ; rdfs:range elg:EvidenceStep ;
+    rdfs:comment "For a scope parameter: one step of the path from the case to the value the condition reads, as a LATTICE evidence step (index, property, direction)."@en ;
+    fnd:utility "Binding copies these steps into the elg:EvidenceBinding it generates for the bound condition. rsk:riskLocation is one step from a risk. The policy's contract type is two: rsk:ofPolicy, then rsk:contractType."@en .
+
+stm:scopeStrategy a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "scope strategy"@en ;
+    rdfs:domain stm:ParameterBinding ; rdfs:range elg:MatchStrategy ;
+    rdfs:comment "For a scope parameter: how the condition matches (HierarchicalMatch for territory, IntervalContainment for amounts)."@en .
+
+#################################################################
+# Constitutive and meta parameters
+#################################################################
+
+stm:definesTerm a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "defines term"@en ;
+    rdfs:domain stm:Definition ; rdfs:range xsd:string ;
+    rdfs:comment "The defined term, as written (Complaint). Its meaning is the wording that expresses the definition, within the definition's scope."@en .
+
+stm:classifiedAs a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "classified as"@en ;
+    rdfs:domain stm:Classification ; rdfs:range skos:Concept .
+
+stm:classifies a owl:ObjectProperty ;
+    rdfs:label "classifies"@en ;
+    rdfs:domain stm:Classification ;
+    rdfs:comment "What is classified, when it is not the agreement itself."@en .
+
+stm:prevails a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "prevails"@en ;
+    rdfs:domain stm:Precedence ; rdfs:range prov:Entity .
+
+stm:over a owl:ObjectProperty ;
+    rdfs:label "over"@en ;
+    rdfs:domain stm:Precedence ; rdfs:range prov:Entity .
+
+#################################################################
+# Encoding status of wording
+#################################################################
+
+stm:EncodingStatus a owl:Class ;
+    rdfs:label "Encoding status"@en ;
+    rdfs:comment "Whether a wording object's meaning has been attached, found to have none, or not yet assessed. A closed set of named individuals (statement-vocab)."@en .
+
+stm:encodingStatus a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "encoding status"@en ;
+    rdfs:domain wim:WordingObject ; rdfs:range stm:EncodingStatus ;
+    rdfs:comment "A recital (M2 2.9, M14 14.29) expresses nothing, and this records that as a finding rather than an omission."@en .
+
+#################################################################
+# Class axioms
+#################################################################
+
+# Templates name roles and an activity. Bound statements name occupancies.
+[ a owl:Class ; owl:intersectionOf ( stm:PrescriptiveStatement stm:StatementTemplate ) ]
+    rdfs:subClassOf
+        [ a owl:Restriction ; owl:onProperty stm:bearer ; owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass pty:Role ] ,
+        [ a owl:Restriction ; owl:onProperty stm:activity ; owl:cardinality "1"^^xsd:nonNegativeInteger ] .
+
+[ a owl:Class ; owl:intersectionOf ( stm:PrescriptiveStatement stm:BoundStatement ) ]
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty stm:activity ; owl:cardinality "1"^^xsd:nonNegativeInteger ] .
+
+# Only bound obligations are Instrument obligations: ins:Obligation needs
+# role occupancies as obligor and obligee, which a template does not have.
+[ a owl:Class ; owl:intersectionOf ( stm:Obligation stm:BoundStatement ) ]
+    rdfs:subClassOf ins:Obligation ,
+        [ a owl:Restriction ; owl:onProperty ins:obligor ; owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass pty:RoleOccupancy ] .
+
+[ a owl:Class ; owl:intersectionOf ( stm:BoundStatement
+        [ a owl:Class ; owl:unionOf ( stm:Prohibition stm:Permission stm:Power stm:AuthorityGrant ) ] ) ]
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty stm:bearerOccupancy ; owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass pty:RoleOccupancy ] .
+
+# A bound authority grant has exactly one scope.
+[ a owl:Class ; owl:intersectionOf ( stm:AuthorityGrant stm:BoundStatement ) ]
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty stm:scope ; owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass elg:AdmissionProfile ] .
+
+stm:Definition rdfs:subClassOf [ a owl:Restriction ; owl:onProperty stm:definesTerm ; owl:cardinality "1"^^xsd:nonNegativeInteger ] .
+stm:Classification rdfs:subClassOf [ a owl:Restriction ; owl:onProperty stm:classifiedAs ; owl:cardinality "1"^^xsd:nonNegativeInteger ] .
+stm:Precedence rdfs:subClassOf
+    [ a owl:Restriction ; owl:onProperty stm:prevails ; owl:cardinality "1"^^xsd:nonNegativeInteger ] ,
+    [ a owl:Restriction ; owl:onProperty stm:over ; owl:minCardinality "1"^^xsd:nonNegativeInteger ] .
+
+# Wording and meaning are separate strata (DP3).
+[] a owl:AllDisjointClasses ;
+    owl:members ( stm:Statement stm:ParameterBinding stm:ParameterKind stm:EncodingStatus wim:WordingObject ) .

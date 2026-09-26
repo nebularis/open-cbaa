@@ -33,6 +33,15 @@ These govern all work in this repository. The [design specification](../docs/des
 
 You MAY write your own notes and memories to `reference` to help you with your work.
 
+### Changing an ontology
+
+[ontology/README.md](../ontology/README.md) describes how the documents fit together. When you change one:
+
+- bump its `owl:versionIRI` under LATTICE's policy (ADR-A86): spec, vocab and each scheme independently, and a shapes directory's `.version` file instead of the spec, then update every `owl:imports` of the old version IRI
+- regenerate the catalog with `tools/lattice_catalog.py`
+- ask the user to run `tools/ontology_check.py` and LATTICE's `ontology_version_check.py` (commands in the ontology README §10)
+- record design decisions once, in the ontology README, and propose them in the design specification's decision log
+
 ## General Guidelines
 
 - Do not use semi-colons in English text. Use periods or commas instead.

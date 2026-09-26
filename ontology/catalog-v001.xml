@@ -10,12 +10,30 @@
     <uri name="http://www.w3.org/2004/02/skos/core" uri="https://www.w3.org/2009/08/skos-reference/skos.rdf"/>
     <uri name="http://www.w3.org/ns/prov-o-20130430" uri="https://www.w3.org/ns/prov-o-20130430"/>
     <uri name="http://www.w3.org/ns/shacl" uri="https://www.w3.org/ns/shacl.ttl"/>
-    <uri name="https://nebularis.github.io/open-cbaa/ontology/lma-wim" uri="lma-wim.ttl"/>
-    <uri name="https://nebularis.github.io/open-cbaa/ontology/lma-wim/agreement" uri="agreement.ttl"/>
-    <uri name="https://nebularis.github.io/open-cbaa/ontology/lma-wim/clause" uri="clause.ttl"/>
-    <uri name="https://nebularis.github.io/open-cbaa/ontology/lma-wim/core" uri="core.ttl"/>
-    <uri name="https://nebularis.github.io/open-cbaa/ontology/lma-wim/data-element" uri="data-element.ttl"/>
-    <uri name="https://nebularis.github.io/open-cbaa/ontology/lma-wim/policy" uri="policy.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/agreement" uri="agreement/spec/agreement.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/agreement-vocab" uri="agreement/vocab/agreement-vocab.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/agreement-vocab/0.1.0" uri="agreement/vocab/agreement-vocab.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/agreement/0.1.0" uri="agreement/spec/agreement.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/examples/ba-2026-001" uri="examples/ba-2026-001.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/examples/ba-2026-001/0.1.0" uri="examples/ba-2026-001.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/open-cbaa" uri="open-cbaa.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/open-cbaa/0.2.0" uri="open-cbaa.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/risk" uri="risk/spec/risk.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/risk-vocab" uri="risk/vocab/risk-vocab.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/risk-vocab/0.1.0" uri="risk/vocab/risk-vocab.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/risk/0.1.0" uri="risk/spec/risk.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/schemes/activity" uri="schemes/activity.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/schemes/activity/0.1.0" uri="schemes/activity.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/schemes/lma-wim-typing" uri="schemes/lma-wim-typing.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/schemes/lma-wim-typing/0.1.0" uri="schemes/lma-wim-typing.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/statement" uri="statement/spec/statement.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/statement-vocab" uri="statement/vocab/statement-vocab.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/statement-vocab/0.1.0" uri="statement/vocab/statement-vocab.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/statement/0.1.0" uri="statement/spec/statement.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/wim" uri="wim/spec/wim.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/wim-vocab" uri="wim/vocab/wim-vocab.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/wim-vocab/0.1.0" uri="wim/vocab/wim-vocab.ttl"/>
+    <uri name="https://nebularis.github.io/open-cbaa/ontology/wim/0.2.0" uri="wim/spec/wim.ttl"/>
     <uri name="https://www.nebularis.org/neuro-semantic/behaviour" uri="https://raw.githubusercontent.com/nebularis/lattice/refs/tags/behaviour-v0.6.0/ontology/behaviour/spec/behaviour.ttl"/>
     <uri name="https://www.nebularis.org/neuro-semantic/behaviour-vocab" uri="https://raw.githubusercontent.com/nebularis/lattice/refs/tags/behaviour-vocab-v0.6.0/ontology/behaviour/vocab/behaviour-vocab.ttl"/>
     <uri name="https://www.nebularis.org/neuro-semantic/eligibility" uri="https://raw.githubusercontent.com/nebularis/lattice/refs/tags/eligibility-v0.6.0/ontology/eligibility/spec/eligibility.ttl"/>

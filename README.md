@@ -11,9 +11,10 @@ The principles governing this repository and anything built on it are set out in
 
 ### Repository Structure
 
-- `ontology/` — normative OWL 2 ontology sources, their [README](ontology/README.md), and `catalog-v001.xml`, which Protégé reads to resolve imports, LATTICE's included, without a LATTICE checkout
-- `docs/design/` — the [design specification](docs/design/design-spec.md), the [LATTICE integration specification](docs/design/lattice-integration.md), the [LATTICE design review](docs/design/design-review.md) and the [vision and demo ideation](docs/design/ideation.md)
+- `ontology/` — the OWL 2 ontologies (`wim`, `statement`, `agreement`, `risk`, each with `spec/`, `vocab/` and `shapes/`), provisional `schemes/`, `governance/` shapes, a worked `examples/` agreement, the `open-cbaa.ttl` umbrella, their [README](ontology/README.md), and `catalog-v001.xml`, which Protégé reads to resolve imports, LATTICE's included, without a LATTICE checkout
+- `docs/design/` — the [design specification](docs/design/design-spec.md), the [LATTICE integration specification](docs/design/lattice-integration.md), the [LATTICE design review](docs/design/design-review.md), the [WIM design review](docs/design/wim-review.md) and the [vision and demo ideation](docs/design/ideation.md)
+- `docs/architecture.md` — a narrative [walkthrough](docs/architecture.md) of how the ontologies, compilation and runtime fit together
 - `docs/development/` — the working [plan](docs/development/plan.md)
 - `docs/discovery/` — a single-page, dependency-free illustration of the [vision and demo ideation](docs/design/ideation.md), and [prototype architecture discovery notes](docs/discovery/poc-ideas.md)
 - `reference/` — reference documents, data, and notes
-- `tools/` — tools that produce or check the specifications, e.g. the CBAA spec extractor, and their own [README](tools/README.md)
+- `tools/` — tools that produce or check the specifications: the catalog generator, the ontology check and the CBAA spec extractor, with their own [README](tools/README.md)

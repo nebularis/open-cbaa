@@ -1,0 +1,146 @@
+@prefix agr:  <https://nebularis.github.io/open-cbaa/ontology/agreement#> .
+@prefix stm:  <https://nebularis.github.io/open-cbaa/ontology/statement#> .
+@prefix wim:  <https://nebularis.github.io/open-cbaa/ontology/wim#> .
+@prefix fnd:  <https://www.nebularis.org/neuro-semantic/lattice/foundation#> .
+@prefix voc:  <https://www.nebularis.org/neuro-semantic/lattice/vocabulary#> .
+@prefix qnt:  <https://www.nebularis.org/neuro-semantic/lattice/quantification#> .
+@prefix pty:  <https://www.nebularis.org/neuro-semantic/lattice/party#> .
+@prefix ins:  <https://www.nebularis.org/neuro-semantic/lattice/instrument#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# Open CBAA — Agreements.
+#
+# An agreement is a persistent identity whose versions are assembled from
+# library wording, bound to parties and variable values, and changed by
+# amendment. Each accepted version is immutable and lives in its own named
+# graph (design-spec §8.2). See ontology/README.md for the design.
+
+<https://nebularis.github.io/open-cbaa/ontology/agreement> a owl:Ontology ;
+    rdfs:label "Open CBAA — Agreements"@en ;
+    owl:versionIRI <https://nebularis.github.io/open-cbaa/ontology/agreement/0.1.0> ;
+    owl:imports <https://nebularis.github.io/open-cbaa/ontology/statement/0.1.0> .
+
+#################################################################
+# Identity and versions
+#################################################################
+
+agr:AgreementIdentity a owl:Class ;
+    rdfs:subClassOf fnd:PersistentIdentity ;
+    rdfs:label "Agreement identity"@en ;
+    rdfs:comment "The persistent identity of one agreement: an opaque surrogate, never derived from the UMR (design-spec §8.3)."@en ;
+    fnd:utility "Replacing the Coverholder legal entity, the Lead Insurer or the broker number ends the agreement: the change mints a new identity, not a new version (M3 3.9.1)."@en .
+
+agr:AgreementVersion a owl:Class ;
+    rdfs:subClassOf wim:Contract , ins:Element , fnd:TemporallyScoped ,
+        [ a owl:Restriction ; owl:onProperty fnd:hasIdentity ; owl:someValuesFrom agr:AgreementIdentity ] ;
+    rdfs:label "Agreement version"@en ;
+    rdfs:comment "One version of an agreement: the WIM contract root of its assembled wording, its parties, variable values and bound statements, valid from its effective date."@en ;
+    fnd:utility "A wim:Contract whose contract category is Agreement or narrower, an ins:Element (so Behaviour effects can target it), a fnd:Version of its agr:AgreementIdentity, and temporally scoped by its valid time. Its governance state is the record's: Draft while proposed, Active once accepted, Superseded after a later version is accepted. Its lifecycle state (in force, suspended, run-off) is Behaviour's concern (agreement-vocab)."@en .
+
+agr:umr a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "UMR"@en ;
+    rdfs:domain agr:AgreementVersion ; rdfs:range xsd:string ;
+    rdfs:comment "The Unique Market Reference: a claimed key, unique per market among current versions. It can change within one agreement (M3 3.7.1.2), which is why it is not the identity."@en .
+
+agr:inMarket a owl:ObjectProperty ;
+    rdfs:label "in market"@en ;
+    rdfs:domain agr:AgreementVersion ; rdfs:range voc:BindingScope ;
+    rdfs:comment "A market whose capacity the agreement uses (Lloyd's, Lloyd's Europe, the company market). Markets are binding scopes, so scheme bindings scoped to a market apply to the agreement."@en .
+
+#################################################################
+# Assembly: what an agreement version is made of
+#################################################################
+
+agr:includes a owl:ObjectProperty ;
+    rdfs:label "includes"@en ;
+    rdfs:domain agr:AgreementVersion ; rdfs:range wim:WordingObject ;
+    rdfs:comment "A library wording object version included in this agreement version, after inclusion is resolved: every mandatory object, one variant per slot, and the optional and conditional objects that apply."@en ;
+    fnd:utility "The resolved set is recorded, not recomputed, so the agreement's text is fixed at acceptance even if an inclusion condition's evaluation would change later."@en .
+
+agr:VariableValue a owl:Class ;
+    rdfs:label "Variable value"@en ;
+    rdfs:comment "The value an agreement version supplies for one variable declaration."@en ;
+    rdfs:subClassOf [ a owl:Restriction ; owl:onProperty agr:forVariable ; owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass wim:Variable ] ;
+    fnd:utility "Exactly one of agr:value (a concept, quantity, range set, ordinal value, role occupancy or other individual) or agr:literalValue (text, a date, a number with no space). A multi-valued variable has one agr:VariableValue with several agr:value triples."@en .
+
+agr:hasVariableValue a owl:ObjectProperty , owl:InverseFunctionalProperty ;
+    rdfs:label "has variable value"@en ;
+    rdfs:domain agr:AgreementVersion ; rdfs:range agr:VariableValue .
+
+agr:forVariable a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "for variable"@en ;
+    rdfs:domain agr:VariableValue ; rdfs:range wim:Variable .
+
+agr:value a owl:ObjectProperty ;
+    rdfs:label "value"@en ;
+    rdfs:domain agr:VariableValue .
+
+agr:literalValue a owl:DatatypeProperty ;
+    rdfs:label "literal value"@en ;
+    rdfs:domain agr:VariableValue .
+
+#################################################################
+# Parties and meaning
+#################################################################
+
+agr:hasOccupancy a owl:ObjectProperty ;
+    rdfs:label "has occupancy"@en ;
+    rdfs:domain agr:AgreementVersion ; rdfs:range pty:RoleOccupancy ;
+    rdfs:comment "Who holds each CBAA role in this agreement version. Time-scoped, so outgoing and incoming parties of an annual transfer are distinct occupancies (M2 2.9)."@en .
+
+agr:insurers a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "insurers"@en ;
+    rdfs:domain agr:AgreementVersion ; rdfs:range pty:ParticipationGroup ;
+    rdfs:comment "The insurers as a participation group: each membership's share is its signed line, and liability is several only (M1 1.19, M14 14.4)."@en .
+
+agr:hasStatement a owl:ObjectProperty , owl:InverseFunctionalProperty ;
+    rdfs:label "has statement"@en ;
+    rdfs:domain agr:AgreementVersion ; rdfs:range stm:BoundStatement ;
+    rdfs:comment "A statement bound for this agreement version from a template of an included wording object."@en .
+
+#################################################################
+# Amendments
+#################################################################
+
+agr:Amendment a owl:Class ;
+    rdfs:subClassOf prov:Activity ,
+        [ a owl:Restriction ; owl:onProperty agr:amends ; owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass agr:AgreementVersion ] ,
+        [ a owl:Restriction ; owl:onProperty agr:resultsIn ; owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass agr:AgreementVersion ] ;
+    rdfs:label "Amendment"@en ;
+    rdfs:comment "The activity that changes one agreement version into the next (M3). The new version's valid time is the amendment's effective date, which may be retrospective (M3 3.20)."@en .
+
+agr:amends a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "amends"@en ;
+    rdfs:subPropertyOf prov:used ;
+    rdfs:domain agr:Amendment ; rdfs:range agr:AgreementVersion .
+
+agr:resultsIn a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "results in"@en ;
+    rdfs:subPropertyOf prov:generated ;
+    rdfs:domain agr:Amendment ; rdfs:range agr:AgreementVersion .
+
+agr:agreedOn a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "agreed on"@en ;
+    rdfs:domain agr:Amendment ; rdfs:range xsd:date ;
+    rdfs:comment "When the parties agreed the amendment. Foundation has no term for it (integration spec §4.1)."@en .
+
+agr:operationalFrom a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "operational from"@en ;
+    rdfs:domain agr:Amendment ; rdfs:range xsd:date ;
+    rdfs:comment "When the amendment is implemented in operation, which can precede its legal effect (M3 3.22)."@en .
+
+agr:Materiality a owl:Class ;
+    rdfs:label "Materiality"@en ;
+    rdfs:comment "Whether an amendment is material (M3 3.9.1). A closed set of named individuals (agreement-vocab)."@en .
+
+agr:materiality a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "materiality"@en ;
+    rdfs:domain agr:Amendment ; rdfs:range agr:Materiality ;
+    fnd:utility "Recorded from a design-time check where one exists: an expansion of authority, found as a failed subsumption between the grant's envelope classes in the two versions, is material."@en .
+
+[] a owl:AllDisjointClasses ;
+    owl:members ( agr:AgreementIdentity agr:AgreementVersion agr:VariableValue agr:Amendment agr:Materiality ) .

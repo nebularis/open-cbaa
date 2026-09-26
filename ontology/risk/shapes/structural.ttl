@@ -1,0 +1,24 @@
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix rsk:  <https://nebularis.github.io/open-cbaa/ontology/risk#> .
+@prefix agr:  <https://nebularis.github.io/open-cbaa/ontology/agreement#> .
+@prefix qnt:  <https://www.nebularis.org/neuro-semantic/lattice/quantification#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# Risks and bound policies: per-node shapes. The single-valued dimensions
+# are what makes each authority dimension a single-valued evidence path.
+
+rsk:BoundPolicyShape a sh:NodeShape ;
+    sh:targetClass rsk:BoundPolicy ;
+    sh:property [ sh:path rsk:boundUnder ; sh:minCount 1 ; sh:maxCount 1 ; sh:class agr:AgreementVersion ] ;
+    sh:property [ sh:path rsk:boundAt ; sh:minCount 1 ; sh:maxCount 1 ; sh:datatype xsd:dateTime ] ;
+    sh:property [ sh:path rsk:contractType ; sh:maxCount 1 ] ;
+    sh:property [ sh:path rsk:policyholderLocation ; sh:maxCount 1 ] ;
+    sh:property [ sh:path rsk:policyholderClassification ; sh:maxCount 1 ] .
+
+rsk:RiskShape a sh:NodeShape ;
+    sh:targetClass rsk:Risk ;
+    sh:property [ sh:path rsk:ofPolicy ; sh:minCount 1 ; sh:maxCount 1 ; sh:class rsk:BoundPolicy ] ;
+    sh:property [ sh:path rsk:riskLocation ; sh:maxCount 1 ;
+                  sh:message "A risk has one deemed location. A policy covering several locations has one risk per location." ] ;
+    sh:property [ sh:path rsk:sumInsured ; sh:maxCount 1 ; sh:class qnt:Quantity ] ;
+    sh:property [ sh:path rsk:grossPremium ; sh:maxCount 1 ; sh:class qnt:Quantity ] .

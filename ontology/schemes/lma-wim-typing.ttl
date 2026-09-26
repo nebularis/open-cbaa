@@ -1,0 +1,240 @@
+@prefix lma:  <https://nebularis.github.io/open-cbaa/ontology/schemes/lma#> .
+@prefix wim:  <https://nebularis.github.io/open-cbaa/ontology/wim#> .
+@prefix fnd:  <https://www.nebularis.org/neuro-semantic/lattice/foundation#> .
+@prefix voc:  <https://www.nebularis.org/neuro-semantic/lattice/vocabulary#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+# Provisional editions of the LMA Wordings Information Model's Typing and
+# Sub-Typing, as SKOS concept schemes (design-spec §4.1 tier V2, §11).
+#
+# These classifications belong to the LMA (DA Wordings Group and CBAA Steer).
+# They are authored here only because no published edition exists yet, and
+# each scheme says so in skos:editorialNote. When the LMA publishes, its
+# editions are bound to the same scheme contracts (wim-vocab) and these are
+# superseded. Applicability to agreements or policies, the colour legend of
+# the WIM diagram, is wim:applicableTo on the concepts.
+
+<https://nebularis.github.io/open-cbaa/ontology/schemes/lma-wim-typing> a owl:Ontology ;
+    rdfs:label "Provisional LMA WIM typing schemes"@en ;
+    owl:versionIRI <https://nebularis.github.io/open-cbaa/ontology/schemes/lma-wim-typing/0.1.0> ;
+    owl:imports <https://nebularis.github.io/open-cbaa/ontology/wim/0.2.0> ,
+                <https://www.nebularis.org/neuro-semantic/lattice/foundation-vocab/0.3.0> .
+
+#################################################################
+# Contract typing
+#################################################################
+
+lma:ContractCategoryScheme a voc:ConceptScheme ;
+    skos:prefLabel "LMA WIM contract typing (provisional)"@en ;
+    skos:editorialNote "Provisional edition authored by Open CBAA pending an LMA publication."@en ;
+    fnd:hasIdentity lma:ContractCategoryScheme-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    skos:hasTopConcept lma:Agreement , lma:Policy .
+
+lma:Agreement a skos:Concept ; skos:prefLabel "Agreement"@en ;
+    skos:inScheme lma:ContractCategoryScheme ; skos:topConceptOf lma:ContractCategoryScheme .
+lma:Policy a skos:Concept ; skos:prefLabel "Policy"@en ;
+    skos:inScheme lma:ContractCategoryScheme ; skos:topConceptOf lma:ContractCategoryScheme ;
+    skos:scopeNote "A policy's insurance or reinsurance nature is its contract type (rsk:contractType), not a narrower category."@en .
+
+lma:BindingAuthority a skos:Concept ; skos:prefLabel "Binding Authority"@en ;
+    skos:inScheme lma:ContractCategoryScheme ; skos:broader lma:Agreement .
+lma:LineSlip a skos:Concept ; skos:prefLabel "Line Slip"@en ;
+    skos:inScheme lma:ContractCategoryScheme ; skos:broader lma:Agreement .
+lma:Consortium a skos:Concept ; skos:prefLabel "Consortium"@en ;
+    skos:inScheme lma:ContractCategoryScheme ; skos:broader lma:Agreement .
+lma:DCAA a skos:Concept ; skos:prefLabel "DCAA"@en ;
+    skos:inScheme lma:ContractCategoryScheme ; skos:broader lma:Agreement ;
+    skos:scopeNote "Abbreviation as given in the WIM; its expansion is not stated there."@en .
+
+#################################################################
+# Component group typing
+#################################################################
+
+lma:ComponentGroupTypeScheme a voc:ConceptScheme ;
+    skos:prefLabel "LMA WIM component group typing (provisional)"@en ;
+    skos:editorialNote "Provisional edition authored by Open CBAA pending an LMA publication."@en ;
+    fnd:hasIdentity lma:ComponentGroupTypeScheme-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    skos:hasTopConcept lma:Module , lma:EndorsementOrComplexComponent , lma:Schedule .
+
+lma:Module a skos:Concept ; skos:prefLabel "Module"@en ;
+    skos:inScheme lma:ComponentGroupTypeScheme ; skos:topConceptOf lma:ComponentGroupTypeScheme ;
+    wim:applicableTo lma:Agreement .
+lma:EndorsementOrComplexComponent a skos:Concept ; skos:prefLabel "Endorsement / Complex Component"@en ;
+    skos:inScheme lma:ComponentGroupTypeScheme ; skos:topConceptOf lma:ComponentGroupTypeScheme ;
+    wim:applicableTo lma:Policy .
+lma:Schedule a skos:Concept ; skos:prefLabel "Schedule"@en ;
+    skos:inScheme lma:ComponentGroupTypeScheme ; skos:topConceptOf lma:ComponentGroupTypeScheme ;
+    wim:applicableTo lma:Agreement , lma:Policy ;
+    skos:scopeNote "Initially CBAA only, per the WIM."@en .
+
+#################################################################
+# Component typing
+#################################################################
+
+lma:ComponentTypeScheme a voc:ConceptScheme ;
+    skos:prefLabel "LMA WIM component typing (provisional)"@en ;
+    skos:editorialNote "Provisional edition authored by Open CBAA pending an LMA publication."@en ;
+    fnd:hasIdentity lma:ComponentTypeScheme-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    skos:hasTopConcept lma:Clause , lma:Definition , lma:SystemGuidance , lma:TechnicalGuidance .
+
+lma:Clause a skos:Concept ; skos:prefLabel "Clause"@en ; skos:altLabel "CLS" ;
+    skos:inScheme lma:ComponentTypeScheme ; skos:topConceptOf lma:ComponentTypeScheme ;
+    wim:applicableTo lma:Agreement , lma:Policy .
+lma:Definition a skos:Concept ; skos:prefLabel "Definition"@en ; skos:altLabel "DEF" ;
+    skos:inScheme lma:ComponentTypeScheme ; skos:topConceptOf lma:ComponentTypeScheme .
+lma:SystemGuidance a skos:Concept ; skos:prefLabel "System Guidance"@en ; skos:altLabel "SYS" ;
+    skos:inScheme lma:ComponentTypeScheme ; skos:topConceptOf lma:ComponentTypeScheme .
+lma:TechnicalGuidance a skos:Concept ; skos:prefLabel "Technical Guidance"@en ; skos:altLabel "TEC" ;
+    skos:inScheme lma:ComponentTypeScheme ; skos:topConceptOf lma:ComponentTypeScheme .
+
+#################################################################
+# Clause classification (a polyhierarchy)
+#################################################################
+
+lma:ClauseClassificationScheme a voc:ConceptScheme ;
+    skos:prefLabel "LMA WIM clause classification (provisional)"@en ;
+    skos:editorialNote "Provisional edition authored by Open CBAA pending an LMA publication."@en ;
+    fnd:hasIdentity lma:ClauseClassificationScheme-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    skos:hasTopConcept lma:ScopeOfAuthorityClause , lma:ScopeOfCoverageClause , lma:ContractualProvision .
+
+lma:ScopeOfAuthorityClause a skos:Concept ; skos:prefLabel "Scope of Authority Clause"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:topConceptOf lma:ClauseClassificationScheme ;
+    wim:applicableTo lma:Agreement .
+lma:ScopeOfCoverageClause a skos:Concept ; skos:prefLabel "Scope of Coverage Clause"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:topConceptOf lma:ClauseClassificationScheme ;
+    wim:applicableTo lma:Policy .
+lma:ContractualProvision a skos:Concept ; skos:prefLabel "Contractual Provision"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:topConceptOf lma:ClauseClassificationScheme ;
+    wim:applicableTo lma:Agreement , lma:Policy .
+
+lma:GrantOfAuthority a skos:Concept ; skos:prefLabel "Grant of Authority"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:ScopeOfAuthorityClause .
+
+lma:GrantsOfCoverage a skos:Concept ; skos:prefLabel "Grants of Coverage"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:ScopeOfCoverageClause .
+lma:Limitations a skos:Concept ; skos:prefLabel "Limitations"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:ScopeOfCoverageClause .
+lma:Conditions a skos:Concept ; skos:prefLabel "Conditions"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:ScopeOfCoverageClause .
+
+lma:InsuringClause a skos:Concept ; skos:prefLabel "Insuring Clause"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:GrantsOfCoverage .
+lma:Affirmation a skos:Concept ; skos:prefLabel "Affirmation"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:GrantsOfCoverage .
+lma:AffirmationAndLimitedExclusion a skos:Concept ; skos:prefLabel "Affirmation and Limited Exclusion"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:GrantsOfCoverage , lma:Limitations ;
+    skos:scopeNote "Under both Grants of Coverage and Limitations in the WIM, which is why this is a scheme and not a class tree."@en .
+lma:ExclusionAndLimitedWriteback a skos:Concept ; skos:prefLabel "Exclusion and Limited Writeback"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:GrantsOfCoverage , lma:Limitations .
+lma:Exclusion a skos:Concept ; skos:prefLabel "Exclusion"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:Limitations .
+lma:LimitsOrSubLimits a skos:Concept ; skos:prefLabel "Limits (or Sub-limits)"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:Limitations .
+lma:Excesses a skos:Concept ; skos:prefLabel "Excess(es)"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:Limitations .
+lma:Deductible a skos:Concept ; skos:prefLabel "Deductible"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:Limitations .
+
+lma:BareOrOrdinaryCondition a skos:Concept ; skos:prefLabel "Bare / Ordinary Condition"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:Conditions .
+lma:ConditionPrecedent a skos:Concept ; skos:prefLabel "Condition Precedent"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:Conditions .
+lma:Warranty a skos:Concept ; skos:prefLabel "Warranty"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:Conditions .
+
+lma:Claims a skos:Concept ; skos:prefLabel "Claims"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:ContractualProvision .
+lma:Complaints a skos:Concept ; skos:prefLabel "Complaints"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:ContractualProvision .
+lma:Service a skos:Concept ; skos:prefLabel "Service"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:ContractualProvision .
+lma:Payment a skos:Concept ; skos:prefLabel "Payment"@en ; skos:scopeNote "e.g. premiums"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:ContractualProvision .
+lma:Cancellation a skos:Concept ; skos:prefLabel "Cancellation"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:ContractualProvision .
+lma:InformationOrNotice a skos:Concept ; skos:prefLabel "Information / Notice"@en ; skos:scopeNote "e.g. privacy"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:ContractualProvision .
+lma:Calculation a skos:Concept ; skos:prefLabel "Calculation"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:ContractualProvision .
+lma:ServiceOfSuit a skos:Concept ; skos:prefLabel "Service of Suit"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:ContractualProvision .
+lma:SeveralLiability a skos:Concept ; skos:prefLabel "Several Liability"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:ContractualProvision .
+lma:Sanctions a skos:Concept ; skos:prefLabel "Sanctions"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:ContractualProvision .
+lma:Communication a skos:Concept ; skos:prefLabel "Communication"@en ;
+    skos:inScheme lma:ClauseClassificationScheme ; skos:broader lma:ContractualProvision .
+
+#################################################################
+# Data element sub-typing
+#################################################################
+
+lma:ElementTypeScheme a voc:ConceptScheme ;
+    skos:prefLabel "LMA WIM data element sub-typing (provisional)"@en ;
+    skos:editorialNote "Provisional edition authored by Open CBAA pending an LMA publication."@en ;
+    fnd:hasIdentity lma:ElementTypeScheme-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    skos:hasTopConcept lma:TextElement , lma:TableElement , lma:MetadataElement .
+
+lma:TextElement a skos:Concept ; skos:prefLabel "Text"@en ;
+    skos:inScheme lma:ElementTypeScheme ; skos:topConceptOf lma:ElementTypeScheme ;
+    skos:scopeNote "Types a wim:Text data element."@en .
+lma:Title a skos:Concept ; skos:prefLabel "Title"@en ; skos:altLabel "HDG" ;
+    skos:inScheme lma:ElementTypeScheme ; skos:broader lma:TextElement .
+lma:Paragraph a skos:Concept ; skos:prefLabel "Paragraph"@en ;
+    skos:inScheme lma:ElementTypeScheme ; skos:broader lma:TextElement .
+lma:NumberedClause a skos:Concept ; skos:prefLabel "Numbered Clause"@en ;
+    skos:inScheme lma:ElementTypeScheme ; skos:broader lma:TextElement .
+lma:NestedClause a skos:Concept ; skos:prefLabel "Nested Clause"@en ;
+    skos:inScheme lma:ElementTypeScheme ; skos:broader lma:TextElement .
+lma:OrderedList a skos:Concept ; skos:prefLabel "Ordered List"@en ;
+    skos:inScheme lma:ElementTypeScheme ; skos:broader lma:TextElement .
+
+lma:TableElement a skos:Concept ; skos:prefLabel "Table"@en ;
+    skos:inScheme lma:ElementTypeScheme ; skos:topConceptOf lma:ElementTypeScheme ;
+    skos:scopeNote "Types a wim:Table data element."@en .
+lma:DynamicTable a skos:Concept ; skos:prefLabel "Dynamic Table"@en ; skos:altLabel "DTB" ;
+    skos:inScheme lma:ElementTypeScheme ; skos:broader lma:TableElement .
+lma:StaticTable a skos:Concept ; skos:prefLabel "Static Table"@en ; skos:altLabel "STB" ;
+    skos:inScheme lma:ElementTypeScheme ; skos:broader lma:TableElement .
+
+lma:MetadataElement a skos:Concept ; skos:prefLabel "Metadata"@en ;
+    skos:inScheme lma:ElementTypeScheme ; skos:topConceptOf lma:ElementTypeScheme ;
+    skos:scopeNote "Types a wim:Metadata data element."@en .
+lma:DescriptiveMetadata a skos:Concept ; skos:prefLabel "Descriptive Metadata"@en ;
+    skos:inScheme lma:ElementTypeScheme ; skos:broader lma:MetadataElement .
+lma:SystemMetadata a skos:Concept ; skos:prefLabel "System Metadata"@en ;
+    skos:inScheme lma:ElementTypeScheme ; skos:broader lma:MetadataElement .
+
+#################################################################
+# Document object kinds (analogue for now)
+#################################################################
+
+lma:DocumentKindScheme a voc:ConceptScheme ;
+    skos:prefLabel "LMA WIM document object kinds (provisional)"@en ;
+    skos:editorialNote "Provisional edition authored by Open CBAA pending an LMA publication."@en ;
+    fnd:hasIdentity lma:DocumentKindScheme-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    skos:hasTopConcept lma:ScheduleDocument , lma:ContractJacket , lma:CertificateOfInsurance ,
+        lma:IPID , lma:ListOfBenefits , lma:NoticeDocument , lma:Assessment .
+
+lma:ScheduleDocument a skos:Concept ; skos:prefLabel "Schedule document"@en ;
+    skos:inScheme lma:DocumentKindScheme ; skos:topConceptOf lma:DocumentKindScheme .
+lma:ContractJacket a skos:Concept ; skos:prefLabel "Contract Jacket"@en ;
+    skos:inScheme lma:DocumentKindScheme ; skos:topConceptOf lma:DocumentKindScheme .
+lma:CertificateOfInsurance a skos:Concept ; skos:prefLabel "Certificate of Insurance"@en ;
+    skos:inScheme lma:DocumentKindScheme ; skos:topConceptOf lma:DocumentKindScheme .
+lma:IPID a skos:Concept ; skos:prefLabel "IPID"@en ; skos:altLabel "Insurance Product Information Document"@en ;
+    skos:inScheme lma:DocumentKindScheme ; skos:topConceptOf lma:DocumentKindScheme .
+lma:ListOfBenefits a skos:Concept ; skos:prefLabel "List of Benefits"@en ;
+    skos:inScheme lma:DocumentKindScheme ; skos:topConceptOf lma:DocumentKindScheme .
+lma:NoticeDocument a skos:Concept ; skos:prefLabel "Notice"@en ;
+    skos:inScheme lma:DocumentKindScheme ; skos:topConceptOf lma:DocumentKindScheme .
+lma:Assessment a skos:Concept ; skos:prefLabel "Assessment"@en ;
+    skos:inScheme lma:DocumentKindScheme ; skos:topConceptOf lma:DocumentKindScheme .

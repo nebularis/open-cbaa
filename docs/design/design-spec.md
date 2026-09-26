@@ -1,11 +1,12 @@
 # Open CBAA Semantic Design Specification
 
-Version 0.2, draft for review. Nothing here has been applied to the `*.ttl` files yet. Section
-[12](#12-decision-log) records what is decided and what is open.
+Version 0.3, draft for review. §3, §4 and §11 are applied in [`ontology/`](../../ontology/README.md),
+whose README says how. Section [12](#12-decision-log) records what is decided, what is proposed
+and what is open.
 
 Inputs: the CBAA module drafts M1–M14 (evidence in
 [reference/cbaa-spec-observations.md](../../reference/cbaa-spec-observations.md)), the
-[design review](../../ontology/README.md#design-review-cbaa-modules-m1m14), the MERIDIAN CSO, FBO and
+[WIM design review](wim-review.md), the MERIDIAN CSO, FBO and
 unified architecture documents, the SPC description logic encoding and its reference
 architecture, and the LATTICE Foundation, Vocabulary, Quantification and Instrument layers and
 RDF/SPARQL Operational Patterns Guide (commit `558650b`). LATTICE facts in §5 and §10 are
@@ -50,7 +51,7 @@ Three ways to make a clause's meaning machine-readable:
 
 | Option | Shape | Consequence |
 |---|---|---|
-| A. Fixed clause-type hierarchy | `GrantOfAuthority ⊑ ScopeOfAuthorityClause ⊑ Clause` (the current `clause.ttl`) | Meaning is the clause's class. Every change to the classification is a T-Box release. |
+| A. Fixed clause-type hierarchy | `GrantOfAuthority ⊑ ScopeOfAuthorityClause ⊑ Clause` (the retired `clause.ttl`) | Meaning is the clause's class. Every change to the classification is a T-Box release. |
 | B. Attached meaning | `Clause expresses Statement`, where a small, fixed set of statement kinds carries parameters | Meaning is data attached to wording. Classifications become vocabularies. |
 | C. Hybrid (MERIDIAN) | B, plus named classes generated where axioms or shapes need a target | Attached meaning at authoring time, classes only as compiled artefacts. |
 
@@ -80,7 +81,7 @@ statement kinds are unchanged.
 | Layer | Content | General or specific |
 |---|---|---|
 | Statement kinds, `expresses`, parameters | §3.3 | general |
-| WIM structure (Contract, Component Group, Component, Data Element, `comprises`) | current `core.ttl` | WIM-normative, kept in the T-Box |
+| WIM structure (Contract, Component Group, Component, Data Element, `comprises`) | `ontology/wim` (was `core.ttl`) | WIM-normative, kept in the T-Box |
 | Classifications (WIM clause types, element types, agreement types) | SKOS schemes | specific, A-Box |
 | CBAA library content | wording objects, variables, attached statements | specific, A-Box |
 
@@ -540,19 +541,20 @@ status are specified in the [LATTICE integration specification](lattice-integrat
 
 ## 11. Consequences for the Current Ontology
 
-Not yet applied. Applying DP1 and DP2 to the files in this directory:
+Applied in `ontology/wim` 0.2.0 and `ontology/schemes` (D18). The table records what the flat
+`lma-wim` modules held and what replaced it.
 
 | Current | Proposed |
 |---|---|
-| `Agreement` subclasses Binding Authority, Line Slip, Consortium, DCAA | concepts in an agreement-type scheme |
-| `Policy` subclasses Insurance, Reinsurance | concepts in a contract-type scheme |
+| `Agreement` subclasses Binding Authority, Line Slip, Consortium, DCAA | concepts under Agreement in the contract-category scheme, since `wim:contractCategory` is functional (integration spec §5.4) |
+| `Policy` subclasses Insurance, Reinsurance | `rsk:contractType`, a V1 scheme on the bound policy |
 | Clause sub-typing tree in `clause.ttl` | concepts in a WIM clause-classification scheme, with the overlap (two leaves under two groups) as ordinary `skos:broader` links |
 | `AgreementRelated`, `PolicyRelated` mixins | an applicability annotation on the classification concepts |
-| Contractual Provision leaves (Claims, Complaints, ...) | concepts, aligned with the activity scheme |
+| Contractual Provision leaves (Claims, Complaints, ...) | concepts in the clause-classification scheme, linked to the activity scheme by `skos:closeMatch` |
 | Text leaves (Title, Paragraph, ...) | concepts in an element-type scheme |
-| Document/analogue artifacts | Document Objects referenced by `de:linksTo`, with `representationStatus` retained |
+| Document/analogue artifacts | `wim:DocumentObject`, classified by `wim:documentKind` and referenced by `wim:linksTo`. The class replaces `representationStatus` |
 | Contract, Component Group, Component, Data Element, `comprises`, Text, Table, Variable, Metadata, Reference | kept as classes (structurally distinct) |
-| none | `expresses` and the statement kinds (§3) in a new meaning module |
+| none | `stm:expresses` and the statement kinds (§3) in the meaning module `ontology/statement` |
 
 ## 12. Decision Log
 
@@ -577,7 +579,25 @@ Not yet applied. Applying DP1 and DP2 to the files in this directory:
 | D15 | The repository is renamed Open CBAA, and its ontology IRIs move to `https://nebularis.github.io/open-cbaa/`, before version IRIs are assigned (§3.4 of the integration specification) | 2026-09-25 |
 | D16 | LATTICE imports resolve through a catalog that maps each released LATTICE version IRI to its file at its release tag, so an ontology opens in Protégé without a LATTICE checkout. The submodule remains for LATTICE's tooling (integration spec §3.3) | 2026-09-26 |
 
+### Proposed
+
+Taken while building the ontologies (2026-09-26), for ratification. [ontology/README.md](../../ontology/README.md)
+gives the reasoning.
+
+| # | Decision | README |
+|---|---|---|
+| D17 | Ontologies use LATTICE's module layout (`spec/`, `vocab/`, `shapes/` with a `.version`), plus `schemes/`, `governance/` and `examples/`. The flat `lma-wim` modules are retired, and `wim` starts at 0.2.0 | §1, §2 |
+| D18 | §11 as applied: WIM typing becomes provisional LMA schemes under scheme contracts, agreement types sit under Agreement in `wim:contractCategory`, `wim:applicableTo` replaces the mixins, insurance and reinsurance become `rsk:contractType`, analogue artefacts become `wim:DocumentObject`. Data element classes stay classes | §3, §6 |
+| D19 | A variation slot is a `wim:VariationSlot` whose variants are ordinary wording objects with `wim:variantOf`, all comprised by the slot's parent. An agreement includes exactly one | §3 |
+| D20 | Inclusion conditions are admission profiles evaluated in question form over the agreement's variable values (I8 for slot conditions). Design-time exclusivity checks over a slot need a Surface promotion first | §3 |
+| D21 | An agreement's variable values are `agr:VariableValue` nodes, not one property per variable | §5 |
+| D22 | Templates take variable parameters through `stm:ParameterBinding`s. Scope parameters carry the case class and evidence path, so bound scopes are plain Eligibility profiles with evidence bindings (I8 for statement scopes). Only bound obligations are `ins:Obligation`, refining integration spec §5.5. Bound statements are `fnd:Version`s. `stm:bearer` serves every kind | §4 |
+| D23 | I6 is not adopted for now: typing library wording `ins:Provision` would fail `ins:ProvisionShape`, since a library object's obligations are templates, not `ins:Obligation`s. Attachment stays `stm:expresses` | §4 |
+| D24 | I7: the case is `rsk:Risk`, whose location is its deemed location. Multi-valued dimensions (perils, risk codes, territorial limits) stay out of design-time classes until surveyed | §5 |
+| D25 | An agreement version is a `wim:Contract`, an `ins:Element` and temporally scoped, with an opaque identity, the UMR as a claimed key per market, and markets as `voc:BindingScope`s | §5 |
+| D26 | The M12 lifecycle is declared on Behaviour in agreement-vocab, before the other lifecycles of integration spec §9 step 6 | §5 |
+
 ### Open
 
 The integration specification's [open questions](lattice-integration.md#10-open-questions)
-(I1, I3, I5 to I10).
+(I1, I3, I5 to I10). D20 and D22 to D24 propose answers to I6 to I8.

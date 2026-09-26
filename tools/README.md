@@ -15,6 +15,21 @@ access to GitHub.
 python3 tools/lattice_catalog.py
 ```
 
+## ontology_check.py
+
+Checks the ontologies in `ontology/` with LATTICE's tooling: HermiT consistency and class
+satisfiability, SHACL conformance of the worked example against Open CBAA's and LATTICE's
+shapes, and probes that each OWL axiom and SHACL constraint still rejects what it should
+([ontology README §10](../ontology/README.md#10-validation)). It needs a LATTICE checkout
+beside this repository, and LATTICE's Python (rdflib, pySHACL) and Java 25, so it runs from
+the LATTICE directory. A pass prints `0 failure(s)` and exits 0.
+
+```bash
+cd ../lattice && python ../open-dare/tools/ontology_check.py
+```
+
+When a probe fails, its line names the claim, and a SHACL probe prints the report.
+
 ## cbaa_extract.py
 
 Renders CBAA module drafts and table files as annotated plain text, so they can be read,

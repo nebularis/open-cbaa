@@ -1,0 +1,108 @@
+@prefix rsk:  <https://nebularis.github.io/open-cbaa/ontology/risk#> .
+@prefix agr:  <https://nebularis.github.io/open-cbaa/ontology/agreement#> .
+@prefix fnd:  <https://www.nebularis.org/neuro-semantic/lattice/foundation#> .
+@prefix qnt:  <https://www.nebularis.org/neuro-semantic/lattice/quantification#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd:  <http://www.w3.org/2001/XMLSchema#> .
+
+# Open CBAA — Risks and bound policies.
+#
+# The operational case that authority is evaluated over (design-spec §6.2,
+# §6.3). The case is the risk: the CBAA speaks of where a risk "is deemed to
+# be located", one location per risk, so a policy covering several risks
+# gives several cases, and each dimension an authority grant reads is
+# single-valued from the risk (integration spec I7). See ontology/README.md.
+
+<https://nebularis.github.io/open-cbaa/ontology/risk> a owl:Ontology ;
+    rdfs:label "Open CBAA — Risks and bound policies"@en ;
+    owl:versionIRI <https://nebularis.github.io/open-cbaa/ontology/risk/0.1.0> ;
+    owl:imports <https://nebularis.github.io/open-cbaa/ontology/agreement/0.1.0> .
+
+#################################################################
+# Bound policies
+#################################################################
+
+rsk:BoundPolicy a owl:Class ;
+    rdfs:subClassOf prov:Entity ,
+        [ a owl:Restriction ; owl:onProperty rsk:boundUnder ; owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass agr:AgreementVersion ] ;
+    rdfs:label "Bound policy"@en ;
+    rdfs:comment "An operational record of a policy bound under an agreement version: who the policyholder is, where, and what kind of contract. Not the policy wording, which is a wim:Contract of category Policy."@en ;
+    fnd:utility "Judged under the agreement version valid when it was bound (rsk:boundAt), not the one in force when the question is asked."@en .
+
+rsk:boundUnder a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "bound under"@en ;
+    rdfs:domain rsk:BoundPolicy ; rdfs:range agr:AgreementVersion .
+
+rsk:boundAt a owl:DatatypeProperty , owl:FunctionalProperty ;
+    rdfs:label "bound at"@en ;
+    rdfs:domain rsk:BoundPolicy ; rdfs:range xsd:dateTime .
+
+rsk:contractType a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "contract type"@en ;
+    rdfs:domain rsk:BoundPolicy ; rdfs:range skos:Concept ;
+    rdfs:comment "Insurance or reinsurance (M5 5.1)."@en .
+
+rsk:policyholderLocation a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "policyholder location"@en ;
+    rdfs:domain rsk:BoundPolicy ; rdfs:range skos:Concept ;
+    rdfs:comment "Where the policyholder is deemed to be located, as a territory concept."@en .
+
+rsk:policyholderClassification a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "policyholder classification"@en ;
+    rdfs:domain rsk:BoundPolicy ; rdfs:range skos:Concept ;
+    rdfs:comment "Consumer, commercial, and so on, from a market's customer-type scheme."@en .
+
+rsk:territorialLimit a owl:ObjectProperty ;
+    rdfs:label "territorial limit"@en ;
+    rdfs:domain rsk:BoundPolicy ; rdfs:range skos:Concept ;
+    rdfs:comment "Where cover applies, as territory concepts. Several values, so a design-time class cannot read it (integration spec I7)."@en .
+
+#################################################################
+# Risks: the case
+#################################################################
+
+rsk:Risk a owl:Class ;
+    rdfs:subClassOf prov:Entity ,
+        [ a owl:Restriction ; owl:onProperty rsk:ofPolicy ; owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ; owl:onClass rsk:BoundPolicy ] ;
+    rdfs:label "Risk"@en ;
+    rdfs:comment "One insured risk: the case an authority grant is evaluated over, at the point of bind and in bordereau checks."@en ;
+    fnd:utility "Authority scopes read a risk through elg:EvidenceBinding paths: rsk:riskLocation directly, rsk:ofPolicy then rsk:policyholderLocation for the policyholder. Every such path is single-valued, which LATTICE's OWL backend requires (ADR-A90)."@en .
+
+rsk:ofPolicy a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "of policy"@en ;
+    rdfs:domain rsk:Risk ; rdfs:range rsk:BoundPolicy .
+
+rsk:riskLocation a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "risk location"@en ;
+    rdfs:domain rsk:Risk ; rdfs:range skos:Concept ;
+    rdfs:comment "Where the risk is deemed to be located, as a territory concept at whatever level is known (country to city)."@en ;
+    fnd:utility "A location known only at a level above an excluded concept (France, where Corsica is excluded) evaluates to Undetermined, never to Permitted."@en .
+
+rsk:insurableInterest a owl:ObjectProperty ;
+    rdfs:label "insurable interest"@en ;
+    rdfs:domain rsk:Risk ; rdfs:range skos:Concept .
+
+rsk:peril a owl:ObjectProperty ;
+    rdfs:label "peril"@en ;
+    rdfs:domain rsk:Risk ; rdfs:range skos:Concept ;
+    rdfs:comment "A peril covered for the risk. Several values, so a design-time class cannot read it until LATTICE supports an every-value reading (integration spec I7)."@en .
+
+rsk:riskCode a owl:ObjectProperty ;
+    rdfs:label "risk code"@en ;
+    rdfs:domain rsk:Risk ; rdfs:range skos:Concept ;
+    rdfs:comment "A Lloyd's risk code. Bound only in the Lloyd's market scope."@en .
+
+rsk:sumInsured a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "sum insured"@en ;
+    rdfs:domain rsk:Risk ; rdfs:range qnt:Quantity ;
+    rdfs:comment "A money quantity on stm:MoneySpace, in one currency."@en .
+
+rsk:grossPremium a owl:ObjectProperty , owl:FunctionalProperty ;
+    rdfs:label "gross premium"@en ;
+    rdfs:domain rsk:Risk ; rdfs:range qnt:Quantity ;
+    rdfs:comment "Feeds the aggregate GWP accumulator of the agreement (design-spec §6.4)."@en .
+
+[] a owl:AllDisjointClasses ; owl:members ( rsk:BoundPolicy rsk:Risk agr:AgreementVersion ) .

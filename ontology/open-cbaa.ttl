@@ -1,0 +1,17 @@
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+# Open CBAA — umbrella. Open this file in Protégé: the catalog in this
+# directory resolves every import, LATTICE's included, without a checkout.
+
+<https://nebularis.github.io/open-cbaa/ontology/open-cbaa> a owl:Ontology ;
+    rdfs:label "Open CBAA"@en ;
+    rdfs:comment "Every Open CBAA module, its vocabulary, and the provisional schemes, with the LATTICE layers they build on."@en ;
+    owl:versionIRI <https://nebularis.github.io/open-cbaa/ontology/open-cbaa/0.2.0> ;
+    owl:priorVersion <https://nebularis.github.io/open-cbaa/ontology/lma-wim> ;
+    owl:imports <https://nebularis.github.io/open-cbaa/ontology/wim-vocab/0.1.0> ,
+                <https://nebularis.github.io/open-cbaa/ontology/statement-vocab/0.1.0> ,
+                <https://nebularis.github.io/open-cbaa/ontology/agreement-vocab/0.1.0> ,
+                <https://nebularis.github.io/open-cbaa/ontology/risk-vocab/0.1.0> ,
+                <https://nebularis.github.io/open-cbaa/ontology/schemes/lma-wim-typing/0.1.0> ,
+                <https://nebularis.github.io/open-cbaa/ontology/schemes/activity/0.1.0> .

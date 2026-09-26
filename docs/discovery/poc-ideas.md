@@ -48,7 +48,7 @@ account of validation depends on both being ingested through different routes:
 
 | | Wording ingestion | Meaning attachment |
 |---|---|---|
-| Produces | `core:Contract` / `ComponentGroup` / `Component` / `DataElement` graph, `Text` content | `AuthorityGrant`, `Obligation` and other statements |
+| Produces | `wim:Contract` / `ComponentGroup` / `Component` / `DataElement` graph, `Text` content | `AuthorityGrant`, `Obligation` and other statements |
 | Route | `.docx` → XSLT → RDF (§4) | the Word add-in, or an internal tool, writing directly (§5). Later, suggestions from InsurLE compilation or LLM extraction, reviewed in the same tools (§5.4) |
 | Runs | once per published wording object version | once per statement, bound per agreement version |
 | Automatic? | yes, from a well-formed document | no — a person authors it, or accepts a proposal (design-spec §3.7) |
@@ -113,7 +113,7 @@ flowchart LR
     B --> C["XSD-validate against the\nexpected paragraph/tag shape"]
     C -->|fails| C1["Reject: per-paragraph error,\nno partial write"]
     C --> D["XSLT 3.0 (Saxon):\nregroup by objectId/wimClass,\nemit RDF/XML"]
-    D --> E["SHACL: comprises-tree shapes\n(core.ttl restrictions)"]
+    D --> E["SHACL: comprises-tree shapes\n(wim restrictions and shapes)"]
     E -->|fails| E1["Reject: shape violation,\ncites the object id"]
     E --> F["Write to the library plane,\nnamed graph per wording\nobject version"]
     F --> G["Publish event.written.library.*"]
@@ -125,7 +125,7 @@ because they operate on one document, not the whole store:
 - **Structural pre-check** (an XSD, or an XSLT assertion pass) over the unzipped XML, before the
   RDF transform runs, so a missing tag fails with "paragraph 14 has no `wimClass`", not a
   malformed graph three steps downstream.
-- **SHACL**, immediately after the transform, checking the same constraints `core.ttl` already
+- **SHACL**, immediately after the transform, checking the same constraints `ontology/wim` already
   states as OWL restrictions (a `Component` may not comprise a `ComponentGroup`, and so on).
   Cheap over one document's data, so no reason to defer it to a worker.
 
@@ -133,14 +133,14 @@ because they operate on one document, not the whole store:
 
 | Word construct | WIM term | Note |
 |---|---|---|
-| custom-XML-tagged range, `wimClass: ComponentGroup` | `core:ComponentGroup` | nestable — a Module or an Endorsement, per the tag |
-| custom-XML-tagged range, `wimClass: Component` | `core:Component` | |
+| custom-XML-tagged range, `wimClass: ComponentGroup` | `wim:ComponentGroup` | nestable — a Module or an Endorsement, per the tag |
+| custom-XML-tagged range, `wimClass: Component` | `wim:Component` | |
 | a numbered paragraph | `data-element:NumberedClauseText` | subclass of `Text` |
 | a nested sub-paragraph | `data-element:NestedClauseText` | |
 | a heading-styled paragraph | `data-element:Title` | |
 | a Word table, `wimClass: DynamicTable` vs `StaticTable` | `data-element:DynamicTable` / `data-element:StaticTable` | the tag disambiguates, not the OOXML table shape |
 | a merge field or content control bound to a governing variable | `data-element:GoverningVariable` or `EmbeddedVariable` | per the tag |
-| direct containment between adjacent tagged ranges | `core:directlyComprises` | asserted; `comprises`'s transitive closure is left to the reasoner or materialised at load, per the store's choice (§6.3) |
+| direct containment between adjacent tagged ranges | `wim:directlyComprises` | asserted; `comprises`'s transitive closure is left to the reasoner or materialised at load, per the store's choice (§6.3) |
 
 Everything else in `document.xml` — run-level formatting, track changes, comments — is dropped.
 None of it is WIM structure.

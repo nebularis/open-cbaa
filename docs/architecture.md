@@ -2,9 +2,7 @@
 
 A narrative walkthrough of how Open CBAA's ontologies fit together, how data gets into them, how the T-Box is used to author at design time, how the A-Box is hydrated at runtime, and how meaning attached to a contract becomes checks that run in the graph.
 
-**Status.** This is a guide, not a specification. Much of what is described is designed but not yet built: the [plan](development/plan.md) sets the order. LATTICE's parts (its layers and compilers) exist.
-
-Open CBAA's meaning module does not yet, so the names used here for its terms (prefix `cbaa:`) are indicative until it is authored.
+**Status.** This is a guide, not a specification. The ontologies it describes exist as static documents in [`ontology/`](../ontology/README.md), with shapes and the worked agreement of §5.3 as [data](../ontology/examples/ba-2026-001.ttl). LATTICE's layers and compilers exist. Compilation, runtime and coordination (§5 to §8) are designed but not built: the [plan](development/plan.md) sets the order.
 
 ---
 
@@ -25,8 +23,11 @@ Open CBAA's meaning module does not yet, so the names used here for its terms (p
 
 | Prefix | Namespace | Source |
 |---|---|---|
-| `core:`, `de:`, `cls:`, `agr:`, `pol:` | the LMA Wordings Information Model (WIM) structure | this repository, `ontology/` |
-| `cbaa:` | the meaning module, vocabularies and profiles still to be authored | this repository, planned |
+| `wim:` | wording structure: the LMA Wordings Information Model (WIM) | this repository, `ontology/wim` |
+| `stm:` | meaning: statements, templates, bound statements | this repository, `ontology/statement` |
+| `agr:` | agreements: versions, assembly, parties, amendments, lifecycle | this repository, `ontology/agreement` |
+| `rsk:` | the case: bound policies and risks | this repository, `ontology/risk` |
+| `lma:`, `act:` | provisional schemes: WIM typing, activities | this repository, `ontology/schemes` |
 | `fnd:` | Foundation: identity, versions, time, evidence, derived artefacts | LATTICE |
 | `voc:` | Vocabulary: scheme contracts, editions, scoped bindings | LATTICE |
 | `qnt:` | Quantification: quantities, bounds, ranges, recurrences | LATTICE |
@@ -86,8 +87,8 @@ classifications, perils, territories, agreement types, and every agreement itsel
 ```mermaid
 flowchart LR
     subgraph T["T-Box: changes only with an ontology release"]
-        C1["core:Contract, core:Component, ..."]
-        C2["cbaa:AuthorityGrant, cbaa:Obligation, ..."]
+        C1["wim:Contract, wim:Component, ..."]
+        C2["stm:AuthorityGrant, stm:Obligation, ..."]
         C3["LATTICE classes<br/>elg:AdmissionProfile, qnt:Range, ..."]
     end
     subgraph A["A-Box: data, governed and versioned"]
@@ -217,7 +218,7 @@ flowchart TB
     MAP --> STAGE[("Staging: proposals<br/>with provenance")]
     PROP --> STAGE
     STAGE --> R{"Reviewer:<br/>confirm, retarget, decline, defer"}
-    R -- "confirm" --> T["cbaa:StatementTemplate<br/>in the Library"]
+    R -- "confirm" --> T["stm:StatementTemplate<br/>in the Library"]
     R -- "decline" --> NEG["Recorded as negative evidence"]
 ```
 
@@ -251,24 +252,24 @@ flowchart LR
 ### 3.1 Class or concept
 
 The T-Box gets a class only where instances need different properties, axioms or shapes. A
-difference in classification alone is a SKOS concept (DP2). The current WIM structure is kept
-as classes. The clause and agreement type trees become concepts (design-spec §11).
+difference in classification alone is a SKOS concept (DP2). The WIM structure is kept as
+classes. The clause and agreement type trees are concepts (design-spec §11).
 
 ```mermaid
 flowchart LR
     subgraph Classes["Classes: structurally different"]
-        K1["core:Contract"]
-        K2["core:Component"]
-        K3["cbaa:Obligation"]
-        K4["cbaa:AuthorityGrant"]
+        K1["wim:Contract"]
+        K2["wim:Component"]
+        K3["stm:Obligation"]
+        K4["stm:AuthorityGrant"]
     end
     subgraph Concepts["Concepts: classified differently"]
-        S1["Binding Authority, Line Slip<br/>(agreement-type scheme)"]
+        S1["Binding Authority, Line Slip<br/>(contract category scheme)"]
         S2["Exclusion, Warranty, Claims<br/>(clause classification scheme)"]
         S3["Fire, Flood<br/>(peril scheme)"]
     end
-    K1 -- "cbaa:agreementType" --> S1
-    K2 -- "cbaa:clauseClassification" --> S2
+    K1 -- "wim:contractCategory" --> S1
+    K2 -- "wim:clauseClassification" --> S2
     K4 -- "scope conditions over" --> S3
 ```
 
@@ -324,11 +325,11 @@ asserted, and skip-level containment is entailed.
 
 ```mermaid
 flowchart TB
-    CON["core:Contract"] -->|"core:directlyComprises"| CGP["core:ComponentGroup"]
-    CGP -->|"core:directlyComprises"| CGP2["core:ComponentGroup<br/>(nested)"]
-    CGP -->|"core:directlyComprises"| CMP["core:Component"]
-    CMP -->|"core:directlyComprises"| CMP2["core:Component<br/>(sub-component)"]
-    CMP -->|"core:directlyComprises"| DE["core:DataElement"]
+    CON["wim:Contract"] -->|"wim:directlyComprises"| CGP["wim:ComponentGroup"]
+    CGP -->|"wim:directlyComprises"| CGP2["wim:ComponentGroup<br/>(nested)"]
+    CGP -->|"wim:directlyComprises"| CMP["wim:Component"]
+    CMP -->|"wim:directlyComprises"| CMP2["wim:Component<br/>(sub-component)"]
+    CMP -->|"wim:directlyComprises"| DE["wim:DataElement"]
 ```
 
 ```text
@@ -342,16 +343,19 @@ DataElement    ⊑ ∀comprises.⊥
 
 ```mermaid
 flowchart LR
-    DE["core:DataElement"] --> T["de:Text"]
-    DE --> TB["de:Table"]
-    DE --> V["de:Variable"]
-    DE --> M["de:Metadata"]
-    DE --> R["de:Reference"]
-    T --> T1["de:Title, de:Paragraph,<br/>de:NumberedClauseText, ..."]
-    TB --> TB1["de:DynamicTable, de:StaticTable"]
-    V --> V1["de:EmbeddedVariable,<br/>de:GoverningVariable"]
-    R --> R1["de:InternalObject,<br/>de:ExternalDocument"]
+    DE["wim:DataElement"] --> T["wim:Text"]
+    DE --> TB["wim:Table"]
+    DE --> V["wim:Variable"]
+    DE --> M["wim:Metadata"]
+    DE --> R["wim:Reference"]
+    T -.->|"wim:elementType"| T1["lma:Title, lma:Paragraph,<br/>lma:NumberedClause, ..."]
+    TB -.->|"wim:elementType"| TB1["lma:DynamicTable, lma:StaticTable"]
+    V --> V1["wim:EmbeddedVariable,<br/>wim:GoverningVariable"]
+    R -.->|"wim:linksTo"| R1["a wording object, wim:DocumentObject<br/>or wim:ExternalDocument"]
 ```
+
+Solid arrows are subclasses. Text and table sub-types are concepts in the element type scheme,
+since they differ only in classification.
 
 ### 4.3 Versions of a wording object
 
@@ -360,8 +364,8 @@ the old one, and agreements keep pointing at the version they were made with.
 
 ```mermaid
 flowchart LR
-    ID["fnd:PersistentIdentity<br/>C09.3"] --> V1["core:Component<br/>C09.3 v1"]
-    ID --> V2["core:Component<br/>C09.3 v2"]
+    ID["fnd:PersistentIdentity<br/>C09.3"] --> V1["wim:Component<br/>C09.3 v1"]
+    ID --> V2["wim:Component<br/>C09.3 v2"]
     V1 -->|"fnd:supersededBy"| V2
     V1 -.-> V1s["fnd:Version, fnd:Governable<br/>state: Active then Superseded"]
 ```
@@ -369,29 +373,31 @@ flowchart LR
 ### 4.4 Variation slots and inclusion conditions
 
 A slot holds a position in the structure. Its variants are alternatives, and exactly one is
-included. An inclusion condition decides, from the agreement's governing variables, whether
-wording appears at all (design-spec §3.6).
+included. Each variant is an ordinary wording object, `wim:variantOf` the slot and comprised by
+the slot's parent. An inclusion condition decides, from the agreement's governing variables,
+whether wording appears at all (design-spec §3.6).
 
 ```mermaid
 flowchart LR
-    SLOT["cbaa:VariationSlot<br/>M1 1.4"] -->|"cbaa:hasVariant"| VA["variant 1.4A"]
-    SLOT -->|"cbaa:hasVariant"| VB["variant 1.4B"]
-    SLOT -->|"cbaa:hasVariant"| VC["variant 1.4C"]
-    VA -->|"cbaa:includedWhen"| IC["elg:AdmissionProfile<br/>one Coverholder entity"]
-    IC -.->|"reads"| GV["de:GoverningVariable<br/>number of entities"]
+    SLOT["wim:VariationSlot<br/>M1 1.4"] -->|"wim:hasVariant"| VA["variant 1.4A"]
+    SLOT -->|"wim:hasVariant"| VB["variant 1.4B"]
+    SLOT -->|"wim:hasVariant"| VC["variant 1.4C"]
+    VA -->|"wim:includedWhen"| IC["elg:AdmissionProfile<br/>one Coverholder entity"]
+    IC -.->|"wim:readsVariable"| GV["wim:GoverningVariable<br/>number of entities"]
 ```
 
-Inclusion conditions are evaluated once, at assembly and on amendment. They are never
+Inclusion conditions are evaluated once, at assembly and on amendment, by posing the
+agreement's value for each governing variable as an `elg:Question`. They are never
 evaluated per operational event, which is what the next relation, applicability, is for.
 
 ### 4.5 Text segments
 
 ```mermaid
 flowchart LR
-    TX["de:NumberedClauseText<br/>(version, immutable)"] -->|"cbaa:segment 0"| S0["text: 'The Coverholder must notify within '"]
-    TX -->|"cbaa:segment 1"| S1["variable reference → 8.1.2 period"]
-    TX -->|"cbaa:segment 2"| S2["text: ' of receipt.'"]
-    S1 -.-> VD["de:EmbeddedVariable<br/>declaration"]
+    TX["wim:Text, a numbered clause<br/>(version, immutable)"] -->|"wim:hasSegment, index 0"| S0["text: 'The Coverholder must notify within '"]
+    TX -->|"index 1"| S1["variable reference → 8.1.2 period"]
+    TX -->|"index 2"| S2["text: ' of receipt.'"]
+    S1 -.->|"wim:refersToVariable"| VD["wim:EmbeddedVariable<br/>declaration"]
 ```
 
 SHACL requires segment indices `0..n-1`, unique and contiguous, which gives closed-world
@@ -401,10 +407,10 @@ completeness without `rdf:List`.
 
 ```mermaid
 flowchart LR
-    DECL["de:EmbeddedVariable<br/>declaration 6.11"] -->|"cbaa:populatedBy"| PM["population method<br/>pick list, lookup, rule, entry"]
-    DECL -->|"cbaa:admissibleValues"| RNG["qnt:Range<br/>e.g. at least 7 years"]
-    VAL["cbaa:VariableValue<br/>(per agreement version)"] -->|"cbaa:bindsVariable"| DECL
-    VAL -->|"cbaa:value"| Q["qnt:Quantity or concept<br/>or party reference"]
+    DECL["wim:EmbeddedVariable<br/>declaration 6.11"] -->|"wim:populationMethod"| PM["population method<br/>pick list, lookup, rule, entry"]
+    DECL -->|"wim:admissibleValues"| RNG["qnt:RangeSet<br/>e.g. at least 7 years"]
+    VAL["agr:VariableValue<br/>(per agreement version)"] -->|"agr:forVariable"| DECL
+    VAL -->|"agr:value"| Q["qnt:Quantity or concept<br/>or party reference"]
 ```
 
 ### 4.7 Statement kinds
@@ -414,17 +420,17 @@ A statement is the unit of attached meaning. Its kind fixes its parameter struct
 
 ```mermaid
 flowchart TB
-    ST["cbaa:Statement"] --> P["Prescriptive"]
+    ST["stm:Statement"] --> P["Prescriptive"]
     ST --> CO["Constitutive"]
     ST --> ME["Meta"]
-    P --> OB["cbaa:Obligation ⊑ ins:Obligation"]
-    P --> PR["cbaa:Prohibition"]
-    P --> PE["cbaa:Permission"]
-    P --> PW["cbaa:Power"]
-    P --> AG["cbaa:AuthorityGrant"]
-    CO --> DF["cbaa:Definition"]
-    CO --> CL["cbaa:Classification"]
-    ME --> PC["cbaa:Precedence"]
+    P --> OB["stm:Obligation<br/>(bound: ⊑ ins:Obligation)"]
+    P --> PR["stm:Prohibition"]
+    P --> PE["stm:Permission"]
+    P --> PW["stm:Power"]
+    P --> AG["stm:AuthorityGrant"]
+    CO --> DF["stm:Definition"]
+    CO --> CL["stm:Classification"]
+    ME --> PC["stm:Precedence"]
 ```
 
 The kinds are pairwise disjoint. The prescriptive and constitutive split follows LegalRuleML.
@@ -433,15 +439,15 @@ The kinds are pairwise disjoint. The prescriptive and constitutive split follows
 
 ```mermaid
 flowchart LR
-    W["Wording object version<br/>(any WIM node)"] -->|"cbaa:expresses"| TP["cbaa:StatementTemplate"]
-    TP -->|"cbaa:expressedBy ⊑ prov:wasDerivedFrom"| W
-    BS["cbaa:BoundStatement<br/>(per agreement version)"] -->|"cbaa:boundFrom ⊑ prov:wasDerivedFrom"| TP
+    W["Wording object version<br/>(any WIM node)"] -->|"stm:expresses"| TP["stm:StatementTemplate"]
+    TP -->|"stm:expressedBy ⊑ prov:wasDerivedFrom"| W
+    BS["stm:BoundStatement<br/>(per agreement version)"] -->|"stm:boundFrom ⊑ prov:wasDerivedFrom"| TP
 ```
 
 ```text
 StatementTemplate ⊓ BoundStatement ⊑ ⊥
 BoundStatement    ⊑ =1 boundFrom.StatementTemplate
-StatementTemplate ⊑ ∃expressedBy.WimObject
+StatementTemplate ⊑ ∃expressedBy.WordingObject
 ```
 
 A template names roles and variable declarations. A bound statement names role occupancies and
@@ -451,28 +457,30 @@ values. The meaning is extracted once per wording, and bound many times.
 
 ```mermaid
 flowchart LR
-    OB["cbaa:Obligation<br/>(template)"] -->|"cbaa:bearer"| RO["pty:Role<br/>Coverholder"]
-    OB -->|"cbaa:activity"| AC["activity concept<br/>FNOL onward transfer"]
-    OB -->|"cbaa:trigger"| TR["bhv:TransitionDefinition<br/>FNOL received"]
-    OB -->|"cbaa:deadline"| DL["qnt:AnchorBinding<br/>1 business day after trigger"]
+    OB["stm:Obligation<br/>(template)"] -->|"stm:bearer"| RO["pty:Role<br/>Coverholder"]
+    OB -->|"stm:activity"| AC["activity concept<br/>FNOL onward transfer"]
+    OB -->|"stm:trigger"| TR["bhv:TriggerDefinition<br/>FNOL received"]
+    OB -->|"stm:deadline"| DL["qnt:Range<br/>within 1 business day"]
 ```
 
-Once bound, the bearer is a role occupancy, and `ins:obligor` and `ins:obligee` name who owes
-and who is owed.
+The deadline's value comes from the clause's variable through a `stm:ParameterBinding`. Once
+bound, the obligation is an `ins:Obligation`, and `ins:obligor` and `ins:obligee` name the role
+occupancies that owe and are owed.
 
 ### 4.10 Parameters of an authority grant
 
 ```mermaid
 flowchart LR
-    AG["cbaa:AuthorityGrant"] -->|"cbaa:grantee"| R["pty:Role<br/>Coverholder"]
-    AG -->|"cbaa:activity"| A["activity concept<br/>underwriting"]
-    AG -->|"cbaa:scope"| P["elg:AdmissionProfile"]
-    AG -->|"cbaa:level"| L["qnt:OrdinalValue<br/>level of authority"]
+    AG["stm:AuthorityGrant<br/>(template)"] -->|"stm:bearer"| R["pty:Role<br/>Coverholder"]
+    AG -->|"stm:activity"| A["activity concept<br/>underwriting"]
+    AG -->|"stm:hasParameterBinding"| P["scope parameters<br/>variable, case class, path"]
+    AG -->|"stm:level"| L["qnt:OrdinalValue<br/>level of authority"]
 ```
 
 ```text
-AuthorityGrant ⊑ =1 activity.⊤ ⊓ =1 grantee.pty:Role
-                 ⊓ =1 scope.elg:AdmissionProfile ⊓ ≤1 level.qnt:OrdinalValue
+PrescriptiveStatement ⊓ StatementTemplate ⊑ =1 bearer.pty:Role ⊓ =1 activity.⊤
+AuthorityGrant ⊓ BoundStatement ⊑ =1 scope.elg:AdmissionProfile
+                                  ⊓ =1 bearerOccupancy.pty:RoleOccupancy
 ```
 
 ### 4.11 A grant's scope: one condition per dimension
@@ -498,14 +506,17 @@ question object (LATTICE ADR-A91).
 ```mermaid
 flowchart LR
     EB["elg:EvidenceBinding"] -->|"elg:bindsCondition"| C2["risk location condition"]
-    EB -->|"elg:subjectClass"| RK["cbaa:Risk<br/>(the case)"]
+    EB -->|"elg:subjectClass"| RK["rsk:Risk<br/>(the case)"]
     EB -->|"elg:evidenceStep"| ST["elg:EvidenceStep<br/>index 0, forward"]
-    ST -->|"elg:stepProperty"| RL["cbaa:riskLocation"]
+    ST -->|"elg:stepProperty"| RL["rsk:riskLocation"]
     EB -->|"elg:singleValued"| TRUE["true: one deemed<br/>location per risk"]
 ```
 
 The case is the risk, because the CBAA's rules speak of where a risk "is deemed to be located",
-one location per risk. A policy covering several risks gives several cases.
+one location per risk. A policy covering several risks gives several cases. The contract type
+is read in two steps, the risk's policy and then its contract type, and both are single-valued.
+The grant template's scope parameters carry these paths, and binding copies them into the
+evidence bindings.
 
 ### 4.13 Amounts, bounds and currencies
 
@@ -525,7 +536,7 @@ its own currency, never converted. A case in a currency with no stated limit is 
 
 ```mermaid
 flowchart LR
-    PROP["cbaa:riskLocation"] -.->|"named by"| SC["voc:SchemeContract<br/>territory"]
+    PROP["rsk:riskLocation"] -.->|"named by"| SC["voc:SchemeContract<br/>territory"]
     SB1["voc:SchemeBinding"] -->|"voc:forContract"| SC
     SB1 -->|"voc:bindsScheme"| E1["voc:ConceptScheme<br/>ISO 3166, 2026 edition"]
     SB1 -->|"voc:bindingScope"| BS["voc:BindingScope<br/>Lloyd's market"]
@@ -542,7 +553,7 @@ meant.
 flowchart LR
     RO["pty:RoleOccupancy"] -->|"pty:occupiedBy"| A["pty:Actor<br/>Harbour Underwriting Ltd"]
     RO -->|"pty:inRole"| R["pty:Role<br/>Coverholder"]
-    AV["agreement version"] -->|"cbaa:hasOccupancy"| RO
+    AV["agreement version"] -->|"agr:hasOccupancy"| RO
     RO -.-> T["fnd:TemporallyScoped"]
 ```
 
@@ -576,7 +587,7 @@ flowchart LR
     ID["fnd:PersistentIdentity<br/>(opaque surrogate)"] --> V1["agreement version 1<br/>accepted"]
     ID --> V2["agreement version 2<br/>after amendment"]
     V1 -->|"fnd:supersededBy"| V2
-    AM["cbaa:Amendment"] -->|"produces"| V2
+    AM["agr:Amendment"] -->|"produces"| V2
     UMR["UMR<br/>claimed key, unique per market"] -.-> ID
 ```
 
@@ -616,8 +627,8 @@ flowchart LR
 flowchart RL
     DEC["decision on a case"] -->|"prov:wasDerivedFrom"| ART["compiled artefact"]
     ART -->|"prov:wasDerivedFrom"| BS["bound statement"]
-    BS -->|"cbaa:boundFrom"| TP["statement template"]
-    TP -->|"cbaa:expressedBy"| W["wording object version"]
+    BS -->|"stm:boundFrom"| TP["statement template"]
+    TP -->|"stm:expressedBy"| W["wording object version"]
     ART -->|"prov:wasDerivedFrom"| ED["scheme edition"]
 ```
 
@@ -674,25 +685,27 @@ sequenceDiagram
 
 The agreement: Harbour Underwriting Ltd is the Coverholder. Lead Insurer A takes 60% and Follow
 Insurer B 40%, with a broker. The grant covers insurance, risks in France except Corsica, and
-sums insured up to GBP 5,000,000 or EUR 5,750,000.
+sums insured up to GBP 5,000,000 or EUR 5,750,000. The whole agreement, with its library
+wording, an amendment and the four cases below, is
+[ontology/examples/ba-2026-001.ttl](../ontology/examples/ba-2026-001.ttl).
 
 **The agreement and its parties**
 
 ```mermaid
 flowchart LR
-    V["ex:BA-2026-001-v1<br/>agreement version"] -->|"cbaa:hasOccupancy"| RO1["Harbour Underwriting<br/>as Coverholder"]
-    V -->|"cbaa:hasOccupancy"| RO2["Lead Insurer A"]
-    V -->|"cbaa:hasOccupancy"| RO3["Follow Insurer B"]
-    V -->|"cbaa:hasOccupancy"| RO4["the Broker"]
+    V["ex:BA-2026-001-v1<br/>agr:AgreementVersion"] -->|"agr:hasOccupancy"| RO1["Harbour Underwriting<br/>as Coverholder"]
+    V -->|"agr:hasOccupancy"| RO2["Lead Insurer A"]
+    V -->|"agr:hasOccupancy"| RO3["Follow Insurer B"]
+    V -->|"agr:hasOccupancy"| RO4["the Broker"]
 ```
 
 **The bound grant**
 
 ```mermaid
 flowchart LR
-    BG["ex:grant-uw<br/>cbaa:BoundStatement, cbaa:AuthorityGrant"] -->|"cbaa:boundFrom"| TP["template on C05.2 v3"]
-    BG -->|"cbaa:grantee"| RO1["Harbour as Coverholder"]
-    BG -->|"cbaa:scope"| P["ex:scope-uw<br/>elg:AdmissionProfile"]
+    BG["ex:grant-uw<br/>stm:BoundStatement, stm:AuthorityGrant"] -->|"stm:boundFrom"| TP["template on C05.2 v3"]
+    BG -->|"stm:bearerOccupancy"| RO1["Harbour as Coverholder"]
+    BG -->|"stm:scope"| P["ex:scope-uw<br/>elg:AdmissionProfile"]
 ```
 
 **The scope, bound to this agreement's values**
@@ -774,7 +787,7 @@ ConceptPlan  risk location
   scheme     ISO 3166, 2026 edition (resolved from the pinned binding)
   expansion  France → Permitted, Île-de-France → Permitted, ...,
              Corsica → Denied, Haute-Corse → Denied, Europe → Undetermined, ...
-  evidence   subject cbaa:Risk, path cbaa:riskLocation, single-valued
+  evidence   subject rsk:Risk, path rsk:riskLocation, single-valued
 ```
 
 ### 6.3 SPARQL: the runtime decision
@@ -798,8 +811,8 @@ gives `Denied`, otherwise one `Undetermined` gives `Undetermined`.
 
 ```mermaid
 flowchart LR
-    SH["sh:NodeShape<br/>target: cbaa:Risk"] -->|"sh:sparql"| Q["containment check<br/>from the IR"]
-    ROW["bordereau row as cbaa:Risk"] --> V{"SHACL engine"}
+    SH["sh:NodeShape<br/>target: rsk:Risk"] -->|"sh:sparql"| Q["containment check<br/>from the IR"]
+    ROW["bordereau row as rsk:Risk"] --> V{"SHACL engine"}
     SH --> V
     V -->|"conforms"| OK["accepted"]
     V -->|"violation"| REP["report: focus node, message,<br/>generating plan → grant → wording"]
@@ -818,8 +831,8 @@ and want those facts materialised.
 ### 6.6 OWL: classes for design-time questions
 
 ```text
-Env_g ≡ cbaa:Risk
-        ⊓ ≤1 contractType ⊓ ∃contractType.{Insurance}
+Env_g ≡ rsk:Risk
+        ⊓ ≤1 ofPolicy ⊓ ∃ofPolicy.(≤1 contractType ⊓ ∃contractType.{Insurance})
         ⊓ ≤1 riskLocation ⊓ ∃riskLocation.(Within(France) ⊓ ¬Within(Corsica))
         ⊓ ≤1 sumInsured ⊓ ∃sumInsured.( (∃qnt:inUnit.{GBP} ⊓ ∃qnt:numericValue.owl:real[≤ 5000000])
                                       ⊔ (∃qnt:inUnit.{EUR} ⊓ ∃qnt:numericValue.owl:real[≤ 5750000]) )
@@ -1115,13 +1128,13 @@ agreements run in parallel on as many nodes as needed.
 
 | Part | State |
 |---|---|
-| WIM structure (`core`, `de`, `cls`, `agr`, `pol`) | authored. Reclassification of type trees into schemes planned (plan step 3) |
+| Wording structure (`wim`), with typing reclassified into provisional schemes (`lma`) | authored as static ontologies with shapes (plan step 3) |
 | LATTICE layers and compilers (SPARQL, SHACL, SWRL, OWL, Surface) | built upstream, released by tag |
 | Import resolution | `ontology/catalog-v001.xml`, generated from LATTICE's release register |
-| Meaning module (`cbaa:` statement kinds, templates, bound statements) | designed, not authored (plan step 4) |
-| Scheme contracts and vocabularies | designed (design-spec §4.5), not authored |
+| Meaning, agreements and the case (`stm`, `agr`, `rsk`) | authored as static ontologies with shapes and the worked agreement of §5.3 (plan step 4). Decisions D17 to D26 await ratification |
+| Scheme contracts and vocabularies | authored. Deployment editions (territories, perils, currencies) are bound per market, not shipped |
 | Compilation and persistence modules | designed, not authored (plan step 5) |
-| Lifecycles | designed, not authored (plan step 6) |
+| Lifecycles | M12 declared on Behaviour. The others designed, not authored (plan step 6) |
 | HTTP API, broker, workers | outside this repository (AP1). See the [proof-of-concept notes](discovery/poc-ideas.md) |
 | Meaning production (InsurLE, extraction) | outside this repository. See design-spec §3.7 and LATTICE's ingestion vision |
 

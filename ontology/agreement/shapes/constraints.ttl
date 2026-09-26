@@ -1,0 +1,119 @@
+@prefix sh:   <http://www.w3.org/ns/shacl#> .
+@prefix agr:  <https://nebularis.github.io/open-cbaa/ontology/agreement#> .
+
+# Agreements: whole-graph constraints (SHACL-SPARQL).
+
+agr:AgreementCategoryShape a sh:NodeShape ;
+    sh:targetClass agr:AgreementVersion ;
+    sh:sparql [
+        sh:message "An agreement version's contract category is Agreement or a narrower agreement type." ;
+        sh:select """
+            PREFIX wim:  <https://nebularis.github.io/open-cbaa/ontology/wim#>
+            PREFIX lma:  <https://nebularis.github.io/open-cbaa/ontology/schemes/lma#>
+            PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+            SELECT $this ?value WHERE {
+                $this wim:contractCategory ?value .
+                FILTER NOT EXISTS { ?value skos:broader* lma:Agreement }
+                FILTER NOT EXISTS { ?value skos:broader*/skos:exactMatch lma:Agreement }
+            }
+        """ ;
+    ] .
+
+agr:OneVariantPerSlotShape a sh:NodeShape ;
+    sh:targetClass agr:AgreementVersion ;
+    sh:sparql [
+        sh:message "An agreement version that includes a slot's parent includes exactly one of the slot's variants." ;
+        sh:select """
+            PREFIX wim: <https://nebularis.github.io/open-cbaa/ontology/wim#>
+            PREFIX agr: <https://nebularis.github.io/open-cbaa/ontology/agreement#>
+            SELECT $this ?value WHERE {
+                {
+                    SELECT $this ?value (COUNT(DISTINCT ?included) AS ?n) WHERE {
+                        $this agr:includes ?parent .
+                        ?parent wim:directlyComprises ?variant .
+                        ?variant wim:variantOf ?value .
+                        OPTIONAL { ?value wim:hasVariant ?included . $this agr:includes ?included . }
+                    }
+                    GROUP BY $this ?value
+                }
+                FILTER (?n != 1)
+            }
+        """ ;
+    ] .
+
+agr:MandatoryIncludedShape a sh:NodeShape ;
+    sh:targetClass agr:AgreementVersion ;
+    sh:sparql [
+        sh:message "An agreement version that includes a wording object includes its mandatory children. A child with no inclusion mode is mandatory." ;
+        sh:select """
+            PREFIX wim: <https://nebularis.github.io/open-cbaa/ontology/wim#>
+            PREFIX agr: <https://nebularis.github.io/open-cbaa/ontology/agreement#>
+            SELECT $this ?value WHERE {
+                $this agr:includes ?parent .
+                ?parent wim:directlyComprises ?value .
+                FILTER NOT EXISTS { ?value wim:inclusionMode ?mode . FILTER (?mode != wim:Mandatory) }
+                FILTER NOT EXISTS { $this agr:includes ?value }
+            }
+        """ ;
+    ] .
+
+agr:StatementFromIncludedWordingShape a sh:NodeShape ;
+    sh:targetClass agr:AgreementVersion ;
+    sh:sparql [
+        sh:message "A bound statement of an agreement version is bound from a template of wording the version includes." ;
+        sh:select """
+            PREFIX agr: <https://nebularis.github.io/open-cbaa/ontology/agreement#>
+            PREFIX stm: <https://nebularis.github.io/open-cbaa/ontology/statement#>
+            SELECT $this ?value WHERE {
+                $this agr:hasStatement ?value .
+                ?value stm:boundFrom ?template .
+                FILTER NOT EXISTS { ?template stm:expressedBy|^stm:expresses ?wording . $this agr:includes ?wording }
+            }
+        """ ;
+    ] .
+
+agr:StatementPartiesShape a sh:NodeShape ;
+    sh:targetClass agr:AgreementVersion ;
+    sh:sparql [
+        sh:message "A bound statement's bearer or counterparty is one of the agreement version's own occupancies." ;
+        sh:select """
+            PREFIX agr: <https://nebularis.github.io/open-cbaa/ontology/agreement#>
+            PREFIX stm: <https://nebularis.github.io/open-cbaa/ontology/statement#>
+            PREFIX ins: <https://www.nebularis.org/neuro-semantic/lattice/instrument#>
+            SELECT $this ?value WHERE {
+                $this agr:hasStatement ?statement .
+                ?statement stm:bearerOccupancy|stm:counterpartyOccupancy|ins:obligor|ins:obligee ?value .
+                FILTER NOT EXISTS { $this agr:hasOccupancy ?value }
+            }
+        """ ;
+    ] .
+
+agr:UniqueUMRShape a sh:NodeShape ;
+    sh:targetClass agr:AgreementVersion ;
+    sh:sparql [
+        sh:message "The UMR is a key claimed per market: two active agreements in a market do not share one." ;
+        sh:select """
+            PREFIX agr: <https://nebularis.github.io/open-cbaa/ontology/agreement#>
+            PREFIX fnd: <https://www.nebularis.org/neuro-semantic/lattice/foundation#>
+            SELECT $this ?value WHERE {
+                $this agr:umr ?value ; agr:inMarket ?market ; fnd:hasIdentity ?identity ; fnd:hasGovernanceState fnd:Active .
+                ?other agr:umr ?value ; agr:inMarket ?market ; fnd:hasIdentity ?otherIdentity ; fnd:hasGovernanceState fnd:Active .
+                FILTER (?identity != ?otherIdentity)
+            }
+        """ ;
+    ] .
+
+agr:AmendmentKeepsIdentityShape a sh:NodeShape ;
+    sh:targetClass agr:Amendment ;
+    sh:sparql [
+        sh:message "An amendment produces a version of the same agreement. A change that ends the agreement (a new Coverholder entity, Lead Insurer or broker number) mints a new identity instead (M3 3.9.1)." ;
+        sh:select """
+            PREFIX agr: <https://nebularis.github.io/open-cbaa/ontology/agreement#>
+            PREFIX fnd: <https://www.nebularis.org/neuro-semantic/lattice/foundation#>
+            SELECT $this WHERE {
+                $this agr:amends ?before ; agr:resultsIn ?after .
+                ?before fnd:hasIdentity ?identity .
+                FILTER NOT EXISTS { ?after fnd:hasIdentity ?identity }
+            }
+        """ ;
+    ] .

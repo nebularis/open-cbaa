@@ -1,0 +1,169 @@
+@prefix stm:  <https://nebularis.github.io/open-cbaa/ontology/statement#> .
+@prefix act:  <https://nebularis.github.io/open-cbaa/ontology/schemes/activity#> .
+@prefix lma:  <https://nebularis.github.io/open-cbaa/ontology/schemes/lma#> .
+@prefix fnd:  <https://www.nebularis.org/neuro-semantic/lattice/foundation#> .
+@prefix voc:  <https://www.nebularis.org/neuro-semantic/lattice/vocabulary#> .
+@prefix qnt:  <https://www.nebularis.org/neuro-semantic/lattice/quantification#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+# Open CBAA — Meaning vocabulary.
+#
+# V1 enumerations for the meaning module, the scheme contracts its
+# concept-valued parameters are drawn under, and the value spaces its
+# quantities are stated in. Units of those spaces that belong to a market
+# standard (ISO 4217 currencies) are not authored here: the currency family
+# is declared, and its units come from a deployment's edition.
+
+<https://nebularis.github.io/open-cbaa/ontology/statement-vocab> a owl:Ontology ;
+    rdfs:label "Open CBAA — Meaning vocabulary"@en ;
+    owl:versionIRI <https://nebularis.github.io/open-cbaa/ontology/statement-vocab/0.1.0> ;
+    owl:imports <https://nebularis.github.io/open-cbaa/ontology/statement/0.1.0> ,
+                <https://www.nebularis.org/neuro-semantic/lattice/foundation-vocab/0.3.0> .
+
+#################################################################
+# Parameter kinds
+#################################################################
+
+stm:BearerParameter a owl:NamedIndividual , stm:ParameterKind ;
+    rdfs:label "Bearer"@en ;
+    rdfs:comment "The variable names the party holding the bearer role (the Coverholder's name)."@en .
+stm:CounterpartyParameter a owl:NamedIndividual , stm:ParameterKind ;
+    rdfs:label "Counterparty"@en .
+stm:ScopeInclusion a owl:NamedIndividual , stm:ParameterKind ;
+    rdfs:label "Scope inclusion"@en ;
+    rdfs:comment "The variable's concepts are required concepts of a scope condition (authorised territories)."@en .
+stm:ScopeExclusion a owl:NamedIndividual , stm:ParameterKind ;
+    rdfs:label "Scope exclusion"@en ;
+    rdfs:comment "The variable's concepts are excluded concepts of a scope condition (excluded sub-territories)."@en .
+stm:ScopeLimit a owl:NamedIndividual , stm:ParameterKind ;
+    rdfs:label "Scope limit"@en ;
+    rdfs:comment "The variable's quantity bounds an interval condition of the scope (maximum sum insured)."@en .
+stm:LevelParameter a owl:NamedIndividual , stm:ParameterKind ;
+    rdfs:label "Level"@en .
+stm:DeadlineParameter a owl:NamedIndividual , stm:ParameterKind ;
+    rdfs:label "Deadline"@en ;
+    rdfs:comment "The variable's duration is the offset of the deadline from the trigger (1 business day)."@en .
+stm:RecurrenceParameter a owl:NamedIndividual , stm:ParameterKind ;
+    rdfs:label "Recurrence"@en .
+
+[] a owl:AllDifferent ; owl:distinctMembers ( stm:BearerParameter stm:CounterpartyParameter stm:ScopeInclusion
+    stm:ScopeExclusion stm:ScopeLimit stm:LevelParameter stm:DeadlineParameter stm:RecurrenceParameter ) .
+
+#################################################################
+# Encoding statuses
+#################################################################
+
+stm:Encoded a owl:NamedIndividual , stm:EncodingStatus ;
+    rdfs:label "Encoded"@en ;
+    rdfs:comment "The wording object expresses at least one statement template."@en .
+stm:NoComputableContent a owl:NamedIndividual , stm:EncodingStatus ;
+    rdfs:label "No computable content"@en ;
+    rdfs:comment "Assessed: the wording carries no computable meaning, such as a recital."@en .
+stm:NotYetAssessed a owl:NamedIndividual , stm:EncodingStatus ;
+    rdfs:label "Not yet assessed"@en .
+
+[] a owl:AllDifferent ; owl:distinctMembers ( stm:Encoded stm:NoComputableContent stm:NotYetAssessed ) .
+
+#################################################################
+# Scheme contracts
+#################################################################
+
+stm:ActivityContract a voc:SchemeContract ;
+    rdfs:label "Activity contract"@en ;
+    fnd:hasIdentity stm:ActivityContract-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    voc:constrainsProperty stm:activity ;
+    voc:boundScheme act:ActivityScheme .
+
+stm:BreachTreatmentContract a voc:SchemeContract ;
+    rdfs:label "Breach treatment contract"@en ;
+    fnd:hasIdentity stm:BreachTreatmentContract-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    voc:constrainsProperty stm:breachTreatment ;
+    voc:boundScheme lma:ClauseClassificationScheme ;
+    rdfs:comment "Values are the concepts under lma:Conditions."@en .
+
+stm:ClassificationContract a voc:SchemeContract ;
+    rdfs:label "Classification contract"@en ;
+    fnd:hasIdentity stm:ClassificationContract-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    voc:constrainsProperty stm:classifiedAs ;
+    rdfs:comment "Unbound: each classification statement names the scheme its concept comes from, as the M4 US classifications do. A deployment may bind one."@en .
+
+#################################################################
+# Value spaces
+#################################################################
+
+stm:MoneySpace a qnt:ValueSpace ;
+    rdfs:label "Money"@en ;
+    fnd:hasIdentity stm:MoneySpace-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    qnt:spaceKey "open-cbaa:money" ;
+    qnt:spaceHash "open-cbaa:money:v1" ;
+    qnt:orderKind qnt:TotalOrder ;
+    qnt:densityKind qnt:Dense ;
+    qnt:unitContract stm:CurrencyUnitContract ;
+    qnt:hasOperationCapability stm:MoneyCompare , stm:MoneyContains , stm:MoneySum , stm:MoneyDifference ;
+    rdfs:comment "Amounts of money, each in one currency. Amounts in different currencies are not compared without a conversion context (Undetermined otherwise), and a limit stated in several currencies uses alternative bounds (qnt:alternativeBound)."@en .
+
+stm:CurrencyUnitContract a qnt:UnitContract ;
+    fnd:hasIdentity stm:CurrencyUnitContract-identity ;
+    qnt:requiresUnit true ;
+    qnt:unitFamily stm:Currencies .
+
+stm:Currencies a qnt:UnitFamily ;
+    rdfs:label "Currencies"@en ;
+    rdfs:comment "ISO 4217 currencies. The units are a market standard (tier V2) and come from a deployment's edition."@en .
+
+stm:MoneyCompare a qnt:OperationCapability ; fnd:hasIdentity stm:MoneyCompare-identity ; qnt:operationKind qnt:Compare .
+stm:MoneyContains a qnt:OperationCapability ; fnd:hasIdentity stm:MoneyContains-identity ; qnt:operationKind qnt:Contains ;
+    qnt:rangeSemanticsKind qnt:ExactRangeSemantics ; qnt:participatesInMeet true .
+stm:MoneySum a qnt:OperationCapability ; fnd:hasIdentity stm:MoneySum-identity ; qnt:operationKind qnt:Sum ; qnt:resultSpace stm:MoneySpace ;
+    rdfs:comment "Accumulators (aggregate GWP limits) sum premiums in one currency."@en .
+stm:MoneyDifference a qnt:OperationCapability ; fnd:hasIdentity stm:MoneyDifference-identity ; qnt:operationKind qnt:Difference ; qnt:resultSpace stm:MoneySpace .
+
+stm:DurationSpace a qnt:ValueSpace ;
+    rdfs:label "Duration"@en ;
+    fnd:hasIdentity stm:DurationSpace-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    qnt:spaceKey "open-cbaa:duration" ;
+    qnt:spaceHash "open-cbaa:duration:v1" ;
+    qnt:orderKind qnt:TotalOrder ;
+    qnt:densityKind qnt:Discrete ;
+    qnt:unitContract stm:DurationUnitContract ;
+    qnt:hasOperationCapability stm:DurationCompare , stm:DurationContains , stm:DurationSum ;
+    rdfs:comment "Periods and offsets: notice periods, rectification periods, deadlines, retention periods."@en .
+
+stm:DurationUnitContract a qnt:UnitContract ;
+    fnd:hasIdentity stm:DurationUnitContract-identity ;
+    qnt:requiresUnit true ;
+    qnt:unitFamily stm:DurationUnits ;
+    qnt:canonicalUnit stm:Day .
+
+stm:DurationUnits a qnt:UnitFamily ; rdfs:label "Duration units"@en .
+
+stm:Day a qnt:Unit ; rdfs:label "day"@en ; rdfs:comment "A calendar day of 24 hours, ending at 24:00 (M2 guidance)."@en .
+stm:BusinessDay a qnt:CalendarUnit ; rdfs:label "business day"@en ;
+    rdfs:comment "A working day under a calendar. Any conversion to or from days is Contextual: its context names the calendar's scheme contract and the position counted from (ADR-A94)."@en .
+stm:Month a qnt:CalendarUnit ; rdfs:label "month"@en .
+stm:Year a qnt:CalendarUnit ; rdfs:label "year"@en .
+
+stm:DurationCompare a qnt:OperationCapability ; fnd:hasIdentity stm:DurationCompare-identity ; qnt:operationKind qnt:Compare .
+stm:DurationContains a qnt:OperationCapability ; fnd:hasIdentity stm:DurationContains-identity ; qnt:operationKind qnt:Contains ;
+    qnt:rangeSemanticsKind qnt:ExactRangeSemantics ; qnt:participatesInMeet true .
+stm:DurationSum a qnt:OperationCapability ; fnd:hasIdentity stm:DurationSum-identity ; qnt:operationKind qnt:Sum ; qnt:resultSpace stm:DurationSpace .
+
+stm:AuthorityLevelSpace a qnt:ValueSpace ;
+    rdfs:label "Level of authority"@en ;
+    fnd:hasIdentity stm:AuthorityLevelSpace-identity ;
+    fnd:hasGovernanceState fnd:Active ;
+    qnt:spaceKey "open-cbaa:authority-level" ;
+    qnt:spaceHash "open-cbaa:authority-level:v1" ;
+    qnt:orderKind qnt:TotalOrder ;
+    qnt:densityKind qnt:Discrete ;
+    qnt:hasOperationCapability stm:AuthorityLevelCompare ;
+    rdfs:comment "Ordered levels of authority, as ordinal values whose concepts come from a market's level scheme (tier V2)."@en .
+
+stm:AuthorityLevelCompare a qnt:OperationCapability ; fnd:hasIdentity stm:AuthorityLevelCompare-identity ; qnt:operationKind qnt:Compare .
