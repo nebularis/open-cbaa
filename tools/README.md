@@ -2,6 +2,19 @@
 
 Utilities that support the semantic work in `ontology/`. They are not part of any runtime.
 
+## lattice_catalog.py
+
+Regenerates `ontology/catalog-v001.xml`, the OASIS XML catalog Protégé and the OWL API read
+from the directory of the ontology they open. It maps each Open CBAA ontology IRI to its file,
+and each released LATTICE version IRI to its raw file at its release tag, read from LATTICE's
+[release register](https://nebularis.github.io/lattice/architecture/ontology-releases.html).
+Run it after importing a new LATTICE version. Python 3.10+, standard library only, network
+access to GitHub.
+
+```bash
+python3 tools/lattice_catalog.py
+```
+
 ## cbaa_extract.py
 
 Renders CBAA module drafts and table files as annotated plain text, so they can be read,

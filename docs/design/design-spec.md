@@ -575,6 +575,7 @@ Not yet applied. Applying DP1 and DP2 to the files in this directory:
 | D13 | Instrument and Behaviour are imported without waiting, since L6 is fixed upstream (was I2) | 2026-09-25 |
 | D14 | Envelope and hierarchy classes come from LATTICE's OWL backend on the shared IR, ADR-A90 (was I4) | 2026-09-25 |
 | D15 | The repository is renamed Open CBAA, and its ontology IRIs move to `https://nebularis.github.io/open-cbaa/`, before version IRIs are assigned (§3.4 of the integration specification) | 2026-09-25 |
+| D16 | LATTICE imports resolve through a catalog that maps each released LATTICE version IRI to its file at its release tag, so an ontology opens in Protégé without a LATTICE checkout. The submodule remains for LATTICE's tooling (integration spec §3.3) | 2026-09-26 |
 
 ### Open
 

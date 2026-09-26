@@ -58,8 +58,8 @@ Then the gate decides timing, and nothing is waived. The gate's own conditions a
 
 | Step | Where | Work | Needs |
 |---|---|---|---|
-| 1 | LATTICE | L11: the versioning and catalog checks run on push and pull request. The missing-version check covers consumer layouts. L14: `ontology_catalog.py write` emits a consumer's `nextCatalog` chain | nothing |
-| 2 | here | Submodule `imports/lattice` at the step-1 commit replaces the ignored symlink. Generated `ontology/catalog-v001.xml`. Version IRIs on our six documents (I5), all at `0.1.0` under `open-cbaa`. Import Foundation, Vocabulary and Party. Run the gate | step 1 |
+| 1 | LATTICE | L11: the versioning and catalog checks run on push and pull request. The missing-version check covers consumer layouts. (L14 is superseded by the tag-based catalog, D16) | nothing |
+| 2 | here | Submodule `imports/lattice` at the step-1 commit replaces the ignored symlink, for LATTICE's tooling. `ontology/catalog-v001.xml` already resolves LATTICE imports by release tag (D16). Version IRIs on our six documents (I5), all at `0.1.0` under `open-cbaa`. Import Foundation, Vocabulary and Party. Run the gate | step 1 |
 | 3 | here | Reclassification (design-spec §11): schemes as `voc:ConceptScheme` editions, properties bound by `voc:SchemeContract` | step 2 |
 | 4 | here | Meaning module: statement kinds, templates and bound statements, on Party, Eligibility and Instrument, with attachment per I6. Designed as the target of InsurLE compilation and LLM extraction (design-spec §3.7): parameters in Quantification terms, scopes as Eligibility profiles, and suggestion provenance expressible | step 3, I6, I8, I10 |
 | 5 | LATTICE, then here | L13 upstream first. Then the compilation module (Surface contracts, profile), the Persistence profile module and the design-time classes | L13, I7, I9 |

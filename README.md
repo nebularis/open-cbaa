@@ -11,7 +11,7 @@ The principles governing this repository and anything built on it are set out in
 
 ### Repository Structure
 
-- `ontology/` — normative OWL 2 ontology sources and their [README](ontology/README.md)
+- `ontology/` — normative OWL 2 ontology sources, their [README](ontology/README.md), and `catalog-v001.xml`, which Protégé reads to resolve imports, LATTICE's included, without a LATTICE checkout
 - `docs/design/` — the [design specification](docs/design/design-spec.md), the [LATTICE integration specification](docs/design/lattice-integration.md), the [LATTICE design review](docs/design/design-review.md) and the [vision and demo ideation](docs/design/ideation.md)
 - `docs/development/` — the working [plan](docs/development/plan.md)
 - `docs/discovery/` — a single-page, dependency-free illustration of the [vision and demo ideation](docs/design/ideation.md), and [prototype architecture discovery notes](docs/discovery/poc-ideas.md)

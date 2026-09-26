@@ -5,11 +5,11 @@ Structural ontology for the LMA Wordings Information Model (WIM), derived from
 This is the first stratum: the Object Class Hierarchy, its Typing/Sub-Typing, and the
 part-whole relation between them. The [design review](#design-review-cbaa-modules-m1m14)
 below assesses it against the CBAA module drafts (M1–M14) and proposes further strata. The
-[design specification](design/design-spec.md) turns that review into a concrete design, with
+[design specification](../docs/design/design-spec.md) turns that review into a concrete design, with
 the agreed architecture principles and a decision log, and the
-[LATTICE integration specification](design/lattice-integration.md) covers how LATTICE is
+[LATTICE integration specification](../docs/design/lattice-integration.md) covers how LATTICE is
 brought in and the description logic encoding. Neither is implemented yet. The
-[LATTICE design review](design/design-review.md) records the challenge to depending on LATTICE
+[LATTICE design review](../docs/design/design-review.md) records the challenge to depending on LATTICE
 and its outcome.
 
 ## Files
@@ -188,9 +188,9 @@ current lifecycle state, and extended by any special acceptances.
 ### Proposed strata
 
 The design specification refines this table: meaning as attached statements
-([§3](design/design-spec.md#3-what-a-clause-expresses)), vocabulary tiers and scoped binding
-([§4](design/design-spec.md#4-vocabulary)), and quantification taken from LATTICE
-([§5](design/design-spec.md#5-quantification-evaluation-of-lattice)).
+([§3](../docs/design/design-spec.md#3-what-a-clause-expresses)), vocabulary tiers and scoped binding
+([§4](../docs/design/design-spec.md#4-vocabulary)), and quantification taken from LATTICE
+([§5](../docs/design/design-spec.md#5-quantification-evaluation-of-lattice)).
 
 | Stratum | Content | Profile and mechanism |
 |---|---|---|
@@ -254,7 +254,7 @@ M12 confirms this split and adds three requirements:
 ### Decisions
 
 Decisions taken and still open are recorded in the design specification's
-[decision log](design/design-spec.md#12-decision-log).
+[decision log](../docs/design/design-spec.md#12-decision-log).
 
 ## Validation
 
@@ -265,4 +265,4 @@ No build pipeline yet. Modules are parsed with `rdflib`, merged with `owl:import
 ## Not yet modelled
 
 Everything in [Alignment gaps](#alignment-gaps). LATTICE is to be imported per the
-[integration specification](design/lattice-integration.md), whose §9 sets the order of work.
+[integration specification](../docs/design/lattice-integration.md), whose §9 sets the order of work.
