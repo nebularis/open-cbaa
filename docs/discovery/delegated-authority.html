@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Delegated Authority in the London Market — Open CBAA</title>
+<meta name="description" content="A guide to delegated underwriting and claims authority in the London insurance market: legal, regulatory, contractual, operational, financial, data, and governance dimensions." />
+<meta name="theme-color" content="#0a0d12" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 24'%3E%3Cpath d='M8 16 L16 8 L24 16 Z' fill='none' stroke='%23d8b467' stroke-width='1.6'/%3E%3Ccircle cx='8' cy='16' r='3.2' fill='%2357c48b'/%3E%3Ccircle cx='16' cy='8' r='3.2' fill='%23e0a83d'/%3E%3Ccircle cx='24' cy='16' r='3.2' fill='%23e2695f'/%3E%3C/svg%3E" />
+
+<style>
+  :root{
+    --bg: #0a0d12;
+    --panel: rgba(255,255,255,.035);
+    --panel-strong: rgba(255,255,255,.06);
+    --panel-border: rgba(255,255,255,.09);
+    --ink: #eef1f6;
+    --ink-dim: #99a2b2;
+    --ink-faint: #5c6579;
+    --gold: #d8b467;
+    --gold-bright: #f0cd82;
+    --gold-dim: rgba(216,180,103,.16);
+    --line: rgba(255,255,255,.08);
+    --font-serif: "Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",ui-serif,Georgia,serif;
+    --font-sans: -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,"Helvetica Neue",Arial,sans-serif;
+    --font-mono: ui-monospace,"SF Mono","Cascadia Code","Roboto Mono",Menlo,Consolas,monospace;
+  }
+  *,*::before,*::after{ box-sizing:border-box; }
+  html{ background:var(--bg); }
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:var(--font-sans); font-size:16px; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{ color:var(--gold); }
+  .wrap{ max-width:1180px; margin:0 auto; padding-inline:28px; }
+
+  nav.top{
+    position:sticky; top:0; z-index:10; background:rgba(10,13,18,.82);
+    backdrop-filter:blur(14px) saturate(140%); -webkit-backdrop-filter:blur(14px) saturate(140%);
+    border-bottom:1px solid var(--line);
+  }
+  nav.top .wrap{ display:flex; align-items:center; justify-content:space-between; height:64px; }
+  .brand{ display:flex; align-items:center; gap:10px; font-family:var(--font-serif); font-size:18px; text-decoration:none; color:var(--ink); }
+  .brand svg{ width:30px; height:22px; display:block; }
+  .back{ font-size:13.5px; color:var(--ink-dim); text-decoration:none; }
+  .back:hover{ color:var(--gold-bright); }
+
+  .layout{ display:grid; grid-template-columns:240px 1fr; gap:56px; padding:48px 28px 100px; align-items:start; }
+  .toc{ position:sticky; top:88px; max-height:calc(100vh - 110px); overflow-y:auto; font-size:12.8px; }
+  .toc h4{ font:700 10.5px/1 var(--font-mono); letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); margin:0 0 12px; }
+  .toc ul{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:2px; }
+  .toc li.lvl-h1 a{ font-weight:700; color:var(--ink); }
+  .toc li.lvl-h2 a{ padding-left:12px; color:var(--ink-dim); }
+  .toc a{ display:block; padding:4px 0; text-decoration:none; border-left:2px solid transparent; padding-left:10px; }
+  .toc a:hover{ color:var(--gold-bright); border-left-color:var(--gold); }
+  @media (max-width:900px){ .layout{ grid-template-columns:1fr; } .toc{ position:static; max-height:none; } }
+
+  .prose{ max-width:760px; }
+  .prose h1{ font-family:var(--font-serif); font-size:clamp(28px,4vw,38px); line-height:1.2; margin:56px 0 18px; scroll-margin-top:88px; }
+  .prose h1:first-child{ margin-top:0; }
+  .prose h2{ font-family:var(--font-serif); font-size:26px; border-top:1px solid var(--line); padding-top:36px; margin:44px 0 16px; scroll-margin-top:88px; }
+  .prose h2:first-child{ border-top:none; padding-top:0; }
+  .prose h3{ font-family:var(--font-serif); font-size:20px; margin:32px 0 12px; scroll-margin-top:88px; }
+  .prose h4{ font-size:15px; font-weight:700; margin:24px 0 10px; scroll-margin-top:88px; }
+  .prose p{ margin:0 0 16px; color:var(--ink-dim); }
+  .prose strong{ color:var(--ink); }
+  .prose ul,.prose ol{ margin:0 0 16px; padding-left:22px; color:var(--ink-dim); }
+  .prose li{ margin-bottom:6px; }
+  .prose li > p{ margin-bottom:6px; }
+  .prose blockquote{ margin:0 0 16px; padding:2px 20px; border-left:2px solid var(--gold); color:var(--ink-dim); }
+  .prose hr{ border:none; border-top:1px solid var(--line); margin:44px 0; }
+  .prose code{ font-family:var(--font-mono); font-size:.88em; background:var(--panel-strong); padding:2px 6px; border-radius:5px; color:var(--gold-bright); }
+  .prose pre{ background:var(--panel); border:1px solid var(--panel-border); border-radius:10px; padding:16px 18px; overflow-x:auto; margin:0 0 20px; }
+  .prose pre code{ background:none; padding:0; color:var(--ink); }
+  .prose table{ width:100%; border-collapse:collapse; margin:0 0 20px; font-size:14px; }
+  .prose th,.prose td{ text-align:left; padding:9px 12px; border-bottom:1px solid var(--panel-border); vertical-align:top; }
+  .prose th{ color:var(--ink-faint); font:700 11px/1.3 var(--font-mono); letter-spacing:.03em; text-transform:uppercase; }
+  .prose a{ text-decoration:underline; text-decoration-color:var(--gold-dim); text-underline-offset:2px; }
+  .prose img{ max-width:100%; }
+  .mermaid{
+    display:flex; justify-content:center; background:var(--panel); border:1px solid var(--panel-border);
+    border-radius:12px; padding:22px; margin:0 0 24px; overflow-x:auto;
+  }
+  .loading{ color:var(--ink-faint); font-family:var(--font-mono); font-size:13px; }
+  .error-box{ padding:16px 20px; border-radius:10px; background:rgba(226,105,95,.14); border:1px solid rgba(226,105,95,.35); color:var(--ink); }
+</style>
+</head>
+<body>
+
+<nav class="top">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <svg viewBox="0 0 32 24" fill="none"><path d="M8 16 L16 8 L24 16 Z" stroke="#d8b467" stroke-width="1.6"/><circle cx="8" cy="16" r="3.2" fill="#57c48b"/><circle cx="16" cy="8" r="3.2" fill="#e0a83d"/><circle cx="24" cy="16" r="3.2" fill="#e2695f"/></svg>
+      Open CBAA
+    </a>
+    <a class="back" href="index.html">&larr; Back to vision &amp; proof of value</a>
+  </div>
+</nav>
+
+<div class="wrap layout">
+  <aside class="toc"><h4>Contents</h4><ul id="tocList"></ul></aside>
+  <main class="prose" id="content"><p class="loading">Loading…</p></main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked@11/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+"use strict";
+
+const SOURCE = "../Delegated%20Authority%20in%20the%20London%20Market.md";
+const content = document.getElementById("content");
+const tocList = document.getElementById("tocList");
+
+function slugify(text, used){
+  let base = text.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  if(!base) base = "section";
+  let slug = base, n = 2;
+  while(used.has(slug)){ slug = base + "-" + (n++); }
+  used.add(slug);
+  return slug;
+}
+
+function buildToc(){
+  const used = new Set();
+  const headings = content.querySelectorAll("h1, h2");
+  const frag = document.createDocumentFragment();
+  headings.forEach(h => {
+    h.id = slugify(h.textContent, used);
+    const li = document.createElement("li");
+    li.className = h.tagName === "H1" ? "lvl-h1" : "lvl-h2";
+    const a = document.createElement("a");
+    a.href = "#" + h.id;
+    a.textContent = h.textContent;
+    li.appendChild(a);
+    frag.appendChild(li);
+  });
+  tocList.appendChild(frag);
+}
+
+function promoteMermaidBlocks(){
+  content.querySelectorAll("pre > code.language-mermaid").forEach(code => {
+    const div = document.createElement("div");
+    div.className = "mermaid";
+    div.textContent = code.textContent;
+    code.parentElement.replaceWith(div);
+  });
+}
+
+fetch(SOURCE)
+  .then(r => { if(!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
+  .then(markdown => {
+    content.innerHTML = marked.parse(markdown, { gfm: true });
+    promoteMermaidBlocks();
+    buildToc();
+    mermaid.initialize({ startOnLoad:false, theme:"dark", securityLevel:"strict" });
+    return mermaid.run({ querySelector: ".mermaid" });
+  })
+  .catch(err => {
+    content.innerHTML = '<div class="error-box">Could not load the guide (' + err.message + '). '
+      + 'Read it directly on <a href="https://github.com/nebularis/open-cbaa/blob/main/docs/Delegated%20Authority%20in%20the%20London%20Market.md">GitHub</a> instead.</div>';
+  });
+</script>
+</body>
+</html>
