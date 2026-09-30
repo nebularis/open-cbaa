@@ -516,6 +516,9 @@ them by number.
 | L15 | Behaviour | `bhv:forSubject`'s range is `pty:RoleOccupancy`, so an agreement version cannot be the subject of its lifecycle state occupancy | open | runtime state for the M12 lifecycle (design-spec §8.7) |
 | L16 | Quantification | the vocab document has no `owl:Ontology` header or version IRI, so it cannot be imported, and its individuals resolve only by IRI | open | nothing. Consumers use the IRIs |
 | L17 | Quantification | `qnt:OperationCapabilityMeetShape`'s SPARQL uses `qnt:` without declaring it, so it fails unless the data graph binds the prefix | open | nothing. `tools/ontology_check.py` binds it |
+| L18 | Wording (new) | the general wording model of `wim:` (structure, text, variables, tables, references, assembly, instance values) moves upstream as a Wording layer between Eligibility and Instrument | proposed upstream 2026-09-30 (LATTICE computable-contract-substrate, ADR-A112) | `wim:` structure changes until it lands |
+| L19 | Instrument | Instrument rewritten around terms and the legal relation classes, with templates, parameter bindings, encoding status, amendments and consent rules, taking the general parts of `stm:` and `agr:` | proposed upstream 2026-09-30 (ADR-A104) | `stm:` and `agr:` structure changes until it lands |
+| L20 | Behaviour | relation occasions and records, `bhv:forSubject` widened beyond role occupancies (closes L15), effects retargeted from `ins:Element` | proposed upstream 2026-09-30 (ADR-A106) | runtime state for M12 (as L15) |
 
 ## 9. Sequencing
 

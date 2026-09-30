@@ -95,3 +95,36 @@ Then the gate decides timing, and nothing is waived. The gate's own conditions a
 ## Next Steps
 
 Ratify or amend D17 to D26 (design-spec §12). Then the next concrete work is step 1 in LATTICE. That needs a LATTICE plan and ADR check under its own rules, and I'll draft it once you've answered I7 to I9. None of those block step 1, so we could start it now if you prefer.
+
+## Upstream: LATTICE computable contract substrate (2026-09-30)
+
+LATTICE proposes to take the general parts of this repository's wording and meaning upstream
+([plan](https://github.com/nebularis/lattice/blob/main/docs/developer/plans/computable-contract-substrate.md),
+[sketch](https://github.com/nebularis/lattice/blob/main/docs/developer/sketches/computable-contract-substrate.md)).
+Nothing in `wim:` is specific to binding authorities, so it becomes a LATTICE Wording layer between
+Eligibility and Instrument. Instrument is rewritten around terms and legal relations, taking
+statement kinds, templates, parameter bindings and encoding status. Behaviour gains relation
+occasions and records, which fixes L15.
+
+| Module | After migration |
+|---|---|
+| `wim` | removed, or reduced to the LMA WIM profile if LATTICE decision CC-D3 leaves the profile here |
+| `stm` | `AuthorityGrant ⊑ ins:Power` with its envelope mechanism. Other kinds, templates, parameter bindings and encoding status come from Instrument |
+| `agr` | UMR, markets, CBAA roles, M12 lifecycle data. Agreement versions become `ins:Instrument`s expressed in `wrd:Wording`s |
+| `rsk` | unchanged, with `rsk:BoundPolicy ⊑ ins:Instrument` and `rsk:boundUnder ⊑ ins:boundUnder` |
+| BA-2026-001 | re-expressed, joined by renderings of the binding authority scenarios the LATTICE sketch catalogues from the CBAA modules and the IUA 09-069 agreement |
+
+Effect on decisions here: D22 holds (only bound relations are evaluated). D23 is resolved, since
+attachment becomes `ins:expressedIn` from a template term to a library element. D25 changes, since
+an agreement version is no longer an `ins:Element`. I6 closes. L15 is fixed upstream.
+
+**Sectioned agreements (added 2026-09-30).** A reviewed Lloyd's schedule defines "the Coverholder",
+persons responsible, classes and locations per section. Upstream models sections as segment concepts
+(`ins:inSegment`), each column as an `ins:Definition` scoped to a segment set, and a case's segment
+as fixed by the section authority it was bound under. This is the design-spec §6.2 "agreement
+segment" dimension, made first-class. Party identifiers such as the Coverholder PIN may move into
+LATTICE Party (its CC-D9).
+
+**Until LATTICE's slices C9 and C12 merge:** change `wim:`, `stm:` and `agr:` content only, not
+their structure, so the migration maps a stable model.
+
