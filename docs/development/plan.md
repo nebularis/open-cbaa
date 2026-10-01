@@ -103,25 +103,37 @@ LATTICE proposes to take the general parts of this repository's wording and mean
 [sketch](https://github.com/nebularis/lattice/blob/main/docs/developer/sketches/computable-contract-substrate.md)).
 Nothing in `wim:` is specific to binding authorities, so it becomes a LATTICE Wording layer between
 Eligibility and Instrument. Instrument is rewritten around terms and legal relations, taking
-statement kinds, templates, parameter bindings and encoding status. Behaviour gains relation
-occasions and records, which fixes L15.
+statement kinds, templates, parameter bindings and encoding status. Behaviour moves below
+Instrument and gains relation occasions and records. L15 is fixed (LATTICE C10, merged
+2026-10-01). LATTICE's plan §7 keeps the current list of what changes, and this section mirrors it
+(updated 2026-10-01).
 
 | Module | After migration |
 |---|---|
-| `wim` | removed, or reduced to the LMA WIM profile if LATTICE decision CC-D3 leaves the profile here |
+| `wim` | removed. Its structure is LATTICE's Wording layer (ADR-A112, released as `wording` 0.1.0). The LMA WIM profile (the four levels as element types, containment rules as shapes, the LMA typing schemes and `applicableTo`) is in LATTICE's `applied/insurance/wording/` (CC-D3), and is imported here |
 | `stm` | `AuthorityGrant ⊑ ins:Power` with its envelope mechanism. Other kinds, templates, parameter bindings and encoding status come from Instrument |
-| `agr` | UMR, markets, CBAA roles, M12 lifecycle data. Agreement versions become `ins:Instrument`s expressed in `wrd:Wording`s |
+| `agr` | UMR, markets, CBAA roles. The M12 lifecycle becomes regimes from LATTICE's template library (CC-D8). Agreement versions become `ins:Instrument`s expressed in `wrd:AssembledWording`s |
 | `rsk` | unchanged, with `rsk:BoundPolicy ⊑ ins:Instrument` and `rsk:boundUnder ⊑ ins:boundUnder` |
 | BA-2026-001 | re-expressed, joined by renderings of the binding authority scenarios the LATTICE sketch catalogues from the CBAA modules and the IUA 09-069 agreement |
 
 Effect on decisions here: D22 holds (only bound relations are evaluated). D23 is resolved, since
 attachment becomes `ins:expressedIn` from a template term to a library element. D25 changes, since
-an agreement version is no longer an `ins:Element`. I6 closes. L15 is fixed upstream.
+an agreement version is no longer an `ins:Element`. I6 closes. L15 is fixed upstream. D19 is
+replaced, and D21 moves upstream:
 
-**Sectioned agreements (added 2026-09-30).** A reviewed Lloyd's schedule defines "the Coverholder",
-persons responsible, classes and locations per section. Upstream models sections as segment concepts
-(`ins:inSegment`), each column as an `ins:Definition` scoped to a segment set, and a case's segment
-as fixed by the section authority it was bound under. This is the design-spec §6.2 "agreement
+| Here | Upstream | Upstream decision |
+|---|---|---|
+| `wim:Segment`, `segmentIndex`, `segmentText` | `wrd:TextPart`, `partIndex`, `partText` | sketch §3.2 |
+| D19: a variation slot outside the tree, its variants comprised by its parent | `wrd:VariationSlot`, an element ranked among its siblings with the shared object id ("1.4"), its variants beneath it, lettered only in the library form | C4-Q2. D19 recorded no rationale, and its slot could carry no rank. The LMA drafts number the position and letter the variants |
+| D21: `agr:VariableValue` | `wrd:VariableValue` on an assembled wording, one per variable and per column for a table row's variable | C4-Q1, C4-Q3 |
+| `stm:` templates and bound statements | stated meaning owned by a library element version, bound meaning owned by an instrument version | CC-D12 |
+| an agreement as the subject of its own lifecycle state | a state occupancy for the instrument's persistent identity | ADR-A106 |
+
+**Sectioned agreements (added 2026-09-30, revised by CC-D11).** A reviewed Lloyd's schedule defines
+"the Coverholder", persons responsible, classes and locations per section. Upstream models a section
+as a wording element of element type Section, placed by `ins:appliesWithin` and `ins:notWithin`,
+each schedule column as an `ins:Definition` applying within its sections, and a case's section as
+fixed by the section authority it was bound under. This is the design-spec §6.2 "agreement
 segment" dimension, made first-class. Party identifiers such as the Coverholder PIN may move into
 LATTICE Party (its CC-D9).
 
